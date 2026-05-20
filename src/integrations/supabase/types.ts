@@ -59,6 +59,102 @@ export type Database = {
         }
         Relationships: []
       }
+      generation_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          credits_charged: number
+          duration_seconds: number | null
+          end_image_url: string | null
+          id: string
+          prompt: string
+          result_url: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          start_image_url: string | null
+          status: Database["public"]["Enums"]["gen_status"]
+          type: Database["public"]["Enums"]["gen_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          credits_charged?: number
+          duration_seconds?: number | null
+          end_image_url?: string | null
+          id?: string
+          prompt: string
+          result_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          start_image_url?: string | null
+          status?: Database["public"]["Enums"]["gen_status"]
+          type: Database["public"]["Enums"]["gen_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          credits_charged?: number
+          duration_seconds?: number | null
+          end_image_url?: string | null
+          id?: string
+          prompt?: string
+          result_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          start_image_url?: string | null
+          status?: Database["public"]["Enums"]["gen_status"]
+          type?: Database["public"]["Enums"]["gen_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pending_payments: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          id: string
+          op_number: string
+          receipt_url: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["payment_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          op_number: string
+          receipt_url: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          op_number?: string
+          receipt_url?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -125,6 +221,9 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "pro" | "user"
+      gen_status: "pending" | "in_review" | "completed" | "rejected"
+      gen_type: "video" | "goku_voice"
+      payment_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -253,6 +352,9 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "pro", "user"],
+      gen_status: ["pending", "in_review", "completed", "rejected"],
+      gen_type: ["video", "goku_voice"],
+      payment_status: ["pending", "approved", "rejected"],
     },
   },
 } as const

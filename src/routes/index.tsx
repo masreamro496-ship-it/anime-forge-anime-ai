@@ -99,7 +99,7 @@ function Landing() {
               0 <span className="text-base font-normal text-muted-foreground">جنيه</span>
             </div>
             <ul className="mt-6 space-y-2 text-sm">
-              <li>✦ 10 كريديت مجاني عند التسجيل</li>
+              <li>✦ 20 كريديت مجاني عند التسجيل</li>
               <li>✦ توليد فيديوهات بدقة 480p</li>
               <li>✦ حد النص الأقصى: 2,000 كلمة</li>
               <li>✦ معالجة عادية في الطابور</li>

@@ -51,6 +51,7 @@ function VideoGenPage() {
       ]);
 
       // Credits are deducted by the admin upon approval (Phase 1 — manual review flow).
+      const { error } = await supabase.from("generation_requests").insert({
         user_id: user.id,
         type: "video",
         prompt: prompt.trim(),

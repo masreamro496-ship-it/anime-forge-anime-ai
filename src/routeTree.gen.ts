@@ -13,6 +13,7 @@ import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GenerateVideoRouteImport } from './routes/generate.video'
 
 const ProUpgradeRoute = ProUpgradeRouteImport.update({
   id: '/pro-upgrade',
@@ -34,18 +35,25 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GenerateVideoRoute = GenerateVideoRouteImport.update({
+  id: '/generate/video',
+  path: '/generate/video',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/generate/video': typeof GenerateVideoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/generate/video': typeof GenerateVideoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,20 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/generate/video': typeof GenerateVideoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login' | '/pro-upgrade'
+  fullPaths: '/' | '/dashboard' | '/login' | '/pro-upgrade' | '/generate/video'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/pro-upgrade'
-  id: '__root__' | '/' | '/dashboard' | '/login' | '/pro-upgrade'
+  to: '/' | '/dashboard' | '/login' | '/pro-upgrade' | '/generate/video'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/pro-upgrade'
+    | '/generate/video'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +82,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   ProUpgradeRoute: typeof ProUpgradeRoute
+  GenerateVideoRoute: typeof GenerateVideoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/generate/video': {
+      id: '/generate/video'
+      path: '/generate/video'
+      fullPath: '/generate/video'
+      preLoaderRoute: typeof GenerateVideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +130,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   ProUpgradeRoute: ProUpgradeRoute,
+  GenerateVideoRoute: GenerateVideoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

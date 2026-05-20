@@ -50,16 +50,7 @@ function VideoGenPage() {
         uploadUserFile("gen-inputs", user.id, endImage, "end-"),
       ]);
 
-      // Charge credits + insert request atomically-ish (best effort under RLS).
-      // Admin-only update will refund on rejection.
-      const { error: txErr } = await supabase.rpc("noop_does_not_exist" as never).catch(() => ({ error: null }));
-      void txErr;
-
-      // Deduct credits via insert into transactions + decrement balance.
-      // Since user can't update credits table (admin-only), we instead record a "hold"
-      // by inserting the generation request with credits_charged, and the admin grants/refunds.
-      // For instant deduction we'd need a security-definer RPC — skipped in Phase 1.
-      const { error } = await supabase.from("generation_requests").insert({
+      // Credits are deducted by the admin upon approval (Phase 1 — manual review flow).
         user_id: user.id,
         type: "video",
         prompt: prompt.trim(),

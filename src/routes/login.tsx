@@ -1,0 +1,164 @@
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
+import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
+
+export const Route = createFileRoute("/login")({ component: LoginPage });
+
+function LoginPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) navigate({ to: "/dashboard" });
+  }, [user, navigate]);
+
+  // Anti-spam: 1h cooldown after logout, escalate to 5h on repeat
+  function checkLoginCooldown(): string | null {
+    try {
+      const lastLogout = Number(localStorage.getItem("san:lastLogoutAt") ?? 0);
+      const attempts = Number(localStorage.getItem("san:loginAttemptsAfterLogout") ?? 0);
+      if (!lastLogout) return null;
+      const elapsed = Date.now() - lastLogout;
+      const oneHour = 60 * 60 * 1000;
+      const fiveHours = 5 * oneHour;
+      const limit = attempts >= 1 ? fiveHours : oneHour;
+      if (elapsed < limit) {
+        localStorage.setItem("san:loginAttemptsAfterLogout", String(attempts + 1));
+        return attempts >= 1 ? "برجاء الانتظار خمس ساعات على الأقل" : "برجاء الانتظار ساعة على الأقل";
+      }
+      // cooldown expired — reset
+      localStorage.removeItem("san:lastLogoutAt");
+      localStorage.removeItem("san:loginAttemptsAfterLogout");
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  const handleEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cd = checkLoginCooldown();
+    if (cd) { toast.error(cd); return; }
+    setLoading(true);
+    try {
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: { full_name: name },
+          },
+        });
+        if (error) throw error;
+        toast.success("تم إنشاء الحساب! تحقق من بريدك لتأكيد الحساب.");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        toast.success("تم تسجيل الدخول بنجاح");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "حدث خطأ";
+      toast.error(msg.includes("Invalid") ? "البريد أو كلمة المرور غير صحيحة" : msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogle = async () => {
+    const cd = checkLoginCooldown();
+    if (cd) { toast.error(cd); return; }
+    setLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/dashboard" });
+    if (result.error) {
+      toast.error("فشل تسجيل الدخول بـ Google");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-card">
+        <Link to="/" className="flex items-center justify-center gap-2">
+          <Sparkles className="h-6 w-6 text-gold" />
+          <span className="text-xl font-black text-gradient-gold">شاهد أنمي الآن</span>
+        </Link>
+        <h1 className="mt-6 text-center text-2xl font-black">
+          {mode === "signin" ? "تسجيل الدخول" : "إنشاء حساب جديد"}
+        </h1>
+
+        <button
+          onClick={handleGoogle}
+          disabled={loading}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 font-bold transition-colors hover:bg-accent disabled:opacity-50"
+        >
+          <svg className="h-5 w-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          المتابعة باستخدام Google
+        </button>
+
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-xs text-muted-foreground">أو</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
+        <form onSubmit={handleEmail} className="space-y-3">
+          {mode === "signup" && (
+            <input
+              type="text"
+              placeholder="الاسم بالكامل"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gold/50"
+            />
+          )}
+          <input
+            type="email"
+            placeholder="البريد الإلكتروني"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gold/50"
+          />
+          <input
+            type="password"
+            placeholder="كلمة المرور"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={6}
+            className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gold/50"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold disabled:opacity-60"
+          >
+            {loading ? "جاري المعالجة..." : mode === "signin" ? "تسجيل الدخول" : "إنشاء الحساب"}
+          </button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          {mode === "signin" ? "ليس لديك حساب؟ " : "لديك حساب بالفعل؟ "}
+          <button
+            type="button"
+            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            className="font-bold text-gold hover:underline"
+          >
+            {mode === "signin" ? "أنشئ حساباً" : "سجّل الدخول"}
+          </button>
+        </p>
+      </div>
+    </div>
+  );
+}

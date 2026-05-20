@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GenerateVideoRouteImport } from './routes/generate.video'
+import { Route as GenerateGokuRouteImport } from './routes/generate.goku'
 
 const ProUpgradeRoute = ProUpgradeRouteImport.update({
   id: '/pro-upgrade',
@@ -40,12 +41,18 @@ const GenerateVideoRoute = GenerateVideoRouteImport.update({
   path: '/generate/video',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GenerateGokuRoute = GenerateGokuRouteImport.update({
+  id: '/generate/goku',
+  path: '/generate/goku',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
 }
 export interface FileRoutesById {
@@ -61,19 +69,33 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login' | '/pro-upgrade' | '/generate/video'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/pro-upgrade'
+    | '/generate/goku'
+    | '/generate/video'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/pro-upgrade' | '/generate/video'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/pro-upgrade'
+    | '/generate/goku'
+    | '/generate/video'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
     | '/login'
     | '/pro-upgrade'
+    | '/generate/goku'
     | '/generate/video'
   fileRoutesById: FileRoutesById
 }
@@ -82,6 +104,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   ProUpgradeRoute: typeof ProUpgradeRoute
+  GenerateGokuRoute: typeof GenerateGokuRoute
   GenerateVideoRoute: typeof GenerateVideoRoute
 }
 
@@ -122,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GenerateVideoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/generate/goku': {
+      id: '/generate/goku'
+      path: '/generate/goku'
+      fullPath: '/generate/goku'
+      preLoaderRoute: typeof GenerateGokuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -130,8 +160,19 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   ProUpgradeRoute: ProUpgradeRoute,
+  GenerateGokuRoute: GenerateGokuRoute,
   GenerateVideoRoute: GenerateVideoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

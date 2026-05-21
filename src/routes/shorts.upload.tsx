@@ -121,7 +121,7 @@ function UploadPage() {
       if (insErr) throw insErr;
 
       // 4) call publish_short RPC: deducts 5 credits + sets scheduled_publish_at = now+1h
-      const { error: rpcErr } = await supabase.rpc("publish_short" as never, { _short_id: inserted.id });
+      const { error: rpcErr } = await (supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }> }).rpc("publish_short", { _short_id: inserted.id });
       if (rpcErr) throw rpcErr;
 
       setProgress(100);

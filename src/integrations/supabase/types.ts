@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       credit_transactions: {
         Row: {
           amount: number
@@ -185,6 +209,141 @@ export type Database = {
         }
         Relationships: []
       }
+      shorts: {
+        Row: {
+          comments_count: number
+          created_at: string
+          duration_seconds: number
+          id: string
+          likes_count: number
+          published_at: string | null
+          scheduled_publish_at: string
+          status: Database["public"]["Enums"]["short_status"]
+          thumbnail_path: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          video_path: string
+          views_count: number
+        }
+        Insert: {
+          comments_count?: number
+          created_at?: string
+          duration_seconds: number
+          id?: string
+          likes_count?: number
+          published_at?: string | null
+          scheduled_publish_at?: string
+          status?: Database["public"]["Enums"]["short_status"]
+          thumbnail_path?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+          video_path: string
+          views_count?: number
+        }
+        Update: {
+          comments_count?: number
+          created_at?: string
+          duration_seconds?: number
+          id?: string
+          likes_count?: number
+          published_at?: string | null
+          scheduled_publish_at?: string
+          status?: Database["public"]["Enums"]["short_status"]
+          thumbnail_path?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          video_path?: string
+          views_count?: number
+        }
+        Relationships: []
+      }
+      shorts_comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          short_id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          short_id: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          short_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shorts_comments_short_id_fkey"
+            columns: ["short_id"]
+            isOneToOne: false
+            referencedRelation: "shorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shorts_likes: {
+        Row: {
+          created_at: string
+          short_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          short_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          short_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shorts_likes_short_id_fkey"
+            columns: ["short_id"]
+            isOneToOne: false
+            referencedRelation: "shorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shorts_views: {
+        Row: {
+          created_at: string
+          short_id: string
+          viewer_id: string
+        }
+        Insert: {
+          created_at?: string
+          short_id: string
+          viewer_id: string
+        }
+        Update: {
+          created_at?: string
+          short_id?: string
+          viewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shorts_views_short_id_fkey"
+            columns: ["short_id"]
+            isOneToOne: false
+            referencedRelation: "shorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -218,12 +377,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      promote_scheduled_shorts: { Args: never; Returns: undefined }
+      publish_short: { Args: { _short_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "pro" | "user"
       gen_status: "pending" | "in_review" | "completed" | "rejected"
       gen_type: "video" | "goku_voice"
       payment_status: "pending" | "approved" | "rejected"
+      short_status: "processing" | "test_queue" | "published" | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -355,6 +517,7 @@ export const Constants = {
       gen_status: ["pending", "in_review", "completed", "rejected"],
       gen_type: ["video", "goku_voice"],
       payment_status: ["pending", "approved", "rejected"],
+      short_status: ["processing", "test_queue", "published", "expired"],
     },
   },
 } as const

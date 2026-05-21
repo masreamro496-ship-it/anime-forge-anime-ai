@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPanel() {
-  const [tab, setTab] = useState<"requests" | "payments">("requests");
+  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts">("requests");
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
@@ -32,22 +32,27 @@ function AdminPanel() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-6 flex gap-2">
-          <button
-            onClick={() => setTab("requests")}
-            className={`rounded-lg px-4 py-2 text-sm font-bold ${tab === "requests" ? "bg-gradient-gold text-gold-foreground" : "border border-border bg-card"}`}
-          >
-            طلبات التوليد
-          </button>
-          <button
-            onClick={() => setTab("payments")}
-            className={`rounded-lg px-4 py-2 text-sm font-bold ${tab === "payments" ? "bg-gradient-gold text-gold-foreground" : "border border-border bg-card"}`}
-          >
-            مدفوعات قيد المراجعة
-          </button>
+        <div className="mb-6 flex flex-wrap gap-2">
+          {[
+            { k: "requests", label: "طلبات التوليد" },
+            { k: "payments", label: "المدفوعات" },
+            { k: "shorts", label: "الشورتس" },
+            { k: "messages", label: "رسائل المستخدمين" },
+          ].map((t) => (
+            <button
+              key={t.k}
+              onClick={() => setTab(t.k as typeof tab)}
+              className={`rounded-lg px-4 py-2 text-sm font-bold ${tab === t.k ? "bg-gradient-gold text-gold-foreground" : "border border-border bg-card"}`}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
 
-        {tab === "requests" ? <RequestsTable /> : <PaymentsTable />}
+        {tab === "requests" && <RequestsTable />}
+        {tab === "payments" && <PaymentsTable />}
+        {tab === "shorts" && <ShortsTable />}
+        {tab === "messages" && <MessagesTable />}
       </main>
     </div>
   );

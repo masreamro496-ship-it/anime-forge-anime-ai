@@ -9,14 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShortsUploadRouteImport } from './routes/shorts.upload'
+import { Route as ShortsIdRouteImport } from './routes/shorts.$id'
 import { Route as GenerateVideoRouteImport } from './routes/generate.video'
 import { Route as GenerateGokuRouteImport } from './routes/generate.goku'
 
+const ShortsRoute = ShortsRouteImport.update({
+  id: '/shorts',
+  path: '/shorts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProUpgradeRoute = ProUpgradeRouteImport.update({
   id: '/pro-upgrade',
   path: '/pro-upgrade',
@@ -42,6 +50,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShortsUploadRoute = ShortsUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => ShortsRoute,
+} as any)
+const ShortsIdRoute = ShortsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ShortsRoute,
+} as any)
 const GenerateVideoRoute = GenerateVideoRouteImport.update({
   id: '/generate/video',
   path: '/generate/video',
@@ -59,8 +77,11 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/shorts': typeof ShortsRouteWithChildren
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
+  '/shorts/$id': typeof ShortsIdRoute
+  '/shorts/upload': typeof ShortsUploadRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,8 +89,11 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/shorts': typeof ShortsRouteWithChildren
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
+  '/shorts/$id': typeof ShortsIdRoute
+  '/shorts/upload': typeof ShortsUploadRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,8 +102,11 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/shorts': typeof ShortsRouteWithChildren
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
+  '/shorts/$id': typeof ShortsIdRoute
+  '/shorts/upload': typeof ShortsUploadRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -89,8 +116,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/pro-upgrade'
+    | '/shorts'
     | '/generate/goku'
     | '/generate/video'
+    | '/shorts/$id'
+    | '/shorts/upload'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -98,8 +128,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/pro-upgrade'
+    | '/shorts'
     | '/generate/goku'
     | '/generate/video'
+    | '/shorts/$id'
+    | '/shorts/upload'
   id:
     | '__root__'
     | '/'
@@ -107,8 +140,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/pro-upgrade'
+    | '/shorts'
     | '/generate/goku'
     | '/generate/video'
+    | '/shorts/$id'
+    | '/shorts/upload'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,12 +153,20 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   ProUpgradeRoute: typeof ProUpgradeRoute
+  ShortsRoute: typeof ShortsRouteWithChildren
   GenerateGokuRoute: typeof GenerateGokuRoute
   GenerateVideoRoute: typeof GenerateVideoRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/shorts': {
+      id: '/shorts'
+      path: '/shorts'
+      fullPath: '/shorts'
+      preLoaderRoute: typeof ShortsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pro-upgrade': {
       id: '/pro-upgrade'
       path: '/pro-upgrade'
@@ -158,6 +202,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shorts/upload': {
+      id: '/shorts/upload'
+      path: '/upload'
+      fullPath: '/shorts/upload'
+      preLoaderRoute: typeof ShortsUploadRouteImport
+      parentRoute: typeof ShortsRoute
+    }
+    '/shorts/$id': {
+      id: '/shorts/$id'
+      path: '/$id'
+      fullPath: '/shorts/$id'
+      preLoaderRoute: typeof ShortsIdRouteImport
+      parentRoute: typeof ShortsRoute
+    }
     '/generate/video': {
       id: '/generate/video'
       path: '/generate/video'
@@ -175,15 +233,39 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ShortsRouteChildren {
+  ShortsIdRoute: typeof ShortsIdRoute
+  ShortsUploadRoute: typeof ShortsUploadRoute
+}
+
+const ShortsRouteChildren: ShortsRouteChildren = {
+  ShortsIdRoute: ShortsIdRoute,
+  ShortsUploadRoute: ShortsUploadRoute,
+}
+
+const ShortsRouteWithChildren =
+  ShortsRoute._addFileChildren(ShortsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   ProUpgradeRoute: ProUpgradeRoute,
+  ShortsRoute: ShortsRouteWithChildren,
   GenerateGokuRoute: GenerateGokuRoute,
   GenerateVideoRoute: GenerateVideoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

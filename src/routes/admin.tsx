@@ -322,3 +322,77 @@ function PaymentsTable() {
     </div>
   );
 }
+
+/* ---------------- User messages ---------------- */
+function MessagesTable() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "messages"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("admin_messages").select("*").order("created_at", { ascending: false }).limit(200);
+      if (error) throw error;
+      return data;
+    },
+  });
+  if (isLoading) return <p className="text-muted-foreground">جاري التحميل...</p>;
+  if (!data?.length) return <p className="text-muted-foreground">لا توجد رسائل</p>;
+  const markRead = async (id: string) => {
+    await supabase.from("admin_messages").update({ is_read: true }).eq("id", id);
+    qc.invalidateQueries({ queryKey: ["admin", "messages"] });
+  };
+  return (
+    <div className="space-y-2">
+      {data.map((m) => (
+        <div key={m.id} className={`rounded-xl border p-4 ${m.is_read ? "border-border bg-card" : "border-gold/50 bg-gold/5"}`}>
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <code dir="ltr">{m.user_id}</code>
+            <span>{new Date(m.created_at).toLocaleString("ar-EG")}</span>
+          </div>
+          <p className="mt-2 whitespace-pre-wrap text-sm">{m.body}</p>
+          {!m.is_read && (
+            <button onClick={() => markRead(m.id)} className="mt-3 rounded bg-gradient-gold px-3 py-1 text-xs font-black text-gold-foreground">تأكيد القراءة</button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------- Shorts moderation ---------------- */
+function ShortsTable() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "shorts"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("shorts").select("*").order("created_at", { ascending: false }).limit(200);
+      if (error) throw error;
+      return data;
+    },
+  });
+  if (isLoading) return <p className="text-muted-foreground">جاري التحميل...</p>;
+  if (!data?.length) return <p className="text-muted-foreground">لا توجد شورتس</p>;
+  const remove = async (id: string) => {
+    if (!confirm("حذف هذا الشورت نهائياً؟")) return;
+    await supabase.from("shorts").delete().eq("id", id);
+    toast.success("تم الحذف");
+    qc.invalidateQueries({ queryKey: ["admin", "shorts"] });
+  };
+  return (
+    <div className="space-y-2">
+      {data.map((s) => (
+        <div key={s.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-3 text-sm">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="rounded bg-background px-2 py-0.5 text-xs font-bold">{s.status}</span>
+              <span className="truncate text-sm font-bold">{s.title || "(بدون عنوان)"}</span>
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              {s.views_count} مشاهدة • {s.likes_count} إعجاب • {s.comments_count} تعليق • {new Date(s.created_at).toLocaleString("ar-EG")}
+            </div>
+          </div>
+          <button onClick={() => remove(s.id)} className="ml-2 rounded border border-destructive bg-destructive/10 px-3 py-1 text-xs font-bold text-destructive">حذف</button>
+        </div>
+      ))}
+    </div>
+  );
+}

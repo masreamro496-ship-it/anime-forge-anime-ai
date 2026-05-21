@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
-import { Crown, Sparkles, LogOut, Coins, ShieldCheck, Video, Mic, Receipt, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { Crown, Sparkles, LogOut, Coins, ShieldCheck, Video, Mic, Receipt, Clock, CheckCircle2, XCircle, Play } from "lucide-react";
+import { AdminChatBox } from "@/components/AdminChatBox";
 
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: async () => {
@@ -95,23 +96,34 @@ function Dashboard() {
 
         {/* Quick actions */}
         <h2 className="mt-10 mb-4 text-xl font-black">أنشئ محتوى الآن</h2>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
+          <ActionCard
+            to="/shorts/upload"
+            icon={Play}
+            title="ارفع شورت 9:16"
+            desc="15 ثانية • 480p • ينزل بعد ساعة"
+            cost="5 كريديت"
+          />
           <ActionCard
             to="/generate/video"
             icon={Video}
             title="توليد فيديو AI"
-            desc="ارفع صورتي البداية والنهاية + وصف، واحصل على فيديو سلس"
+            desc="صورتي البداية والنهاية + وصف"
             cost="25 كريديت"
           />
           <ActionCard
             to="/generate/goku"
             icon={Mic}
             title="استنساخ صوت غوكو"
-            desc={isPro ? "اكتب سكريبتك واستلم الملف الصوتي" : "حصري لأعضاء PRO فقط"}
+            desc={isPro ? "اكتب سكريبتك" : "حصري لأعضاء PRO"}
             cost={isPro ? "10 كريديت" : "PRO"}
             locked={!isPro}
           />
         </div>
+
+        {/* Admin contact */}
+        <h2 className="mt-10 mb-4 text-xl font-black">تواصل مع الإدارة</h2>
+        <AdminChatBox />
 
         {/* Recent requests */}
         <h2 className="mt-10 mb-4 text-xl font-black">طلباتك الأخيرة</h2>

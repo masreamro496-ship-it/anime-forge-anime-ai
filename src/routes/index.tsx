@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Crown, Sparkles, Video, Music, Shield } from "lucide-react";
+import { Crown, Sparkles, Video, Music, Shield, Play, Heart, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -85,6 +85,42 @@ function Landing() {
         </div>
       </section>
 
+      {/* Shorts section — directly under AI section */}
+      <section id="shorts" className="container mx-auto px-4 py-16">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-xs font-bold text-gold">
+            <Play className="h-3.5 w-3.5" /> جديد
+          </span>
+          <h2 className="mt-4 text-3xl font-black md:text-4xl">شورتس الأنمي <span className="text-gradient-gold">9:16</span></h2>
+          <p className="mt-2 text-sm text-muted-foreground md:text-base">
+            ارفع شورت أنمي (15 ثانية، 480p) — يظهر للجميع بعد ساعة من النشر
+          </p>
+        </div>
+
+        <div className="mx-auto mt-8 grid max-w-3xl gap-4 sm:grid-cols-3">
+          {[
+            { icon: Play, t: "نسبة 9:16", d: "عرض عمودي مثل تيك توك ويوتيوب شورتس" },
+            { icon: Heart, t: "تفاعل كامل", d: "إعجاب، تعليقات، ومشاركة بضغطة" },
+            { icon: MessageCircle, t: "خوارزمية ذكية", d: "اختبار لأول 50 مشاهد ثم انتشار للجميع" },
+          ].map(({ icon: Icon, t, d }) => (
+            <div key={t} className="rounded-2xl border border-border bg-card p-5 shadow-card">
+              <Icon className="h-7 w-7 text-gold" />
+              <h3 className="mt-3 text-base font-bold">{t}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{d}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link to="/shorts" className="rounded-xl bg-gradient-gold px-7 py-3 text-base font-black text-gold-foreground shadow-gold transition-transform hover:scale-105">
+            تصفّح الشورتس
+          </Link>
+          <Link to={user ? "/shorts/upload" : "/login"} className="rounded-xl border border-gold/50 bg-gold/10 px-7 py-3 text-base font-bold text-gold">
+            ارفع شورت (5 كريديت)
+          </Link>
+        </div>
+      </section>
+
       {/* Pricing */}
       <section id="pricing" className="container mx-auto px-4 py-20">
         <h2 className="text-center text-3xl font-black md:text-4xl">اختر باقتك</h2>
@@ -99,7 +135,7 @@ function Landing() {
               0 <span className="text-base font-normal text-muted-foreground">جنيه</span>
             </div>
             <ul className="mt-6 space-y-2 text-sm">
-              <li>✦ 20 كريديت مجاني عند التسجيل</li>
+              <li>✦ 25 كريديت مجاني عند التسجيل</li>
               <li>✦ توليد فيديوهات بدقة 480p</li>
               <li>✦ حد النص الأقصى: 2,000 كلمة</li>
               <li>✦ معالجة عادية في الطابور</li>

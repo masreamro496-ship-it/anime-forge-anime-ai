@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPanel() {
-  const [tab, setTab] = useState<"requests" | "payments">("requests");
+  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts">("requests");
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
@@ -32,22 +32,27 @@ function AdminPanel() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-6 flex gap-2">
-          <button
-            onClick={() => setTab("requests")}
-            className={`rounded-lg px-4 py-2 text-sm font-bold ${tab === "requests" ? "bg-gradient-gold text-gold-foreground" : "border border-border bg-card"}`}
-          >
-            طلبات التوليد
-          </button>
-          <button
-            onClick={() => setTab("payments")}
-            className={`rounded-lg px-4 py-2 text-sm font-bold ${tab === "payments" ? "bg-gradient-gold text-gold-foreground" : "border border-border bg-card"}`}
-          >
-            مدفوعات قيد المراجعة
-          </button>
+        <div className="mb-6 flex flex-wrap gap-2">
+          {[
+            { k: "requests", label: "طلبات التوليد" },
+            { k: "payments", label: "المدفوعات" },
+            { k: "shorts", label: "الشورتس" },
+            { k: "messages", label: "رسائل المستخدمين" },
+          ].map((t) => (
+            <button
+              key={t.k}
+              onClick={() => setTab(t.k as typeof tab)}
+              className={`rounded-lg px-4 py-2 text-sm font-bold ${tab === t.k ? "bg-gradient-gold text-gold-foreground" : "border border-border bg-card"}`}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
 
-        {tab === "requests" ? <RequestsTable /> : <PaymentsTable />}
+        {tab === "requests" && <RequestsTable />}
+        {tab === "payments" && <PaymentsTable />}
+        {tab === "shorts" && <ShortsTable />}
+        {tab === "messages" && <MessagesTable />}
       </main>
     </div>
   );
@@ -312,6 +317,80 @@ function PaymentsTable() {
               </>
             )}
           </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------- User messages ---------------- */
+function MessagesTable() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "messages"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("admin_messages").select("*").order("created_at", { ascending: false }).limit(200);
+      if (error) throw error;
+      return data;
+    },
+  });
+  if (isLoading) return <p className="text-muted-foreground">جاري التحميل...</p>;
+  if (!data?.length) return <p className="text-muted-foreground">لا توجد رسائل</p>;
+  const markRead = async (id: string) => {
+    await supabase.from("admin_messages").update({ is_read: true }).eq("id", id);
+    qc.invalidateQueries({ queryKey: ["admin", "messages"] });
+  };
+  return (
+    <div className="space-y-2">
+      {data.map((m) => (
+        <div key={m.id} className={`rounded-xl border p-4 ${m.is_read ? "border-border bg-card" : "border-gold/50 bg-gold/5"}`}>
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <code dir="ltr">{m.user_id}</code>
+            <span>{new Date(m.created_at).toLocaleString("ar-EG")}</span>
+          </div>
+          <p className="mt-2 whitespace-pre-wrap text-sm">{m.body}</p>
+          {!m.is_read && (
+            <button onClick={() => markRead(m.id)} className="mt-3 rounded bg-gradient-gold px-3 py-1 text-xs font-black text-gold-foreground">تأكيد القراءة</button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------- Shorts moderation ---------------- */
+function ShortsTable() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "shorts"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("shorts").select("*").order("created_at", { ascending: false }).limit(200);
+      if (error) throw error;
+      return data;
+    },
+  });
+  if (isLoading) return <p className="text-muted-foreground">جاري التحميل...</p>;
+  if (!data?.length) return <p className="text-muted-foreground">لا توجد شورتس</p>;
+  const remove = async (id: string) => {
+    if (!confirm("حذف هذا الشورت نهائياً؟")) return;
+    await supabase.from("shorts").delete().eq("id", id);
+    toast.success("تم الحذف");
+    qc.invalidateQueries({ queryKey: ["admin", "shorts"] });
+  };
+  return (
+    <div className="space-y-2">
+      {data.map((s) => (
+        <div key={s.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-3 text-sm">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="rounded bg-background px-2 py-0.5 text-xs font-bold">{s.status}</span>
+              <span className="truncate text-sm font-bold">{s.title || "(بدون عنوان)"}</span>
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              {s.views_count} مشاهدة • {s.likes_count} إعجاب • {s.comments_count} تعليق • {new Date(s.created_at).toLocaleString("ar-EG")}
+            </div>
+          </div>
+          <button onClick={() => remove(s.id)} className="ml-2 rounded border border-destructive bg-destructive/10 px-3 py-1 text-xs font-bold text-destructive">حذف</button>
         </div>
       ))}
     </div>

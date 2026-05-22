@@ -184,6 +184,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string | null
+          earnings_usd: number
           id: string
           is_pro: boolean
           pro_expires_at: string | null
@@ -193,6 +194,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          earnings_usd?: number
           id: string
           is_pro?: boolean
           pro_expires_at?: string | null
@@ -202,6 +204,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          earnings_usd?: number
           id?: string
           is_pro?: boolean
           pro_expires_at?: string | null
@@ -209,13 +212,66 @@ export type Database = {
         }
         Relationships: []
       }
+      project_purchases: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          buyer_id: string
+          created_at: string
+          id: string
+          price_usd: number
+          project_id: string
+          seller_id: string
+          status: Database["public"]["Enums"]["purchase_status"]
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          buyer_id: string
+          created_at?: string
+          id?: string
+          price_usd: number
+          project_id: string
+          seller_id: string
+          status?: Database["public"]["Enums"]["purchase_status"]
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          price_usd?: number
+          project_id?: string
+          seller_id?: string
+          status?: Database["public"]["Enums"]["purchase_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_purchases_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "shorts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_purchases_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "shorts_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shorts: {
         Row: {
           comments_count: number
           created_at: string
-          duration_seconds: number
+          description: string
+          duration_seconds: number | null
           id: string
           likes_count: number
+          price_usd: number
           published_at: string | null
           scheduled_publish_at: string
           status: Database["public"]["Enums"]["short_status"]
@@ -225,13 +281,16 @@ export type Database = {
           user_id: string
           video_path: string
           views_count: number
+          vodafone_phone: string
         }
         Insert: {
           comments_count?: number
           created_at?: string
-          duration_seconds: number
+          description?: string
+          duration_seconds?: number | null
           id?: string
           likes_count?: number
+          price_usd?: number
           published_at?: string | null
           scheduled_publish_at?: string
           status?: Database["public"]["Enums"]["short_status"]
@@ -241,13 +300,16 @@ export type Database = {
           user_id: string
           video_path: string
           views_count?: number
+          vodafone_phone?: string
         }
         Update: {
           comments_count?: number
           created_at?: string
-          duration_seconds?: number
+          description?: string
+          duration_seconds?: number | null
           id?: string
           likes_count?: number
+          price_usd?: number
           published_at?: string | null
           scheduled_publish_at?: string
           status?: Database["public"]["Enums"]["short_status"]
@@ -257,6 +319,7 @@ export type Database = {
           user_id?: string
           video_path?: string
           views_count?: number
+          vodafone_phone?: string
         }
         Relationships: []
       }
@@ -290,6 +353,13 @@ export type Database = {
             referencedRelation: "shorts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "shorts_comments_short_id_fkey"
+            columns: ["short_id"]
+            isOneToOne: false
+            referencedRelation: "shorts_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       shorts_likes: {
@@ -314,6 +384,13 @@ export type Database = {
             columns: ["short_id"]
             isOneToOne: false
             referencedRelation: "shorts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shorts_likes_short_id_fkey"
+            columns: ["short_id"]
+            isOneToOne: false
+            referencedRelation: "shorts_public"
             referencedColumns: ["id"]
           },
         ]
@@ -342,6 +419,13 @@ export type Database = {
             referencedRelation: "shorts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "shorts_views_short_id_fkey"
+            columns: ["short_id"]
+            isOneToOne: false
+            referencedRelation: "shorts_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -367,9 +451,74 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      shorts_public: {
+        Row: {
+          comments_count: number | null
+          created_at: string | null
+          description: string | null
+          duration_seconds: number | null
+          id: string | null
+          likes_count: number | null
+          price_usd: number | null
+          published_at: string | null
+          status: Database["public"]["Enums"]["short_status"] | null
+          thumbnail_path: string | null
+          title: string | null
+          user_id: string | null
+          views_count: number | null
+        }
+        Insert: {
+          comments_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string | null
+          likes_count?: number | null
+          price_usd?: number | null
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["short_status"] | null
+          thumbnail_path?: string | null
+          title?: string | null
+          user_id?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          comments_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string | null
+          likes_count?: number | null
+          price_usd?: number | null
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["short_status"] | null
+          thumbnail_path?: string | null
+          title?: string | null
+          user_id?: string | null
+          views_count?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      approve_purchase: { Args: { _purchase_id: string }; Returns: undefined }
+      can_view_project_video: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
+      create_project: {
+        Args: {
+          _description: string
+          _duration_seconds: number
+          _price_usd: number
+          _thumbnail_path: string
+          _title: string
+          _video_path: string
+          _vodafone_phone: string
+        }
+        Returns: string
+      }
+      get_project_video_path: { Args: { _project_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -378,13 +527,14 @@ export type Database = {
         Returns: boolean
       }
       promote_scheduled_shorts: { Args: never; Returns: undefined }
-      publish_short: { Args: { _short_id: string }; Returns: undefined }
+      request_purchase: { Args: { _project_id: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "moderator" | "pro" | "user"
       gen_status: "pending" | "in_review" | "completed" | "rejected"
       gen_type: "video" | "goku_voice"
       payment_status: "pending" | "approved" | "rejected"
+      purchase_status: "pending" | "approved" | "rejected"
       short_status: "processing" | "test_queue" | "published" | "expired"
     }
     CompositeTypes: {
@@ -517,6 +667,7 @@ export const Constants = {
       gen_status: ["pending", "in_review", "completed", "rejected"],
       gen_type: ["video", "goku_voice"],
       payment_status: ["pending", "approved", "rejected"],
+      purchase_status: ["pending", "approved", "rejected"],
       short_status: ["processing", "test_queue", "published", "expired"],
     },
   },

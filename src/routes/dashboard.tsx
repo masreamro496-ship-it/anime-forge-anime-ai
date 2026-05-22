@@ -111,9 +111,9 @@ function Dashboard() {
           <ActionCard
             to="/shorts/upload"
             icon={Play}
-            title="ارفع شورت 9:16"
-            desc="15 ثانية • 480p • ينزل بعد ساعة"
-            cost="5 كريديت"
+            title="مشروع جديد للبيع"
+            desc={isPro ? "حتى 30 دقيقة · 240p · مشروعين كحد أقصى" : "حتى دقيقتين · 240p · مشروع واحد"}
+            cost="ادخل سعرك"
           />
           <ActionCard
             to="/generate/video"

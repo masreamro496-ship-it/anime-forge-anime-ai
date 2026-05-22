@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { uploadUserFile } from "@/lib/storage";
-import { ArrowRight, Upload, Video as VideoIcon, Coins, Send } from "lucide-react";
+import { ArrowRight, Upload, Video as VideoIcon, DollarSign, Phone, Send } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/shorts/upload")({
@@ -12,12 +12,12 @@ export const Route = createFileRoute("/shorts/upload")({
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/login" });
   },
-  component: UploadPage,
+  component: NewProjectPage,
 });
 
-const MAX_DURATION = 15;
-const MAX_BYTES = 15 * 1024 * 1024; // ~15MB proxy for 480p economical
-const PUBLISH_COST = 5;
+const MAX_BYTES = 80 * 1024 * 1024; // ~80MB ceiling for 240p up to 30 min
+const REGULAR_MAX_SEC = 2 * 60;
+const PRO_MAX_SEC = 30 * 60;
 
 async function probeVideo(file: File): Promise<{ duration: number; width: number; height: number }> {
   return new Promise((resolve, reject) => {
@@ -44,91 +44,82 @@ async function captureThumbnail(file: File): Promise<Blob> {
     v.onloadeddata = () => { v.currentTime = Math.min(0.5, v.duration / 2); };
     v.onseeked = () => {
       const c = document.createElement("canvas");
-      c.width = v.videoWidth;
-      c.height = v.videoHeight;
+      c.width = v.videoWidth; c.height = v.videoHeight;
       const ctx = c.getContext("2d")!;
       ctx.drawImage(v, 0, 0);
-      c.toBlob((b) => {
-        URL.revokeObjectURL(url);
-        b ? resolve(b) : reject(new Error("فشل إنشاء صورة مصغرة"));
-      }, "image/jpeg", 0.7);
+      c.toBlob((b) => { URL.revokeObjectURL(url); b ? resolve(b) : reject(new Error("فشل إنشاء صورة مصغرة")); }, "image/jpeg", 0.7);
     };
     v.onerror = () => { URL.revokeObjectURL(url); reject(new Error("فشل قراءة الفيديو")); };
     v.src = url;
   });
 }
 
-function UploadPage() {
+function NewProjectPage() {
   const { user } = useAuth();
   const { data: profile } = useProfile();
   const navigate = useNavigate();
 
+  const isPro = !!profile?.isPro;
+  const maxSec = isPro ? PRO_MAX_SEC : REGULAR_MAX_SEC;
+  const maxLabel = isPro ? "30 دقيقة" : "دقيقتان";
+  const maxProjects = isPro ? 2 : 1;
+
   const [file, setFile] = useState<File | null>(null);
   const [meta, setMeta] = useState<{ duration: number; width: number; height: number } | null>(null);
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priceUsd, setPriceUsd] = useState<string>("");
+  const [vodafonePhone, setVodafonePhone] = useState("");
   const [progress, setProgress] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
-  const balance = profile?.credits ?? 0;
-  const canAfford = balance >= PUBLISH_COST;
-
   const onPick = async (f: File | null) => {
     if (!f) return;
-    if (f.size > MAX_BYTES) return toast.error("حجم الملف أكبر من 15MB — صدّر فيديوك بجودة 480p اقتصادية");
+    if (f.size > MAX_BYTES) return toast.error("الحجم أكبر من 80MB — صدّر بجودة 240p اقتصادية");
     try {
       const m = await probeVideo(f);
-      if (m.duration > MAX_DURATION + 0.5) return toast.error(`المدة المسموحة 15 ثانية فقط (فيديوك ${m.duration.toFixed(1)} ث)`);
-      if (m.height > 0 && m.width > m.height) toast("نصيحة: الفيديو أفقي — الشورتس بنسبة 9:16 (عمودي) أفضل", { icon: "ℹ️" });
-      setFile(f);
-      setMeta(m);
-    } catch (e) {
-      toast.error((e as Error).message);
-    }
+      if (m.duration > maxSec + 1) return toast.error(`المدة المسموحة لك هي ${maxLabel} فقط (فيديوك ${Math.round(m.duration)} ث)`);
+      setFile(f); setMeta(m);
+    } catch (e) { toast.error((e as Error).message); }
   };
 
-  const handlePublish = async () => {
+  const handleSubmit = async () => {
     if (!user || !file) return;
-    if (!canAfford) return toast.error(`تحتاج ${PUBLISH_COST} كريديت للنشر`);
+    const priceNum = Number(priceUsd);
+    if (!priceNum || priceNum <= 0) return toast.error("ادخل سعراً صحيحاً بالدولار");
+    if (vodafonePhone.trim().length < 8) return toast.error("ادخل رقم فودافون كاش صحيح");
+    if (description.trim().length < 5) return toast.error("اكتب وصفاً مختصراً للمشروع");
 
     setSubmitting(true);
     setProgress(5);
     try {
-      // 1) thumbnail
       const thumb = await captureThumbnail(file);
       setProgress(20);
-
-      // 2) upload thumb + video
       const thumbFile = new File([thumb], `thumb-${Date.now()}.jpg`, { type: "image/jpeg" });
       const thumbPath = await uploadUserFile("shorts", user.id, thumbFile, "thumbs/");
-      setProgress(40);
+      setProgress(45);
       const videoPath = await uploadUserFile("shorts", user.id, file, "videos/");
-      setProgress(75);
+      setProgress(80);
 
-      // 3) insert short row (scheduled far in the future; publish RPC sets +1h)
-      const { data: inserted, error: insErr } = await supabase
-        .from("shorts")
-        .insert({
-          user_id: user.id,
-          title: title.trim().slice(0, 100),
-          video_path: videoPath,
-          thumbnail_path: thumbPath,
-          duration_seconds: Math.round(meta?.duration ?? 0),
-          status: "processing",
-          scheduled_publish_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 50).toISOString(),
-        })
-        .select("id")
-        .single();
-      if (insErr) throw insErr;
-
-      // 4) call publish_short RPC: deducts 5 credits + sets scheduled_publish_at = now+1h
-      const { error: rpcErr } = await (supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }> }).rpc("publish_short", { _short_id: inserted.id });
+      const { error: rpcErr } = await (supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }> }).rpc("create_project", {
+        _title: title.trim().slice(0, 100),
+        _description: description.trim().slice(0, 1000),
+        _video_path: videoPath,
+        _thumbnail_path: thumbPath,
+        _duration_seconds: Math.round(meta?.duration ?? 0),
+        _price_usd: priceNum,
+        _vodafone_phone: vodafonePhone.trim(),
+      });
       if (rpcErr) throw rpcErr;
 
       setProgress(100);
-      toast.success("تم النشر! سيظهر فيديوك على المنصة بعد ساعة من الآن");
+      toast.success("تم نشر مشروعك! سيظهر فوراً للجميع 🎉");
       navigate({ to: "/shorts" });
     } catch (err) {
-      toast.error((err as Error).message);
+      const m = (err as Error).message;
+      if (m.includes("project limit reached")) toast.error(`وصلت للحد الأقصى للمشاريع (${maxProjects}). احذف مشروعاً قديماً أو رقّ لـ Pro.`);
+      else if (m.includes("video too long")) toast.error(`الفيديو أطول من المسموح (${maxLabel})`);
+      else toast.error(m);
       setProgress(0);
     } finally {
       setSubmitting(false);
@@ -139,36 +130,54 @@ function UploadPage() {
     <div className="min-h-screen">
       <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
-          <Link to="/shorts" className="flex items-center gap-2 text-sm font-bold"><ArrowRight className="h-4 w-4" /> الشورتس</Link>
-          <div className="flex items-center gap-2"><VideoIcon className="h-5 w-5 text-gold" /><span className="font-black text-gradient-gold">رفع شورت</span></div>
-          <div className="flex items-center gap-1 rounded-lg border border-border bg-card px-3 py-1.5 text-sm">
-            <Coins className="h-4 w-4 text-gold" /><span className="font-black">{balance}</span>
+          <Link to="/shorts" className="flex items-center gap-2 text-sm font-bold"><ArrowRight className="h-4 w-4" /> المشاريع</Link>
+          <div className="flex items-center gap-2"><VideoIcon className="h-5 w-5 text-gold" /><span className="font-black text-gradient-gold">مشروع جديد</span></div>
+          <div className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs">
+            {isPro ? "Pro" : "مجاني"} · حد {maxProjects}
           </div>
         </div>
       </header>
 
       <main className="container mx-auto max-w-2xl px-4 py-8 space-y-5">
         <div className="rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm leading-relaxed">
-          📱 <strong>شورت أنمي بنسبة 9:16</strong> — أقصى مدة <strong>15 ثانية</strong>، جودة <strong>480p اقتصادية</strong> (حد أقصى 15MB). يتم نشره بعد <strong>ساعة كاملة</strong> من الضغط على «نشر».
+          💰 <strong>منصة مشاريع فودافون كاش</strong> — أنشئ مشروعك، ضع سعراً بالدولار ورقم فودافون كاش. المشتري يحوّل لك ثم يطلب التفعيل وأنت توافق.
+          <br />
+          <span className="text-xs opacity-80">حدّك الحالي: فيديو حتى <strong>{maxLabel}</strong> · جودة 240p · حتى <strong>{maxProjects}</strong> مشروع.</span>
         </div>
 
         <label className="block">
-          <span className="mb-2 block text-sm font-bold">عنوان قصير (اختياري)</span>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            maxLength={100}
-            placeholder="مثال: لقطة من معركة ناروتو 🔥"
-            className="w-full rounded-lg border border-input bg-background px-4 py-2.5"
-          />
+          <span className="mb-2 block text-sm font-bold">عنوان المشروع</span>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={100} placeholder="مثال: قالب مونتاج أنمي احترافي" className="w-full rounded-lg border border-input bg-background px-4 py-2.5" />
         </label>
+
+        <label className="block">
+          <span className="mb-2 block text-sm font-bold">وصف المشروع</span>
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={1000} rows={4} placeholder="اشرح للمشتري ماذا سيحصل عليه..." className="w-full rounded-lg border border-input bg-background px-4 py-2.5" />
+        </label>
+
+        <div className="grid grid-cols-2 gap-3">
+          <label className="block">
+            <span className="mb-2 block text-sm font-bold">السعر بالدولار</span>
+            <div className="relative">
+              <DollarSign className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold" />
+              <input type="number" min={1} step={0.01} value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} placeholder="5" className="w-full rounded-lg border border-input bg-background px-4 py-2.5 pr-9 text-right" />
+            </div>
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-sm font-bold">رقم فودافون كاش</span>
+            <div className="relative">
+              <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold" />
+              <input value={vodafonePhone} onChange={(e) => setVodafonePhone(e.target.value)} placeholder="010xxxxxxxx" maxLength={20} className="w-full rounded-lg border border-input bg-background px-4 py-2.5 pr-9" />
+            </div>
+          </label>
+        </div>
 
         <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-border bg-background/40 p-8 hover:border-gold">
           <Upload className="h-8 w-8 text-gold" />
           <span className="text-sm font-bold">{file?.name ?? "اختر ملف الفيديو (MP4)"}</span>
           {meta && (
             <span className="text-xs text-muted-foreground">
-              {meta.width}×{meta.height} • {meta.duration.toFixed(1)} ث • {(file!.size / 1024 / 1024).toFixed(1)}MB
+              {meta.width}×{meta.height} • {Math.round(meta.duration)} ث • {(file!.size / 1024 / 1024).toFixed(1)}MB
             </span>
           )}
           <input type="file" accept="video/mp4,video/*" className="hidden" onChange={(e) => onPick(e.target.files?.[0] ?? null)} />
@@ -176,25 +185,16 @@ function UploadPage() {
 
         {progress > 0 && (
           <div>
-            <div className="mb-1 flex justify-between text-xs"><span>جاري المعالجة...</span><span className="font-black text-gold">{progress}%</span></div>
+            <div className="mb-1 flex justify-between text-xs"><span>جاري الرفع...</span><span className="font-black text-gold">{progress}%</span></div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
               <div className="h-full bg-gradient-gold transition-all" style={{ width: `${progress}%` }} />
             </div>
           </div>
         )}
 
-        <div className="flex items-center justify-between rounded-xl border border-border bg-background/40 p-4">
-          <div className="text-sm"><div className="font-bold">تكلفة النشر</div><div className="text-xs text-muted-foreground">يُخصم فوراً عند الضغط على «نشر»</div></div>
-          <div className="flex items-center gap-1 text-2xl font-black text-gradient-gold"><Coins className="h-5 w-5 text-gold" />{PUBLISH_COST}</div>
-        </div>
-
-        <button
-          onClick={handlePublish}
-          disabled={submitting || !file || !canAfford}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold disabled:opacity-50"
-        >
+        <button onClick={handleSubmit} disabled={submitting || !file} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold disabled:opacity-50">
           <Send className="h-5 w-5" />
-          {submitting ? "جاري الرفع..." : canAfford ? "نشر الشورت" : "رصيد غير كافٍ"}
+          {submitting ? "جاري النشر..." : "نشر المشروع"}
         </button>
       </main>
     </div>

@@ -21,23 +21,25 @@ function LoginPage() {
     if (user) navigate({ to: "/dashboard" });
   }, [user, navigate]);
 
-  // Anti-spam: 1h cooldown after logout, escalate to 5h on repeat
+  // Anti-spam: allow 5 attempts; then 5h cooldown
   function checkLoginCooldown(): string | null {
     try {
-      const lastLogout = Number(localStorage.getItem("san:lastLogoutAt") ?? 0);
-      const attempts = Number(localStorage.getItem("san:loginAttemptsAfterLogout") ?? 0);
-      if (!lastLogout) return null;
-      const elapsed = Date.now() - lastLogout;
-      const oneHour = 60 * 60 * 1000;
-      const fiveHours = 5 * oneHour;
-      const limit = attempts >= 1 ? fiveHours : oneHour;
-      if (elapsed < limit) {
-        localStorage.setItem("san:loginAttemptsAfterLogout", String(attempts + 1));
-        return attempts >= 1 ? "برجاء الانتظار خمس ساعات على الأقل" : "برجاء الانتظار ساعة على الأقل";
+      const cooldownUntil = Number(localStorage.getItem("san:loginCooldownUntil") ?? 0);
+      if (cooldownUntil && Date.now() < cooldownUntil) {
+        const hoursLeft = Math.ceil((cooldownUntil - Date.now()) / (60 * 60 * 1000));
+        return `تم تجاوز الحد المسموح. الرجاء الانتظار ${hoursLeft} ساعة تقريباً`;
       }
-      // cooldown expired — reset
-      localStorage.removeItem("san:lastLogoutAt");
-      localStorage.removeItem("san:loginAttemptsAfterLogout");
+      if (cooldownUntil && Date.now() >= cooldownUntil) {
+        localStorage.removeItem("san:loginCooldownUntil");
+        localStorage.setItem("san:loginAttempts", "0");
+      }
+      const attempts = Number(localStorage.getItem("san:loginAttempts") ?? 0);
+      if (attempts >= 5) {
+        const until = Date.now() + 5 * 60 * 60 * 1000;
+        localStorage.setItem("san:loginCooldownUntil", String(until));
+        return "تم تجاوز 5 محاولات. الرجاء الانتظار 5 ساعات";
+      }
+      localStorage.setItem("san:loginAttempts", String(attempts + 1));
       return null;
     } catch {
       return null;

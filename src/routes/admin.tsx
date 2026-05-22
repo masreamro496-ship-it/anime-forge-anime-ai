@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPanel() {
-  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts">("requests");
+  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases">("purchases");
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
@@ -34,10 +34,11 @@ function AdminPanel() {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6 flex flex-wrap gap-2">
           {[
+            { k: "purchases", label: "طلبات الشراء" },
             { k: "requests", label: "طلبات التوليد" },
             { k: "payments", label: "المدفوعات" },
-            { k: "shorts", label: "الشورتس" },
-            { k: "messages", label: "رسائل المستخدمين" },
+            { k: "shorts", label: "المشاريع" },
+            { k: "messages", label: "الرسائل" },
           ].map((t) => (
             <button
               key={t.k}
@@ -49,6 +50,7 @@ function AdminPanel() {
           ))}
         </div>
 
+        {tab === "purchases" && <PurchasesTable />}
         {tab === "requests" && <RequestsTable />}
         {tab === "payments" && <PaymentsTable />}
         {tab === "shorts" && <ShortsTable />}
@@ -391,6 +393,48 @@ function ShortsTable() {
             </div>
           </div>
           <button onClick={() => remove(s.id)} className="ml-2 rounded border border-destructive bg-destructive/10 px-3 py-1 text-xs font-bold text-destructive">حذف</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PurchasesTable() {
+  const qc = useQueryClient();
+  const sb = supabase as unknown as { from: (t: string) => { select: (c: string) => { order: (col: string, opts: { ascending: boolean }) => Promise<{ data: unknown; error: { message: string } | null }> } }; rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }> };
+  const { data: rows } = useQuery({
+    queryKey: ["admin-purchases"],
+    queryFn: async () => {
+      const res = await sb.from("project_purchases").select("id,project_id,buyer_id,seller_id,price_usd,status,created_at").order("created_at", { ascending: false });
+      if (res.error) throw new Error(res.error.message);
+      return (res.data ?? []) as { id: string; project_id: string; buyer_id: string; seller_id: string; price_usd: number; status: string; created_at: string }[];
+    },
+  });
+
+  const approve = async (id: string) => {
+    const res = await sb.rpc("approve_purchase", { _purchase_id: id });
+    if (res.error) return toast.error(res.error.message);
+    toast.success("تم التفعيل");
+    qc.invalidateQueries({ queryKey: ["admin-purchases"] });
+  };
+
+  if (!rows?.length) return <p className="text-center text-sm text-muted-foreground py-10">لا توجد طلبات شراء.</p>;
+  return (
+    <div className="space-y-2">
+      {rows.map((r) => (
+        <div key={r.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-4">
+          <div className="text-xs">
+            <div className="font-bold">مشروع {r.project_id.slice(0, 8)} • مشتري {r.buyer_id.slice(0, 8)}</div>
+            <div className="text-muted-foreground">{new Date(r.created_at).toLocaleString("ar-EG")} • ${Number(r.price_usd).toFixed(2)}</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={`rounded-full px-2 py-0.5 text-[11px] font-black ${r.status === "approved" ? "bg-green-500/20 text-green-400" : r.status === "rejected" ? "bg-red-500/20 text-red-400" : "bg-yellow-500/20 text-yellow-400"}`}>{r.status}</span>
+            {r.status === "pending" && (
+              <button onClick={() => approve(r.id)} className="flex items-center gap-1 rounded-lg bg-gradient-gold px-3 py-1 text-xs font-black text-gold-foreground">
+                <Check className="h-3 w-3" /> موافقة
+              </button>
+            )}
+          </div>
         </div>
       ))}
     </div>

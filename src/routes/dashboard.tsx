@@ -187,3 +187,50 @@ function StatusIcon({ status }: { status: string }) {
   if (status === "rejected") return <XCircle className="h-5 w-5 text-destructive" />;
   return <Clock className="h-5 w-5 text-yellow-400" />;
 }
+
+function PendingSales() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const sb = supabase as unknown as { from: (t: string) => { select: (c: string) => { eq: (k: string, v: unknown) => { eq: (k: string, v: unknown) => { order: (col: string, opts: { ascending: boolean }) => Promise<{ data: unknown; error: { message: string } | null }> } } } }; rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }> };
+
+  const { data: pending } = useQuery({
+    queryKey: ["my-pending-sales", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const res = await sb.from("project_purchases").select("id,project_id,buyer_id,price_usd,created_at,status").eq("seller_id", user!.id).eq("status", "pending").order("created_at", { ascending: false });
+      if (res.error) throw new Error(res.error.message);
+      return (res.data ?? []) as { id: string; project_id: string; buyer_id: string; price_usd: number; created_at: string }[];
+    },
+  });
+
+  const approve = async (id: string) => {
+    const res = await sb.rpc("approve_purchase", { _purchase_id: id });
+    if (res.error) return toast.error(res.error.message);
+    toast.success("تم تفعيل عملية الشراء وإضافة الأرباح");
+    qc.invalidateQueries({ queryKey: ["my-pending-sales", user?.id] });
+    qc.invalidateQueries({ queryKey: ["profile", user?.id] });
+  };
+
+  if (!pending?.length) return null;
+  return (
+    <section className="mt-8">
+      <h2 className="mb-3 text-xl font-black">طلبات شراء معلقة لمشاريعك ({pending.length})</h2>
+      <div className="space-y-2">
+        {pending.map((p) => (
+          <div key={p.id} className="flex items-center justify-between rounded-xl border border-yellow-500/40 bg-yellow-500/5 p-4">
+            <div>
+              <div className="text-sm font-bold">مشروع #{p.project_id.slice(0, 8)}</div>
+              <div className="text-xs text-muted-foreground">من المشتري {p.buyer_id.slice(0, 8)} • {new Date(p.created_at).toLocaleString("ar-EG")}</div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="rounded-full bg-green-500/15 px-3 py-1 text-xs font-black text-green-400">${Number(p.price_usd).toFixed(2)}</span>
+              <button onClick={() => approve(p.id)} className="flex items-center gap-1 rounded-lg bg-gradient-gold px-3 py-1.5 text-xs font-black text-gold-foreground">
+                <Check className="h-4 w-4" /> موافقة تفعيل
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}

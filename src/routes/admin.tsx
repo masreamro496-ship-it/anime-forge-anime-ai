@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPanel() {
-  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts">("requests");
+  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases">("purchases");
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
@@ -34,10 +34,11 @@ function AdminPanel() {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6 flex flex-wrap gap-2">
           {[
+            { k: "purchases", label: "طلبات الشراء" },
             { k: "requests", label: "طلبات التوليد" },
             { k: "payments", label: "المدفوعات" },
-            { k: "shorts", label: "الشورتس" },
-            { k: "messages", label: "رسائل المستخدمين" },
+            { k: "shorts", label: "المشاريع" },
+            { k: "messages", label: "الرسائل" },
           ].map((t) => (
             <button
               key={t.k}
@@ -49,6 +50,7 @@ function AdminPanel() {
           ))}
         </div>
 
+        {tab === "purchases" && <PurchasesTable />}
         {tab === "requests" && <RequestsTable />}
         {tab === "payments" && <PaymentsTable />}
         {tab === "shorts" && <ShortsTable />}

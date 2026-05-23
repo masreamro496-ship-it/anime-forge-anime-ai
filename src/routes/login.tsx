@@ -25,30 +25,9 @@ function LoginPage() {
     if (user) navigate({ to: (redirectTo ?? "/dashboard") as "/dashboard" });
   }, [user, navigate, redirectTo]);
 
-  // Anti-spam: allow 5 attempts; then 5h cooldown
-  function checkLoginCooldown(): string | null {
-    try {
-      const cooldownUntil = Number(localStorage.getItem("san:loginCooldownUntil") ?? 0);
-      if (cooldownUntil && Date.now() < cooldownUntil) {
-        const hoursLeft = Math.ceil((cooldownUntil - Date.now()) / (60 * 60 * 1000));
-        return `تم تجاوز الحد المسموح. الرجاء الانتظار ${hoursLeft} ساعة تقريباً`;
-      }
-      if (cooldownUntil && Date.now() >= cooldownUntil) {
-        localStorage.removeItem("san:loginCooldownUntil");
-        localStorage.setItem("san:loginAttempts", "0");
-      }
-      const attempts = Number(localStorage.getItem("san:loginAttempts") ?? 0);
-      if (attempts >= 5) {
-        const until = Date.now() + 5 * 60 * 60 * 1000;
-        localStorage.setItem("san:loginCooldownUntil", String(until));
-        return "تم تجاوز 5 محاولات. الرجاء الانتظار 5 ساعات";
-      }
-      localStorage.setItem("san:loginAttempts", String(attempts + 1));
-      return null;
-    } catch {
-      return null;
-    }
-  }
+  // Cooldown removed per requirement: users can sign in/up freely without waiting.
+  function checkLoginCooldown(): string | null { return null; }
+
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();

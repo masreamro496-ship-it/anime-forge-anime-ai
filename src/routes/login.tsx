@@ -6,11 +6,15 @@ import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
 
-export const Route = createFileRoute("/login")({ component: LoginPage });
+export const Route = createFileRoute("/login")({
+  validateSearch: (s: Record<string, unknown>) => ({ redirect: typeof s.redirect === "string" ? s.redirect : undefined }),
+  component: LoginPage,
+});
 
 function LoginPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { redirect: redirectTo } = Route.useSearch();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,33 +22,12 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) navigate({ to: "/dashboard" });
-  }, [user, navigate]);
+    if (user) navigate({ to: (redirectTo ?? "/dashboard") as "/dashboard" });
+  }, [user, navigate, redirectTo]);
 
-  // Anti-spam: allow 5 attempts; then 5h cooldown
-  function checkLoginCooldown(): string | null {
-    try {
-      const cooldownUntil = Number(localStorage.getItem("san:loginCooldownUntil") ?? 0);
-      if (cooldownUntil && Date.now() < cooldownUntil) {
-        const hoursLeft = Math.ceil((cooldownUntil - Date.now()) / (60 * 60 * 1000));
-        return `تم تجاوز الحد المسموح. الرجاء الانتظار ${hoursLeft} ساعة تقريباً`;
-      }
-      if (cooldownUntil && Date.now() >= cooldownUntil) {
-        localStorage.removeItem("san:loginCooldownUntil");
-        localStorage.setItem("san:loginAttempts", "0");
-      }
-      const attempts = Number(localStorage.getItem("san:loginAttempts") ?? 0);
-      if (attempts >= 5) {
-        const until = Date.now() + 5 * 60 * 60 * 1000;
-        localStorage.setItem("san:loginCooldownUntil", String(until));
-        return "تم تجاوز 5 محاولات. الرجاء الانتظار 5 ساعات";
-      }
-      localStorage.setItem("san:loginAttempts", String(attempts + 1));
-      return null;
-    } catch {
-      return null;
-    }
-  }
+  // Cooldown removed per requirement: users can sign in/up freely without waiting.
+  function checkLoginCooldown(): string | null { return null; }
+
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +40,7 @@ function LoginPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}${redirectTo ?? "/dashboard"}`,
             data: { full_name: name },
           },
         });
@@ -80,7 +63,7 @@ function LoginPage() {
     const cd = checkLoginCooldown();
     if (cd) { toast.error(cd); return; }
     setLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/dashboard" });
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + (redirectTo ?? "/dashboard") });
     if (result.error) {
       toast.error("فشل تسجيل الدخول بـ Google");
       setLoading(false);

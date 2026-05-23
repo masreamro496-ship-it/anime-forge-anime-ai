@@ -115,9 +115,15 @@ function Landing() {
           <Link to="/shorts" className="rounded-xl bg-gradient-gold px-7 py-3 text-base font-black text-gold-foreground shadow-gold transition-transform hover:scale-105">
             تصفّح الشورتس
           </Link>
-          <Link to={user ? "/shorts/upload" : "/login"} className="rounded-xl border border-gold/50 bg-gold/10 px-7 py-3 text-base font-bold text-gold">
-            ارفع شورت (5 كريديت)
-          </Link>
+          {user ? (
+            <Link to="/shorts/upload" className="rounded-xl border border-gold/50 bg-gold/10 px-7 py-3 text-base font-bold text-gold">
+              إنشاء مشروع
+            </Link>
+          ) : (
+            <Link to="/login" search={{ redirect: "/shorts/upload" }} className="rounded-xl border border-gold/50 bg-gold/10 px-7 py-3 text-base font-bold text-gold">
+              سجّل لإنشاء مشروع
+            </Link>
+          )}
         </div>
       </section>
 

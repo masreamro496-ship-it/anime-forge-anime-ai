@@ -41,7 +41,7 @@ function ProjectsFeed() {
               <Upload className="h-3.5 w-3.5" /> إنشاء مشروع
             </Link>
           ) : (
-            <Link to="/login" className="rounded-lg border border-gold/50 px-3 py-1.5 text-xs font-bold text-gold">دخول</Link>
+            <Link to="/login" search={{ redirect: "/shorts/upload" }} className="rounded-lg border border-gold/50 px-3 py-1.5 text-xs font-bold text-gold">دخول</Link>
           )}
         </div>
       </header>
@@ -56,12 +56,22 @@ function ProjectsFeed() {
                 ارفع فيديو مشروعك (تحويل تلقائي إلى 240p للمجاني، وحتى 30 دقيقة لـ Pro) وضع سعراً بالدولار.
               </p>
             </div>
-            <Link
-              to={user ? "/shorts/upload" : "/login"}
-              className="flex shrink-0 items-center gap-2 rounded-xl bg-gradient-gold px-5 py-2.5 text-sm font-black text-gold-foreground shadow-gold"
-            >
-              <Upload className="h-4 w-4" /> {user ? "إنشاء مشروع" : "سجّل لإنشاء مشروع"}
-            </Link>
+            {user ? (
+              <Link
+                to="/shorts/upload"
+                className="flex shrink-0 items-center gap-2 rounded-xl bg-gradient-gold px-5 py-2.5 text-sm font-black text-gold-foreground shadow-gold"
+              >
+                <Upload className="h-4 w-4" /> إنشاء مشروع
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                search={{ redirect: "/shorts/upload" }}
+                className="flex shrink-0 items-center gap-2 rounded-xl bg-gradient-gold px-5 py-2.5 text-sm font-black text-gold-foreground shadow-gold"
+              >
+                <Upload className="h-4 w-4" /> سجّل لإنشاء مشروع
+              </Link>
+            )}
           </div>
         </section>
 

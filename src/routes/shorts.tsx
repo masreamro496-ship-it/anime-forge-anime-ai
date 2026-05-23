@@ -41,7 +41,7 @@ function ProjectsFeed() {
               <Upload className="h-3.5 w-3.5" /> إنشاء مشروع
             </Link>
           ) : (
-            <Link to="/login" className="rounded-lg border border-gold/50 px-3 py-1.5 text-xs font-bold text-gold">دخول</Link>
+            <Link to="/login" search={{ redirect: "/shorts/upload" }} className="rounded-lg border border-gold/50 px-3 py-1.5 text-xs font-bold text-gold">دخول</Link>
           )}
         </div>
       </header>

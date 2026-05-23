@@ -47,6 +47,26 @@ function ProjectsFeed() {
       </header>
 
       <main className="container mx-auto max-w-6xl px-4 py-6">
+        {/* Project Creation section — directly above the Shorts/Videos feed */}
+        <section className="mb-6 rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/10 to-transparent p-5 sm:p-6">
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-black text-gradient-gold sm:text-xl">إنشاء مشروع جديد</h2>
+              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
+                ارفع فيديو مشروعك (تحويل تلقائي إلى 240p للمجاني، وحتى 30 دقيقة لـ Pro) وضع سعراً بالدولار.
+              </p>
+            </div>
+            <Link
+              to={user ? "/shorts/upload" : "/login"}
+              className="flex shrink-0 items-center gap-2 rounded-xl bg-gradient-gold px-5 py-2.5 text-sm font-black text-gold-foreground shadow-gold"
+            >
+              <Upload className="h-4 w-4" /> {user ? "إنشاء مشروع" : "سجّل لإنشاء مشروع"}
+            </Link>
+          </div>
+        </section>
+
+        {/* Shorts Video feed */}
+        <h3 className="mb-3 text-sm font-black text-muted-foreground">فيديوهات الشورتس</h3>
         {isLoading && <p className="text-center text-sm text-muted-foreground py-10">جاري التحميل...</p>}
         {!isLoading && !projects?.length && (
           <div className="rounded-2xl border border-dashed border-border bg-card/40 p-10 text-center text-sm text-muted-foreground">
@@ -57,6 +77,7 @@ function ProjectsFeed() {
           {projects?.map((p) => <ProjectCard key={p.id} project={p} />)}
         </div>
       </main>
+
     </div>
   );
 }

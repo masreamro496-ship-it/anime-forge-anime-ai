@@ -59,17 +59,23 @@ function ProjectDetail() {
   const isOwner = !!user && !!project && user.id === project.user_id;
   const isApproved = myPurchase?.status === "approved";
 
-  // Load signed video URL when allowed
+  // Load video URL when allowed (Cloudinary URLs are direct; legacy storage paths get a signed URL)
   useEffect(() => {
     if (!user || !project) return;
     if (!isOwner && !isApproved) return;
     (async () => {
       const { data, error } = await sb.rpc("get_project_video_path", { _project_id: project.id });
       if (error || !data) return;
-      const pathRes = await sb.storage.from("shorts").createSignedUrl(String(data), 3600);
-      if (pathRes.data) setVideoUrl(pathRes.data.signedUrl);
+      const path = String(data);
+      if (/^https?:\/\//i.test(path)) {
+        setVideoUrl(path);
+      } else {
+        const pathRes = await sb.storage.from("shorts").createSignedUrl(path, 3600);
+        if (pathRes.data) setVideoUrl(pathRes.data.signedUrl);
+      }
     })();
   }, [user, project, isOwner, isApproved]);
+
 
   const handleBuy = async () => {
     if (!user) return toast.error("سجّل دخولك للشراء");
@@ -84,7 +90,7 @@ function ProjectDetail() {
   if (isLoading) return <div className="p-10 text-center text-muted-foreground">جاري التحميل...</div>;
   if (!project) return <div className="p-10 text-center text-muted-foreground">المشروع غير موجود.</div>;
 
-  const thumb = project.thumbnail_path ? publicUrl("shorts", project.thumbnail_path) : undefined;
+  const thumb = project.thumbnail_path ? (/^https?:\/\//i.test(project.thumbnail_path) ? project.thumbnail_path : publicUrl("shorts", project.thumbnail_path)) : undefined;
   const mins = Math.floor((project.duration_seconds ?? 0) / 60);
   const secs = (project.duration_seconds ?? 0) % 60;
 

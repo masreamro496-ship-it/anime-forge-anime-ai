@@ -63,7 +63,7 @@ function LoginPage() {
     const cd = checkLoginCooldown();
     if (cd) { toast.error(cd); return; }
     setLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/dashboard" });
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + (redirectTo ?? "/dashboard") });
     if (result.error) {
       toast.error("فشل تسجيل الدخول بـ Google");
       setLoading(false);

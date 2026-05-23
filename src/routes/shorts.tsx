@@ -62,7 +62,7 @@ function ProjectsFeed() {
 }
 
 function ProjectCard({ project }: { project: Project }) {
-  const thumb = project.thumbnail_path ? publicUrl("shorts", project.thumbnail_path) : undefined;
+  const thumb = project.thumbnail_path ? (/^https?:\/\//i.test(project.thumbnail_path) ? project.thumbnail_path : publicUrl("shorts", project.thumbnail_path)) : undefined;
   const mins = Math.floor((project.duration_seconds ?? 0) / 60);
   const secs = (project.duration_seconds ?? 0) % 60;
   return (

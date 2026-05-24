@@ -9,10 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WatermarkRouteImport } from './routes/watermark'
 import { Route as ShortsRouteImport } from './routes/shorts'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FreeShortsRouteImport } from './routes/free-shorts'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AudioRouteImport } from './routes/audio'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShortsUploadRouteImport } from './routes/shorts.upload'
@@ -20,9 +24,19 @@ import { Route as ShortsIdRouteImport } from './routes/shorts.$id'
 import { Route as GenerateVideoRouteImport } from './routes/generate.video'
 import { Route as GenerateGokuRouteImport } from './routes/generate.goku'
 
+const WatermarkRoute = WatermarkRouteImport.update({
+  id: '/watermark',
+  path: '/watermark',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShortsRoute = ShortsRouteImport.update({
   id: '/shorts',
   path: '/shorts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProUpgradeRoute = ProUpgradeRouteImport.update({
@@ -35,9 +49,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FreeShortsRoute = FreeShortsRouteImport.update({
+  id: '/free-shorts',
+  path: '/free-shorts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AudioRoute = AudioRouteImport.update({
+  id: '/audio',
+  path: '/audio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -74,10 +98,14 @@ const GenerateGokuRoute = GenerateGokuRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/audio': typeof AudioRoute
   '/dashboard': typeof DashboardRoute
+  '/free-shorts': typeof FreeShortsRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
+  '/watermark': typeof WatermarkRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
@@ -86,10 +114,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/audio': typeof AudioRoute
   '/dashboard': typeof DashboardRoute
+  '/free-shorts': typeof FreeShortsRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
+  '/watermark': typeof WatermarkRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
@@ -99,10 +131,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/audio': typeof AudioRoute
   '/dashboard': typeof DashboardRoute
+  '/free-shorts': typeof FreeShortsRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
+  '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
+  '/watermark': typeof WatermarkRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
@@ -113,10 +149,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/audio'
     | '/dashboard'
+    | '/free-shorts'
     | '/login'
     | '/pro-upgrade'
+    | '/profile'
     | '/shorts'
+    | '/watermark'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
@@ -125,10 +165,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/audio'
     | '/dashboard'
+    | '/free-shorts'
     | '/login'
     | '/pro-upgrade'
+    | '/profile'
     | '/shorts'
+    | '/watermark'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
@@ -137,10 +181,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/audio'
     | '/dashboard'
+    | '/free-shorts'
     | '/login'
     | '/pro-upgrade'
+    | '/profile'
     | '/shorts'
+    | '/watermark'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
@@ -150,21 +198,39 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AudioRoute: typeof AudioRoute
   DashboardRoute: typeof DashboardRoute
+  FreeShortsRoute: typeof FreeShortsRoute
   LoginRoute: typeof LoginRoute
   ProUpgradeRoute: typeof ProUpgradeRoute
+  ProfileRoute: typeof ProfileRoute
   ShortsRoute: typeof ShortsRouteWithChildren
+  WatermarkRoute: typeof WatermarkRoute
   GenerateGokuRoute: typeof GenerateGokuRoute
   GenerateVideoRoute: typeof GenerateVideoRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/watermark': {
+      id: '/watermark'
+      path: '/watermark'
+      fullPath: '/watermark'
+      preLoaderRoute: typeof WatermarkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shorts': {
       id: '/shorts'
       path: '/shorts'
       fullPath: '/shorts'
       preLoaderRoute: typeof ShortsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pro-upgrade': {
@@ -181,11 +247,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/free-shorts': {
+      id: '/free-shorts'
+      path: '/free-shorts'
+      fullPath: '/free-shorts'
+      preLoaderRoute: typeof FreeShortsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/audio': {
+      id: '/audio'
+      path: '/audio'
+      fullPath: '/audio'
+      preLoaderRoute: typeof AudioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -249,13 +329,27 @@ const ShortsRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AudioRoute: AudioRoute,
   DashboardRoute: DashboardRoute,
+  FreeShortsRoute: FreeShortsRoute,
   LoginRoute: LoginRoute,
   ProUpgradeRoute: ProUpgradeRoute,
+  ProfileRoute: ProfileRoute,
   ShortsRoute: ShortsRouteWithChildren,
+  WatermarkRoute: WatermarkRoute,
   GenerateGokuRoute: GenerateGokuRoute,
   GenerateVideoRoute: GenerateVideoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

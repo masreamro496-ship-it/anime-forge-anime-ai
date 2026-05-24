@@ -38,6 +38,71 @@ export type Database = {
         }
         Relationships: []
       }
+      audio_clips: {
+        Row: {
+          audio_url: string
+          created_at: string
+          description: string
+          download_cost: number
+          duration_seconds: number | null
+          id: string
+          title: string
+          uploader_id: string
+        }
+        Insert: {
+          audio_url: string
+          created_at?: string
+          description?: string
+          download_cost?: number
+          duration_seconds?: number | null
+          id?: string
+          title?: string
+          uploader_id: string
+        }
+        Update: {
+          audio_url?: string
+          created_at?: string
+          description?: string
+          download_cost?: number
+          duration_seconds?: number | null
+          id?: string
+          title?: string
+          uploader_id?: string
+        }
+        Relationships: []
+      }
+      audio_downloads: {
+        Row: {
+          clip_id: string
+          cost: number
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          clip_id: string
+          cost: number
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          clip_id?: string
+          cost?: number
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_downloads_clip_id_fkey"
+            columns: ["clip_id"]
+            isOneToOne: false
+            referencedRelation: "audio_clips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credit_transactions: {
         Row: {
           amount: number
@@ -133,6 +198,36 @@ export type Database = {
           status?: Database["public"]["Enums"]["gen_status"]
           type?: Database["public"]["Enums"]["gen_type"]
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean
+          link: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          title?: string
           user_id?: string
         }
         Relationships: []
@@ -270,6 +365,7 @@ export type Database = {
           description: string
           duration_seconds: number | null
           id: string
+          kind: string
           likes_count: number
           price_usd: number
           published_at: string | null
@@ -289,6 +385,7 @@ export type Database = {
           description?: string
           duration_seconds?: number | null
           id?: string
+          kind?: string
           likes_count?: number
           price_usd?: number
           published_at?: string | null
@@ -308,6 +405,7 @@ export type Database = {
           description?: string
           duration_seconds?: number | null
           id?: string
+          kind?: string
           likes_count?: number
           price_usd?: number
           published_at?: string | null
@@ -449,6 +547,36 @@ export type Database = {
         }
         Relationships: []
       }
+      watermark_jobs: {
+        Row: {
+          cost: number
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          processed_url: string
+          source_url: string
+          user_id: string
+        }
+        Insert: {
+          cost?: number
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          processed_url: string
+          source_url: string
+          user_id: string
+        }
+        Update: {
+          cost?: number
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          processed_url?: string
+          source_url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       shorts_public: {
@@ -506,6 +634,16 @@ export type Database = {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
+      create_free_short: {
+        Args: {
+          _description: string
+          _duration_seconds: number
+          _thumbnail_path: string
+          _title: string
+          _video_path: string
+        }
+        Returns: string
+      }
       create_project: {
         Args: {
           _description: string
@@ -527,7 +665,16 @@ export type Database = {
         Returns: boolean
       }
       promote_scheduled_shorts: { Args: never; Returns: undefined }
+      purchase_audio_download: { Args: { _clip_id: string }; Returns: string }
       request_purchase: { Args: { _project_id: string }; Returns: string }
+      spend_watermark_credits: {
+        Args: {
+          _duration_seconds: number
+          _processed_url: string
+          _source_url: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "pro" | "user"

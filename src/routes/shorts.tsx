@@ -23,8 +23,9 @@ function ProjectsFeed() {
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects", "feed"],
     queryFn: async () => {
-      const sb = supabase as unknown as { from: (t: string) => { select: (c: string) => { order: (col: string, opts: { ascending: boolean }) => { limit: (n: number) => Promise<{ data: Project[] | null; error: { message: string } | null }> } } } };
-      const { data, error } = await sb.from("shorts_public").select("id,user_id,title,description,thumbnail_path,duration_seconds,price_usd,views_count").order("created_at", { ascending: false }).limit(60);
+      const sb = supabase as unknown as { from: (t: string) => { select: (c: string) => { eq: (k: string, v: unknown) => { order: (col: string, opts: { ascending: boolean }) => { limit: (n: number) => Promise<{ data: Project[] | null; error: { message: string } | null }> } } } } };
+      // Only paid projects (exclude free 30s shorts)
+      const { data, error } = await sb.from("shorts").select("id,user_id,title,description,thumbnail_path,duration_seconds,price_usd,views_count").eq("kind", "project").order("created_at", { ascending: false }).limit(60);
       if (error) throw new Error(error.message);
       return data ?? [];
     },

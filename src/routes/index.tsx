@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Crown, Sparkles, Video, Music, Shield, Play, Heart, MessageCircle } from "lucide-react";
+import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -12,25 +12,27 @@ function Landing() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/60 backdrop-blur-md">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <Link to="/" className="flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-gold" />
-            <span className="text-xl font-black text-gradient-gold">شاهد أنمي الآن</span>
+            <span className="text-xl font-black text-gradient-gold">منصة فودافون كاش</span>
           </Link>
           <nav className="flex items-center gap-2">
+            <Link to="/audio" className="hidden sm:inline-flex rounded-lg border border-border bg-card px-3 py-2 text-xs font-bold">
+              الصوتيات
+            </Link>
             {user ? (
-              <Link
-                to="/dashboard"
-                className="rounded-lg bg-gradient-gold px-4 py-2 text-sm font-bold text-gold-foreground shadow-gold"
-              >
-                لوحة التحكم
-              </Link>
+              <>
+                <Link to="/profile" className="flex items-center gap-1 rounded-lg border border-gold/50 bg-gold/10 px-3 py-2 text-xs font-black text-gold">
+                  <User className="h-3.5 w-3.5" /> PROFILE
+                </Link>
+                <Link to="/dashboard" className="rounded-lg bg-gradient-gold px-3 py-2 text-xs font-black text-gold-foreground shadow-gold">
+                  لوحتي
+                </Link>
+              </>
             ) : (
-              <Link
-                to="/login"
-                className="rounded-lg bg-gradient-gold px-4 py-2 text-sm font-bold text-gold-foreground shadow-gold transition-transform hover:scale-105"
-              >
+              <Link to="/login" className="rounded-lg bg-gradient-gold px-4 py-2 text-sm font-bold text-gold-foreground shadow-gold">
                 تسجيل الدخول
               </Link>
             )}
@@ -38,151 +40,83 @@ function Landing() {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="container mx-auto px-4 py-20 text-center">
-        <div className="mx-auto max-w-3xl">
-          <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-xs font-bold text-gold">
-            <Sparkles className="h-3.5 w-3.5" /> الجيل الجديد من توليد الأنمي
-          </span>
-          <h1 className="mt-6 text-4xl font-black leading-tight md:text-6xl">
-            ولّد فيديوهات <span className="text-gradient-gold">أنمي خيالية</span>
-            <br /> بالذكاء الاصطناعي
-          </h1>
-          <p className="mt-6 text-base text-muted-foreground md:text-lg">
-            ارفع صورة البداية والنهاية، أضف صوتك، واختر الجودة. نحن نتولى الباقي.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              to={user ? "/dashboard" : "/login"}
-              className="rounded-xl bg-gradient-gold px-7 py-3 text-base font-bold text-gold-foreground shadow-gold transition-transform hover:scale-105"
-            >
-              ابدأ الآن مجاناً
-            </Link>
-            <a
-              href="#pricing"
-              className="rounded-xl border border-border bg-card px-7 py-3 text-base font-bold text-foreground"
-            >
-              عرض الباقات
-            </a>
+      {/* Big Gold CTA — Free Shorts */}
+      <section className="container mx-auto px-4 pt-6">
+        <Link to="/free-shorts" className="block rounded-3xl border-2 border-gold bg-gradient-to-br from-gold/30 via-gold/10 to-transparent p-6 shadow-gold transition-transform hover:scale-[1.01] sm:p-8">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <span className="inline-flex items-center gap-1 rounded-full bg-gold px-3 py-1 text-[10px] font-black text-gold-foreground">
+                <Sparkles className="h-3 w-3" /> مجاني للجميع
+              </span>
+              <h2 className="mt-2 text-2xl font-black text-gradient-gold sm:text-3xl">نشر فيديوهات شورتس القوية</h2>
+              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">30 ثانية كحد أقصى · تظهر لكل زوار الموقع · بدون كريديت</p>
+            </div>
+            <Upload className="h-12 w-12 shrink-0 text-gold sm:h-16 sm:w-16" />
           </div>
-        </div>
+        </Link>
       </section>
 
-      {/* Features */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="grid gap-4 md:grid-cols-3">
-          {[
-            { icon: Video, title: "توليد فيديو ذكي", desc: "صورة بداية + صورة نهاية = فيديو سلس" },
-            { icon: Music, title: "صوت متعدد المسارات", desc: "أضف حتى 3 ملفات صوتية لكل فيديو" },
-            { icon: Shield, title: "حماية وخصوصية", desc: "بياناتك محفوظة بأعلى معايير الأمان" },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="rounded-2xl border border-border bg-card p-6 shadow-card">
-              <Icon className="h-8 w-8 text-gold" />
-              <h3 className="mt-4 text-lg font-bold">{title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Shorts section — directly under AI section */}
-      <section id="shorts" className="container mx-auto px-4 py-16">
-        <div className="text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-xs font-bold text-gold">
-            <Play className="h-3.5 w-3.5" /> جديد
-          </span>
-          <h2 className="mt-4 text-3xl font-black md:text-4xl">شورتس الأنمي <span className="text-gradient-gold">9:16</span></h2>
-          <p className="mt-2 text-sm text-muted-foreground md:text-base">
-            ارفع شورت أنمي (15 ثانية، 480p) — يظهر للجميع بعد ساعة من النشر
-          </p>
-        </div>
-
-        <div className="mx-auto mt-8 grid max-w-3xl gap-4 sm:grid-cols-3">
-          {[
-            { icon: Play, t: "نسبة 9:16", d: "عرض عمودي مثل تيك توك ويوتيوب شورتس" },
-            { icon: Heart, t: "تفاعل كامل", d: "إعجاب، تعليقات، ومشاركة بضغطة" },
-            { icon: MessageCircle, t: "خوارزمية ذكية", d: "اختبار لأول 50 مشاهد ثم انتشار للجميع" },
-          ].map(({ icon: Icon, t, d }) => (
-            <div key={t} className="rounded-2xl border border-border bg-card p-5 shadow-card">
-              <Icon className="h-7 w-7 text-gold" />
-              <h3 className="mt-3 text-base font-bold">{t}</h3>
-              <p className="mt-1 text-xs text-muted-foreground">{d}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link to="/shorts" className="rounded-xl bg-gradient-gold px-7 py-3 text-base font-black text-gold-foreground shadow-gold transition-transform hover:scale-105">
-            تصفّح الشورتس
+      {/* Hero */}
+      <section className="container mx-auto px-4 py-12 text-center">
+        <h1 className="text-3xl font-black leading-tight md:text-5xl">
+          بيع مشاريعك مباشرة بـ <span className="text-gradient-gold">فودافون كاش</span>
+        </h1>
+        <p className="mt-4 text-sm text-muted-foreground md:text-base">
+          ارفع فيديو مشروعك، ضع سعراً بالدولار، والمشتري يحوّل لك مباشرة. أنت توافق على التفعيل.
+        </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link to="/shorts" className="rounded-xl bg-gradient-gold px-6 py-3 text-sm font-black text-gold-foreground shadow-gold">
+            <DollarSign className="inline h-4 w-4" /> تصفّح المشاريع
           </Link>
           {user ? (
-            <Link to="/shorts/upload" className="rounded-xl border border-gold/50 bg-gold/10 px-7 py-3 text-base font-bold text-gold">
-              إنشاء مشروع
+            <Link to="/shorts/upload" className="rounded-xl border-2 border-gold bg-gold/10 px-6 py-3 text-sm font-black text-gold">
+              إنشاء مشروع جديد
             </Link>
           ) : (
-            <Link to="/login" search={{ redirect: "/shorts/upload" }} className="rounded-xl border border-gold/50 bg-gold/10 px-7 py-3 text-base font-bold text-gold">
-              سجّل لإنشاء مشروع
+            <Link to="/login" search={{ redirect: "/shorts/upload" }} className="rounded-xl border-2 border-gold bg-gold/10 px-6 py-3 text-sm font-black text-gold">
+              سجّل وابدأ البيع
             </Link>
           )}
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="container mx-auto px-4 py-20">
-        <h2 className="text-center text-3xl font-black md:text-4xl">اختر باقتك</h2>
-        <p className="mt-2 text-center text-muted-foreground">ابدأ مجاناً أو ارتقِ إلى الـ PRO الذهبية</p>
+      {/* Audio + Watermark cards */}
+      <section className="container mx-auto px-4 pb-10">
+        <div className="grid gap-4 md:grid-cols-2">
+          <Link to="/audio" className="group rounded-2xl border border-border bg-card p-6 transition-colors hover:border-gold">
+            <Music className="h-10 w-10 text-gold" />
+            <h3 className="mt-3 text-lg font-black">مكتبة الصوتيات</h3>
+            <p className="mt-1 text-sm text-muted-foreground">استمع مجاناً · التحميل 5 كريديت لكل ملف</p>
+          </Link>
 
-        <div className="mx-auto mt-10 grid max-w-4xl gap-6 md:grid-cols-2">
-          {/* Free */}
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
-            <h3 className="text-2xl font-black">مجاني</h3>
-            <p className="mt-1 text-sm text-muted-foreground">للبدء واستكشاف المنصة</p>
-            <div className="mt-4 text-4xl font-black">
-              0 <span className="text-base font-normal text-muted-foreground">جنيه</span>
-            </div>
-            <ul className="mt-6 space-y-2 text-sm">
-              <li>✦ 25 كريديت مجاني عند التسجيل</li>
-              <li>✦ توليد فيديوهات بدقة 480p</li>
-              <li>✦ حد النص الأقصى: 2,000 كلمة</li>
-              <li>✦ معالجة عادية في الطابور</li>
-            </ul>
-          </div>
+          <Link to="/watermark" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#a855f7", background: "linear-gradient(135deg, rgba(168,85,247,0.18), transparent)" }}>
+            <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#a855f7" }}>جديد</span>
+            <Wand2 className="h-10 w-10" style={{ color: "#a855f7" }} />
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>حذف العلامة المائية</h3>
+            <p className="mt-1 text-sm text-muted-foreground">معالجة متقدمة عبر Cloudinary · 15 كريديت · النتيجة خاصة بك فقط</p>
+          </Link>
+        </div>
+      </section>
 
-          {/* PRO - Golden */}
-          <div className="relative overflow-hidden rounded-2xl border-2 border-gold bg-card p-8 shadow-gold ring-gold">
-            <div className="absolute -left-12 top-6 rotate-[-45deg] bg-gradient-gold px-12 py-1 text-xs font-black text-gold-foreground">
-              الأكثر طلباً
+      {/* Quick info */}
+      <section className="container mx-auto px-4 py-8">
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            { icon: Upload, title: "ارفع مشروعك", desc: "فيديو حتى دقيقتين (مجاني) أو 30 دقيقة (Pro)" },
+            { icon: DollarSign, title: "حدّد سعرك", desc: "بالدولار + رقم فودافون كاش" },
+            { icon: Play, title: "وافق على التفعيل", desc: "بعد تحويل المشتري، تفعّل الفيديو له فوراً" },
+          ].map(({ icon: Icon, title, desc }) => (
+            <div key={title} className="rounded-2xl border border-border bg-card p-5 shadow-card">
+              <Icon className="h-7 w-7 text-gold" />
+              <h3 className="mt-3 text-base font-bold">{title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
             </div>
-            <div className="flex items-center gap-2">
-              <Crown className="h-6 w-6 text-gold" />
-              <h3 className="text-2xl font-black text-gradient-gold">PRO الذهبية</h3>
-            </div>
-            <p className="mt-1 text-sm text-muted-foreground">للمبدعين والمحترفين</p>
-            <div className="mt-4 text-4xl font-black text-gradient-gold">
-              50 <span className="text-base font-normal text-muted-foreground">جنيه مصري</span>
-            </div>
-            <ul className="mt-6 space-y-2 text-sm">
-              <li className="text-gold font-bold">
-                ✦ تخفيضات خاصة وحصرية لأعضاء الـ PRO على المدة واستهلاك الكريديت للصوت والفيديو!
-              </li>
-              <li>✦ جودة فيديو حتى 1080p</li>
-              <li>✦ حد النص: 5,000 كلمة</li>
-              <li>✦ أولوية في طابور المعالجة</li>
-              <li>✦ ميزة إزالة العلامة المائية</li>
-              <li>✦ ميزة استنساخ صوت غوكو</li>
-            </ul>
-            <Link
-              to={user ? "/dashboard" : "/login"}
-              className="mt-6 block rounded-xl bg-gradient-gold py-3 text-center text-base font-black text-gold-foreground shadow-gold transition-transform hover:scale-[1.02]"
-            >
-              {user ? "الترقية الآن" : "سجّل وابدأ"}
-            </Link>
-          </div>
+          ))}
         </div>
       </section>
 
       <footer className="border-t border-border/50 py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} شاهد أنمي الآن - جميع الحقوق محفوظة
+        © {new Date().getFullYear()} منصة فودافون كاش — جميع الحقوق محفوظة
       </footer>
     </div>
   );

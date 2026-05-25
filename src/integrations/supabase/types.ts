@@ -103,6 +103,33 @@ export type Database = {
           },
         ]
       }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       credit_transactions: {
         Row: {
           amount: number
@@ -667,6 +694,7 @@ export type Database = {
       promote_scheduled_shorts: { Args: never; Returns: undefined }
       purchase_audio_download: { Args: { _clip_id: string }; Returns: string }
       request_purchase: { Args: { _project_id: string }; Returns: string }
+      spend_chat_credits: { Args: never; Returns: undefined }
       spend_watermark_credits: {
         Args: {
           _duration_seconds: number

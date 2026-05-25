@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload } from "lucide-react";
+import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Landing,

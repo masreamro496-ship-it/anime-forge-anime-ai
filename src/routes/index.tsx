@@ -95,6 +95,13 @@ function Landing() {
             <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>حذف العلامة المائية</h3>
             <p className="mt-1 text-sm text-muted-foreground">معالجة متقدمة عبر Cloudinary · 15 كريديت · النتيجة خاصة بك فقط</p>
           </Link>
+
+          <Link to="/chat" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#a855f7", background: "linear-gradient(135deg, rgba(168,85,247,0.25), transparent)" }}>
+            <span className="absolute right-3 top-3 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-black text-white">New</span>
+            <Rocket className="h-10 w-10" style={{ color: "#a855f7" }} />
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>Omni-Brain · شات برمجي</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Groq AI · 5 كريديت/رسالة · حد 1000 كلمة · تحليل صور الأكواد</p>
+          </Link>
         </div>
       </section>
 

@@ -56,6 +56,7 @@ function AdminPanel() {
         {tab === "payments" && <PaymentsTable />}
         {tab === "shorts" && <ShortsTable />}
         {tab === "messages" && <MessagesTable />}
+        {tab === "credits" && <GrantCreditsPanel />}
       </main>
     </div>
   );

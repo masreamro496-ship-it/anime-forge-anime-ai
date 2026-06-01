@@ -208,13 +208,14 @@ function NewProjectPage() {
               <input type="number" min={1} step={0.01} value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} placeholder="5" className="w-full rounded-lg border border-input bg-background px-4 py-2.5 pr-9 text-right" />
             </div>
           </label>
-          <label className="block">
-            <span className="mb-2 block text-sm font-bold">رقم فودافون كاش</span>
+          <div className="block">
+            <span className="mb-2 block text-sm font-bold">رقم فودافون كاش (الدفع)</span>
             <div className="relative">
               <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold" />
-              <input value={vodafonePhone} onChange={(e) => setVodafonePhone(e.target.value)} placeholder="010xxxxxxxx" maxLength={20} className="w-full rounded-lg border border-input bg-background px-4 py-2.5 pr-9" />
+              <div className="w-full rounded-lg border border-input bg-background/50 px-4 py-2.5 pr-9 font-mono text-sm">{ADMIN_VODAFONE}</div>
             </div>
-          </label>
+            <p className="mt-1 text-[10px] text-muted-foreground">يدفع المشتري عبر فودافون كاش لهذا الرقم</p>
+          </div>
         </div>
 
         <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-border bg-background/40 p-8 hover:border-gold">

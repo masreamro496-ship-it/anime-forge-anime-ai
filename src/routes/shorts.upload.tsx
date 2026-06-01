@@ -19,10 +19,12 @@ export const Route = createFileRoute("/shorts/upload")({
 // Tier limits
 const FREE_MAX_SEC = 10 * 60; // up to 10 minutes
 const PRO_MAX_SEC = 30 * 60;  // up to 30 minutes
+const MIN_SEC = 60;           // minimum 1 minute
 const MAX_BYTES = 500 * 1024 * 1024; // 500MB hard cap for upload
+const ADMIN_VODAFONE = "01080390782";
 
-// Free quality (240p eager transform on Cloudinary)
-const FREE_EAGER = "w_426,h_240,c_limit,q_auto:eco,vc_h264";
+// Quality 360p eager transform on Cloudinary (applies to all users)
+const EAGER_360 = "w_640,h_360,c_limit,q_auto:eco,vc_h264";
 
 async function probeVideo(file: File): Promise<{ duration: number; width: number; height: number }> {
   return new Promise((resolve, reject) => {

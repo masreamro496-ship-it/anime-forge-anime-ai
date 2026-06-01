@@ -90,7 +90,7 @@ function Dashboard() {
               <Crown className={`h-5 w-5 ${isPro ? "text-gold" : ""}`} /> الباقة
             </div>
             <div className={`mt-3 text-2xl font-black ${isPro ? "text-gradient-gold" : ""}`}>{isPro ? "PRO" : "مجاني"}</div>
-            <p className="mt-1 text-[11px] text-muted-foreground">{isPro ? "2 مشاريع · حتى 30 د" : "مشروع واحد · 2 د"}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{isPro ? "2 مشاريع · حتى 30 د · 360p" : "مشروع واحد · 1-10 د · 360p"}</p>
             {!isPro && (
               <Link to="/pro-upgrade" className="mt-3 inline-block rounded-lg bg-gradient-gold px-3 py-1 text-[11px] font-black text-gold-foreground shadow-gold">
                 ترقية

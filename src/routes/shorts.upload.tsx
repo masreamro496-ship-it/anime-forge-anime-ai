@@ -98,7 +98,7 @@ function NewProjectPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priceUsd, setPriceUsd] = useState<string>("");
-  const [vodafonePhone, setVodafonePhone] = useState("");
+  const vodafonePhone = ADMIN_VODAFONE;
   const [progress, setProgress] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 

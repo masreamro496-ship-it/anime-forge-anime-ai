@@ -108,7 +108,7 @@ function NewProjectPage() {
     try {
       const m = await probeVideo(f);
       if (m.duration > maxSec + 1) return toast.error(`المدة المسموحة لك هي ${maxLabel} كحد أقصى (فيديوك ${Math.round(m.duration)} ث)`);
-      if (m.duration < 1) return toast.error("الفيديو قصير جداً");
+      if (m.duration < MIN_SEC) return toast.error(`الحد الأدنى ${MIN_SEC} ثانية (دقيقة)`);
       setFile(f); setMeta(m);
     } catch (e) { toast.error((e as Error).message); }
   };

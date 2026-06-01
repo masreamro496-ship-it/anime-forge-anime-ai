@@ -3,7 +3,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
-import { Crown, Sparkles, LogOut, Coins, ShieldCheck, Video, Mic, Receipt, Clock, CheckCircle2, XCircle, Play, DollarSign, Check } from "lucide-react";
+import { Crown, Sparkles, LogOut, Coins, ShieldCheck, Video, Mic, Receipt, Clock, CheckCircle2, XCircle, Play, DollarSign, Check, Gift, KeyRound, Copy } from "lucide-react";
+import { useState } from "react";
 import { AdminChatBox } from "@/components/AdminChatBox";
 import { toast } from "sonner";
 
@@ -90,7 +91,7 @@ function Dashboard() {
               <Crown className={`h-5 w-5 ${isPro ? "text-gold" : ""}`} /> الباقة
             </div>
             <div className={`mt-3 text-2xl font-black ${isPro ? "text-gradient-gold" : ""}`}>{isPro ? "PRO" : "مجاني"}</div>
-            <p className="mt-1 text-[11px] text-muted-foreground">{isPro ? "2 مشاريع · حتى 30 د" : "مشروع واحد · 2 د"}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{isPro ? "2 مشاريع · حتى 30 د · 360p" : "مشروع واحد · 1-10 د · 360p"}</p>
             {!isPro && (
               <Link to="/pro-upgrade" className="mt-3 inline-block rounded-lg bg-gradient-gold px-3 py-1 text-[11px] font-black text-gold-foreground shadow-gold">
                 ترقية
@@ -105,6 +106,9 @@ function Dashboard() {
           </div>
         </div>
 
+        <DailyGiftCard />
+        {isPro && <ProCodeCard />}
+
         <PendingSales />
 
 
@@ -115,7 +119,7 @@ function Dashboard() {
             to="/shorts/upload"
             icon={Play}
             title="مشروع جديد للبيع"
-            desc={isPro ? "حتى 30 دقيقة · 240p · مشروعين كحد أقصى" : "حتى دقيقتين · 240p · مشروع واحد"}
+            desc={isPro ? "1-30 دقيقة · 360p · مشروعين" : "1-10 دقائق · 360p · مشروع واحد"}
             cost="ادخل سعرك"
           />
           <ActionCard
@@ -234,6 +238,103 @@ function PendingSales() {
           </div>
         ))}
       </div>
+    </section>
+  );
+}
+
+function DailyGiftCard() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const { data: profile } = useProfile();
+  const sb = supabase as unknown as { from: (t: string) => { select: (c: string) => { eq: (k: string, v: unknown) => { order: (col: string, opts: { ascending: boolean }) => { limit: (n: number) => { maybeSingle: () => Promise<{ data: { claimed_at: string } | null }> } } } } }; rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> };
+
+  const { data: last, refetch } = useQuery({
+    queryKey: ["last-gift", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const res = await sb.from("daily_gifts").select("claimed_at").eq("user_id", user!.id).order("claimed_at", { ascending: false }).limit(1).maybeSingle();
+      return res.data?.claimed_at ?? null;
+    },
+  });
+
+  const nextAvailable = last ? new Date(new Date(last).getTime() + 24 * 3600 * 1000) : null;
+  const canClaim = !nextAvailable || nextAvailable.getTime() <= Date.now();
+  const amount = profile?.isPro ? 100 : 25;
+
+  const claim = async () => {
+    const res = await sb.rpc("claim_daily_gift");
+    if (res.error) return toast.error(res.error.message);
+    toast.success(`تم إضافة ${amount} كريديت 🎁`);
+    refetch();
+    qc.invalidateQueries({ queryKey: ["profile", user?.id] });
+  };
+
+  return (
+    <section className="mt-8 rounded-2xl border border-purple-500/40 bg-gradient-to-br from-purple-500/10 to-pink-500/10 p-5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Gift className="h-8 w-8 text-purple-400" />
+          <div>
+            <div className="text-base font-black">هدية يومية: {amount} كريديت</div>
+            <div className="text-xs text-muted-foreground">
+              {canClaim ? "متاحة الآن!" : `العودة بعد ${Math.ceil((nextAvailable!.getTime() - Date.now()) / 3600000)} ساعة`}
+            </div>
+          </div>
+        </div>
+        <button onClick={claim} disabled={!canClaim} className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-black text-white shadow-lg disabled:opacity-50">
+          {canClaim ? "استلام" : "غير متاح"}
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function ProCodeCard() {
+  const { user } = useAuth();
+  const [code, setCode] = useState<string | null>(null);
+  const sb = supabase as unknown as { from: (t: string) => { select: (c: string) => { eq: (k: string, v: unknown) => { order: (col: string, opts: { ascending: boolean }) => Promise<{ data: { code: string }[] | null }> } } }; rpc: (fn: string) => Promise<{ data: string | null; error: { message: string } | null }> };
+
+  const { data: codes, refetch } = useQuery({
+    queryKey: ["pro-codes", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const res = await sb.from("pro_codes").select("code").eq("user_id", user!.id).order("created_at", { ascending: false });
+      return res.data ?? [];
+    },
+  });
+
+  const generate = async () => {
+    const res = await sb.rpc("generate_pro_code");
+    if (res.error) return toast.error(res.error.message);
+    setCode(res.data);
+    toast.success("تم إنشاء الكود");
+    refetch();
+  };
+
+  const copy = (c: string) => { navigator.clipboard.writeText(c); toast.success("تم النسخ"); };
+
+  return (
+    <section className="mt-4 rounded-2xl border border-gold/40 bg-gold/5 p-5">
+      <div className="flex items-center gap-3">
+        <KeyRound className="h-7 w-7 text-gold" />
+        <div className="flex-1">
+          <div className="text-base font-black">كود PRO للمواقع البرمجية</div>
+          <p className="text-xs text-muted-foreground">يُستخدم في موقعين برمجة خارجيين مع Supabase. صلاحية 30 يوم.</p>
+        </div>
+        <button onClick={generate} className="rounded-lg bg-gradient-gold px-4 py-2 text-sm font-black text-gold-foreground shadow-gold">
+          توليد كود
+        </button>
+      </div>
+      {(code || codes?.length) ? (
+        <div className="mt-4 space-y-2">
+          {(code ? [{ code }, ...(codes ?? []).filter((c) => c.code !== code)] : codes ?? []).slice(0, 5).map((c) => (
+            <div key={c.code} className="flex items-center justify-between rounded-lg border border-border bg-background/60 px-3 py-2">
+              <code className="text-xs font-mono">{c.code}</code>
+              <button onClick={() => copy(c.code)} className="text-muted-foreground hover:text-foreground"><Copy className="h-4 w-4" /></button>
+            </div>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

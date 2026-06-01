@@ -19,10 +19,12 @@ export const Route = createFileRoute("/shorts/upload")({
 // Tier limits
 const FREE_MAX_SEC = 10 * 60; // up to 10 minutes
 const PRO_MAX_SEC = 30 * 60;  // up to 30 minutes
+const MIN_SEC = 60;           // minimum 1 minute
 const MAX_BYTES = 500 * 1024 * 1024; // 500MB hard cap for upload
+const ADMIN_VODAFONE = "01080390782";
 
-// Free quality (240p eager transform on Cloudinary)
-const FREE_EAGER = "w_426,h_240,c_limit,q_auto:eco,vc_h264";
+// Quality 360p eager transform on Cloudinary (applies to all users)
+const EAGER_360 = "w_640,h_360,c_limit,q_auto:eco,vc_h264";
 
 async function probeVideo(file: File): Promise<{ duration: number; width: number; height: number }> {
   return new Promise((resolve, reject) => {
@@ -96,7 +98,7 @@ function NewProjectPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priceUsd, setPriceUsd] = useState<string>("");
-  const [vodafonePhone, setVodafonePhone] = useState("");
+  const vodafonePhone = ADMIN_VODAFONE;
   const [progress, setProgress] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
@@ -106,7 +108,7 @@ function NewProjectPage() {
     try {
       const m = await probeVideo(f);
       if (m.duration > maxSec + 1) return toast.error(`المدة المسموحة لك هي ${maxLabel} كحد أقصى (فيديوك ${Math.round(m.duration)} ث)`);
-      if (m.duration < 1) return toast.error("الفيديو قصير جداً");
+      if (m.duration < MIN_SEC) return toast.error(`الحد الأدنى ${MIN_SEC} ثانية (دقيقة)`);
       setFile(f); setMeta(m);
     } catch (e) { toast.error((e as Error).message); }
   };
@@ -126,7 +128,7 @@ function NewProjectPage() {
       const params = await signFn({
         data: {
           folder: `anime-forge/${user.id}`,
-          eager: isPro ? undefined : FREE_EAGER,
+          eager: EAGER_360,
           resourceType: "video",
         },
       });
@@ -206,13 +208,14 @@ function NewProjectPage() {
               <input type="number" min={1} step={0.01} value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} placeholder="5" className="w-full rounded-lg border border-input bg-background px-4 py-2.5 pr-9 text-right" />
             </div>
           </label>
-          <label className="block">
-            <span className="mb-2 block text-sm font-bold">رقم فودافون كاش</span>
+          <div className="block">
+            <span className="mb-2 block text-sm font-bold">رقم فودافون كاش (الدفع)</span>
             <div className="relative">
               <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold" />
-              <input value={vodafonePhone} onChange={(e) => setVodafonePhone(e.target.value)} placeholder="010xxxxxxxx" maxLength={20} className="w-full rounded-lg border border-input bg-background px-4 py-2.5 pr-9" />
+              <div className="w-full rounded-lg border border-input bg-background/50 px-4 py-2.5 pr-9 font-mono text-sm">{ADMIN_VODAFONE}</div>
             </div>
-          </label>
+            <p className="mt-1 text-[10px] text-muted-foreground">يدفع المشتري عبر فودافون كاش لهذا الرقم</p>
+          </div>
         </div>
 
         <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-border bg-background/40 p-8 hover:border-gold">

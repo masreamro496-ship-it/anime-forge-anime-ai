@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPanel() {
-  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases">("purchases");
+  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases" | "credits">("purchases");
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
@@ -39,6 +39,7 @@ function AdminPanel() {
             { k: "payments", label: "المدفوعات" },
             { k: "shorts", label: "المشاريع" },
             { k: "messages", label: "الرسائل" },
+            { k: "credits", label: "منح كريديت" },
           ].map((t) => (
             <button
               key={t.k}
@@ -55,6 +56,7 @@ function AdminPanel() {
         {tab === "payments" && <PaymentsTable />}
         {tab === "shorts" && <ShortsTable />}
         {tab === "messages" && <MessagesTable />}
+        {tab === "credits" && <GrantCreditsPanel />}
       </main>
     </div>
   );
@@ -438,5 +440,46 @@ function PurchasesTable() {
         </div>
       ))}
     </div>
+  );
+}
+
+function GrantCreditsPanel() {
+  const [userId, setUserId] = useState("");
+  const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const sb = supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }> };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const amt = Number(amount);
+    if (!userId.trim() || !amt) return toast.error("ادخل user_id وقيمة");
+    setBusy(true);
+    const res = await sb.rpc("admin_grant_credits", { _target_user: userId.trim(), _amount: amt, _note: note || null });
+    setBusy(false);
+    if (res.error) return toast.error(res.error.message);
+    toast.success(`تم منح ${amt} كريديت`);
+    setAmount(""); setNote("");
+  };
+
+  return (
+    <form onSubmit={submit} className="max-w-xl space-y-4 rounded-2xl border border-border bg-card p-6">
+      <h3 className="text-lg font-black">منح / خصم كريديت لأي مستخدم</h3>
+      <div>
+        <label className="text-xs font-bold">User ID (UUID)</label>
+        <input value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="00000000-0000-0000-0000-000000000000" className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 font-mono text-xs" />
+      </div>
+      <div>
+        <label className="text-xs font-bold">الكمية (سالب للخصم)</label>
+        <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="100" className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2" />
+      </div>
+      <div>
+        <label className="text-xs font-bold">ملاحظة (اختياري)</label>
+        <input value={note} onChange={(e) => setNote(e.target.value)} className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2" />
+      </div>
+      <button disabled={busy} className="w-full rounded-lg bg-gradient-gold py-2.5 text-sm font-black text-gold-foreground shadow-gold disabled:opacity-50">
+        {busy ? "جاري..." : "تنفيذ"}
+      </button>
+    </form>
   );
 }

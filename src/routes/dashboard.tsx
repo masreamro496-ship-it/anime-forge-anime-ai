@@ -49,6 +49,9 @@ function Dashboard() {
             <span className="text-xl font-black text-gradient-gold">شاهد أنمي الآن</span>
           </Link>
           <div className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-1 rounded-lg border border-border bg-card px-3 py-2 text-xs font-bold hover:bg-accent">
+              ← العودة لمنصّة فودافون كاش
+            </Link>
             {data?.isAdmin && (
               <Link to="/admin" className="flex items-center gap-1 rounded-lg border border-gold/50 bg-gold/10 px-3 py-2 text-sm font-bold text-gold">
                 <ShieldCheck className="h-4 w-4" /> الأدمن

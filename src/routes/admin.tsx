@@ -39,6 +39,7 @@ function AdminPanel() {
             { k: "payments", label: "المدفوعات" },
             { k: "shorts", label: "المشاريع" },
             { k: "messages", label: "الرسائل" },
+            { k: "credits", label: "منح كريديت" },
           ].map((t) => (
             <button
               key={t.k}

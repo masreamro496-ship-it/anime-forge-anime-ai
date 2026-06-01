@@ -105,6 +105,9 @@ function Dashboard() {
           </div>
         </div>
 
+        <DailyGiftCard />
+        {isPro && <ProCodeCard />}
+
         <PendingSales />
 
 

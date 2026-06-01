@@ -118,7 +118,7 @@ function Dashboard() {
             to="/shorts/upload"
             icon={Play}
             title="مشروع جديد للبيع"
-            desc={isPro ? "حتى 30 دقيقة · 240p · مشروعين كحد أقصى" : "حتى دقيقتين · 240p · مشروع واحد"}
+            desc={isPro ? "1-30 دقيقة · 360p · مشروعين" : "1-10 دقائق · 360p · مشروع واحد"}
             cost="ادخل سعرك"
           />
           <ActionCard

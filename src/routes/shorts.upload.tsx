@@ -128,7 +128,7 @@ function NewProjectPage() {
       const params = await signFn({
         data: {
           folder: `anime-forge/${user.id}`,
-          eager: isPro ? undefined : FREE_EAGER,
+          eager: EAGER_360,
           resourceType: "video",
         },
       });

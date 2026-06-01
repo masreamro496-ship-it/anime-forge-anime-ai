@@ -175,6 +175,27 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_gifts: {
+        Row: {
+          amount: number
+          claimed_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          claimed_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          claimed_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       generation_requests: {
         Row: {
           admin_notes: string | null
@@ -298,6 +319,33 @@ export type Database = {
           status?: Database["public"]["Enums"]["payment_status"]
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      pro_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          user_id: string
+          uses_remaining: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          user_id: string
+          uses_remaining?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          user_id?: string
+          uses_remaining?: number
         }
         Relationships: []
       }
@@ -656,11 +704,16 @@ export type Database = {
       }
     }
     Functions: {
+      admin_grant_credits: {
+        Args: { _amount: number; _note?: string; _target_user: string }
+        Returns: undefined
+      }
       approve_purchase: { Args: { _purchase_id: string }; Returns: undefined }
       can_view_project_video: {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
+      claim_daily_gift: { Args: never; Returns: number }
       create_free_short: {
         Args: {
           _description: string
@@ -683,6 +736,7 @@ export type Database = {
         }
         Returns: string
       }
+      generate_pro_code: { Args: never; Returns: string }
       get_project_video_path: { Args: { _project_id: string }; Returns: string }
       has_role: {
         Args: {

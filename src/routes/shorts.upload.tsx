@@ -10,8 +10,8 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/shorts/upload")({
   beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/login", search: { redirect: "/shorts/upload" } });
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) throw redirect({ to: "/login", search: { redirect: "/shorts/upload" } });
   },
   component: NewProjectPage,
 });

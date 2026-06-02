@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { publicUrl } from "@/lib/storage";
 import { ArrowRight, Upload, DollarSign, Play, Lock } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/shorts")({ component: ProjectsFeed });
 

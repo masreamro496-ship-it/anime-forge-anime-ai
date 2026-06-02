@@ -319,10 +319,10 @@ function ProCodeCard() {
         <KeyRound className="h-7 w-7 text-gold" />
         <div className="flex-1">
           <div className="text-base font-black">كود PRO للمواقع البرمجية</div>
-          <p className="text-xs text-muted-foreground">يُستخدم في موقعين برمجة خارجيين مع Supabase. صلاحية 30 يوم.</p>
+          <p className="text-xs text-muted-foreground">كود رقمي عشوائي (9 أرقام) · يُستخدم في موقعَيْ برمجة مع Supabase · صلاحية 30 يوم.</p>
         </div>
         <button onClick={generate} className="rounded-lg bg-gradient-gold px-4 py-2 text-sm font-black text-gold-foreground shadow-gold">
-          توليد كود
+          استلام الكود
         </button>
       </div>
       {(code || codes?.length) ? (

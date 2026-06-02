@@ -139,7 +139,7 @@ function ProjectDetail() {
           )}
 
           {!isOwner && !myPurchase && (
-            <button onClick={handleBuy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-gold py-3 font-black text-gold-foreground shadow-gold">
+            <button onClick={handleBuy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-black text-white shadow-lg hover:bg-green-700">
               <ShoppingCart className="h-5 w-5" /> شراء بـ {Number(project.price_usd).toFixed(2)}$
             </button>
           )}

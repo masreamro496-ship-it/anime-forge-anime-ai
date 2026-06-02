@@ -109,6 +109,13 @@ function Landing() {
             <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>إنشاء مفتاح</h3>
             <p className="mt-1 text-sm text-muted-foreground">منصّة Anime Key Forge لتوليد المفاتيح</p>
           </a>
+
+          <a href="https://anime-forge-4k-art.lovable.app/" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#f97316", background: "linear-gradient(135deg, rgba(249,115,22,0.25), transparent)" }}>
+            <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#f97316" }}>جديد</span>
+            <Wand2 className="h-10 w-10" style={{ color: "#f97316" }} />
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#f97316" }}>توليد جودة أنمي صورية خيالية</h3>
+            <p className="mt-1 text-sm text-muted-foreground">صور أنمي بجودة 4K · افتح المولّد في تبويب جديد</p>
+          </a>
         </div>
       </section>
 

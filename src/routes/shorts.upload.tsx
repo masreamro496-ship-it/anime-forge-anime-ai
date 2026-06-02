@@ -10,8 +10,8 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/shorts/upload")({
   beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/login", search: { redirect: "/shorts/upload" } });
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) throw redirect({ to: "/login", search: { redirect: "/shorts/upload" } });
   },
   component: NewProjectPage,
 });
@@ -114,12 +114,13 @@ function NewProjectPage() {
   };
 
   const handleSubmit = async () => {
-    if (!user || !file) return;
+    if (!user) return toast.error("سجّل دخولك أولاً");
+    if (title.trim().length < 2) return toast.error("اكتب عنواناً للمشروع");
+    if (description.trim().length < 5) return toast.error("اكتب وصفاً مختصراً للمشروع");
     const priceNum = Number(priceUsd);
     if (!priceNum || priceNum <= 0) return toast.error("ادخل سعراً صحيحاً بالدولار");
-    if (vodafonePhone.trim().length < 8) return toast.error("ادخل رقم فودافون كاش صحيح");
-    if (description.trim().length < 5) return toast.error("اكتب وصفاً مختصراً للمشروع");
-    if (title.trim().length < 2) return toast.error("اكتب عنواناً للمشروع");
+    if (vodafonePhone.trim().length < 8) return toast.error("رقم فودافون كاش غير صحيح");
+    if (!file) return toast.error("اختر ملف الفيديو أولاً");
 
     setSubmitting(true);
     setProgress(2);

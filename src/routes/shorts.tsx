@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { publicUrl } from "@/lib/storage";
 import { ArrowRight, Upload, DollarSign, Play, Lock } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/shorts")({ component: ProjectsFeed });
 
@@ -20,6 +21,22 @@ type Project = {
 
 function ProjectsFeed() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const goCreate = async () => {
+    try {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        await navigate({ to: "/shorts/upload" });
+      } else {
+        await navigate({ to: "/login", search: { redirect: "/shorts/upload" } });
+      }
+    } catch (e) {
+      toast.error("تعذّر فتح صفحة الإنشاء. حاول مرة أخرى");
+      console.error(e);
+    }
+  };
+
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects", "feed"],
     queryFn: async () => {
@@ -37,13 +54,9 @@ function ProjectsFeed() {
         <div className="container mx-auto flex items-center justify-between px-4 py-3">
           <Link to="/" className="flex items-center gap-2 text-sm font-bold"><ArrowRight className="h-4 w-4" /> الرئيسية</Link>
           <h1 className="text-lg font-black text-gradient-gold">سوق مشاريع الأنمي</h1>
-          {user ? (
-            <Link to="/shorts/upload" className="flex items-center gap-1 rounded-lg bg-gradient-gold px-3 py-1.5 text-xs font-black text-gold-foreground shadow-gold">
-              <Upload className="h-3.5 w-3.5" /> إنشاء مشروع
-            </Link>
-          ) : (
-            <Link to="/login" search={{ redirect: "/shorts/upload" }} className="rounded-lg border border-gold/50 px-3 py-1.5 text-xs font-bold text-gold">دخول</Link>
-          )}
+          <button onClick={goCreate} className="flex items-center gap-1 rounded-lg bg-gradient-gold px-3 py-1.5 text-xs font-black text-gold-foreground shadow-gold">
+            <Upload className="h-3.5 w-3.5" /> {user ? "إنشاء مشروع" : "دخول"}
+          </button>
         </div>
       </header>
 
@@ -54,25 +67,15 @@ function ProjectsFeed() {
             <div>
               <h2 className="text-lg font-black text-gradient-gold sm:text-xl">إنشاء مشروع جديد</h2>
               <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
-                ارفع فيديو مشروعك (تحويل تلقائي إلى 240p للمجاني، وحتى 30 دقيقة لـ Pro) وضع سعراً بالدولار.
+                ارفع فيديو مشروعك، اكتب عنوان ووصف، وحدّد سعرك بالدولار. الدفع عبر فودافون كاش على الرقم <strong>01080390782</strong>.
               </p>
             </div>
-            {user ? (
-              <Link
-                to="/shorts/upload"
-                className="flex shrink-0 items-center gap-2 rounded-xl bg-gradient-gold px-5 py-2.5 text-sm font-black text-gold-foreground shadow-gold"
-              >
-                <Upload className="h-4 w-4" /> إنشاء مشروع
-              </Link>
-            ) : (
-              <Link
-                to="/login"
-                search={{ redirect: "/shorts/upload" }}
-                className="flex shrink-0 items-center gap-2 rounded-xl bg-gradient-gold px-5 py-2.5 text-sm font-black text-gold-foreground shadow-gold"
-              >
-                <Upload className="h-4 w-4" /> سجّل لإنشاء مشروع
-              </Link>
-            )}
+            <button
+              onClick={goCreate}
+              className="flex shrink-0 items-center gap-2 rounded-xl bg-gradient-gold px-5 py-2.5 text-sm font-black text-gold-foreground shadow-gold hover:opacity-90"
+            >
+              <Upload className="h-4 w-4" /> {user ? "إنشاء مشروع" : "سجّل لإنشاء مشروع"}
+            </button>
           </div>
         </section>
 

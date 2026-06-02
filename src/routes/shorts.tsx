@@ -21,6 +21,22 @@ type Project = {
 
 function ProjectsFeed() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const goCreate = async () => {
+    try {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        await navigate({ to: "/shorts/upload" });
+      } else {
+        await navigate({ to: "/login", search: { redirect: "/shorts/upload" } });
+      }
+    } catch (e) {
+      toast.error("تعذّر فتح صفحة الإنشاء. حاول مرة أخرى");
+      console.error(e);
+    }
+  };
+
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects", "feed"],
     queryFn: async () => {

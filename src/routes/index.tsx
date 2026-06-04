@@ -116,6 +116,13 @@ function Landing() {
             <h3 className="mt-3 text-lg font-black" style={{ color: "#f97316" }}>توليد جودة أنمي صورية خيالية</h3>
             <p className="mt-1 text-sm text-muted-foreground">صور أنمي بجودة 4K · افتح المولّد في تبويب جديد</p>
           </a>
+
+          <a href="https://anime-forge-dummling.lovable.app/" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#22c55e", background: "linear-gradient(135deg, rgba(34,197,94,0.25), transparent)" }}>
+            <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#22c55e" }}>جديد</span>
+            <Film className="h-10 w-10" style={{ color: "#22c55e" }} />
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#22c55e" }}>دبلجة فيديوهات</h3>
+            <p className="mt-1 text-sm text-muted-foreground">دبلجة فيديو من لغة انجليزية للغة العربية أو دبلجة من لغة صينية أو يبانية للعربية</p>
+          </a>
         </div>
       </section>
 

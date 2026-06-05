@@ -70,6 +70,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "ANIME-FORGE" },
       { name: "description", content: "منصة توليد فيديوهات الأنمي بالذكاء الاصطناعي - Shaid Anime Now ومشاريع وانمي وكل شيء" },
+      { name: "google-site-verification", content: "infP5TYG3H-GcdYAdTttRN4oCzASItKwf4Va5sCZf1o" },
       { property: "og:title", content: "ANIME-FORGE" },
       { property: "og:description", content: "منصة توليد فيديوهات الأنمي بالذكاء الاصطناعي - Shaid Anime Now ومشاريع وانمي وكل شيء" },
       { property: "og:type", content: "website" },

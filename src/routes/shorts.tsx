@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { publicUrl } from "@/lib/storage";
-import { ArrowRight, Upload, DollarSign, Play, Lock } from "lucide-react";
+import { ArrowRight, Upload, DollarSign, Play, Lock, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/shorts")({ component: ProjectsFeed });

@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { signCloudinaryUpload } from "@/lib/cloudinary.functions";
-import { ArrowRight, Upload, Video as VideoIcon, DollarSign, Phone, Send } from "lucide-react";
+import { ArrowRight, Upload, Video as VideoIcon, DollarSign, Phone, Send, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/shorts/upload")({
@@ -243,6 +243,18 @@ function NewProjectPage() {
           <Send className="h-5 w-5" />
           {submitting ? "جاري النشر..." : "نشر المشروع"}
         </button>
+
+        <div className="rounded-xl border border-border bg-card p-4 text-center">
+          <a
+            href="https://019e9e18-a975-72fa-b6d2-a39e9f8eb8e0.arena.site/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-black text-white hover:bg-blue-700"
+          >
+            <ExternalLink className="h-4 w-4" />
+            تصفّح المزيد من المشاريع
+          </a>
+        </div>
       </main>
     </div>
   );

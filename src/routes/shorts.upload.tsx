@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { signCloudinaryUpload } from "@/lib/cloudinary.functions";
-import { ArrowRight, Upload, Video as VideoIcon, DollarSign, Phone, Send } from "lucide-react";
+import { ArrowRight, Upload, Video as VideoIcon, DollarSign, Phone, Send, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/shorts/upload")({

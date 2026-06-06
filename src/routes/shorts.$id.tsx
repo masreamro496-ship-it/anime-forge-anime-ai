@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { publicUrl } from "@/lib/storage";
-import { ArrowRight, DollarSign, Phone, ShoppingCart, CheckCircle2, Clock, Lock, Play } from "lucide-react";
+import { ArrowRight, DollarSign, Phone, ShoppingCart, CheckCircle2, Clock, Lock, Play, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/shorts/$id")({ component: ProjectDetail });

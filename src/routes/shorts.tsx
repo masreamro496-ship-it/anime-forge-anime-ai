@@ -92,6 +92,20 @@ function ProjectsFeed() {
         </div>
       </main>
 
+      {/* External link banner */}
+      <footer className="border-t border-border/50 bg-background/60">
+        <div className="container mx-auto px-4 py-4 text-center">
+          <a
+            href="https://019e9e18-a975-72fa-b6d2-a39e9f8eb8e0.arena.site/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white shadow-lg hover:bg-blue-700"
+          >
+            <ExternalLink className="h-4 w-4" />
+            تصفّح المزيد من المشاريع
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }

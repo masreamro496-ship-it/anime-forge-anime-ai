@@ -117,10 +117,10 @@ export const submitNovitaVideo = createServerFn({ method: "POST" })
       _start_image: data.startImagePath,
       _end_image: data.endImagePath,
       _duration: data.durationSeconds,
-      _provider_task_id: taskId ?? null,
+      _provider_task_id: taskId ?? "",
       _status: status,
-      _admin_notes: adminNotes || null,
-    });
+      _admin_notes: adminNotes || "",
+    } as never);
     if (error) throw new Error(error.message);
 
     return {

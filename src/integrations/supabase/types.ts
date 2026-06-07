@@ -205,6 +205,8 @@ export type Database = {
           end_image_url: string | null
           id: string
           prompt: string
+          provider: string | null
+          provider_task_id: string | null
           result_url: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -222,6 +224,8 @@ export type Database = {
           end_image_url?: string | null
           id?: string
           prompt: string
+          provider?: string | null
+          provider_task_id?: string | null
           result_url?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -239,6 +243,8 @@ export type Database = {
           end_image_url?: string | null
           id?: string
           prompt?: string
+          provider?: string | null
+          provider_task_id?: string | null
           result_url?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -757,10 +763,28 @@ export type Database = {
         }
         Returns: string
       }
+      submit_novita_video: {
+        Args: {
+          _admin_notes: string
+          _duration: number
+          _end_image: string
+          _prompt: string
+          _provider_task_id: string
+          _start_image: string
+          _status: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "pro" | "user"
-      gen_status: "pending" | "in_review" | "completed" | "rejected"
+      gen_status:
+        | "pending"
+        | "in_review"
+        | "completed"
+        | "rejected"
+        | "processing"
+        | "failed"
       gen_type: "video" | "goku_voice"
       payment_status: "pending" | "approved" | "rejected"
       purchase_status: "pending" | "approved" | "rejected"
@@ -893,7 +917,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "pro", "user"],
-      gen_status: ["pending", "in_review", "completed", "rejected"],
+      gen_status: [
+        "pending",
+        "in_review",
+        "completed",
+        "rejected",
+        "processing",
+        "failed",
+      ],
       gen_type: ["video", "goku_voice"],
       payment_status: ["pending", "approved", "rejected"],
       purchase_status: ["pending", "approved", "rejected"],

@@ -1,9 +1,11 @@
 import { createFileRoute, redirect, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { uploadUserFile } from "@/lib/storage";
+import { submitNovitaVideo } from "@/lib/novita.functions";
 import { ArrowRight, Upload, Video, Sparkles, Coins } from "lucide-react";
 import { toast } from "sonner";
 
@@ -23,6 +25,7 @@ function VideoGenPage() {
   const { user } = useAuth();
   const { data: profile } = useProfile();
   const navigate = useNavigate();
+  const submitFn = useServerFn(submitNovitaVideo);
 
   const [prompt, setPrompt] = useState("");
   const [startImage, setStartImage] = useState<File | null>(null);
@@ -50,20 +53,16 @@ function VideoGenPage() {
         uploadUserFile("gen-inputs", user.id, endImage, "end-"),
       ]);
 
-      // Credits are deducted by the admin upon approval (Phase 1 — manual review flow).
-      const { error } = await supabase.from("generation_requests").insert({
-        user_id: user.id,
-        type: "video",
-        prompt: prompt.trim(),
-        start_image_url: startPath,
-        end_image_url: endPath,
-        duration_seconds: duration,
-        credits_charged: VIDEO_COST,
-        status: "pending",
+      const res = await submitFn({
+        data: {
+          prompt: prompt.trim(),
+          startImagePath: startPath,
+          endImagePath: endPath,
+          durationSeconds: duration,
+        },
       });
-      if (error) throw error;
 
-      toast.success("تم إرسال طلبك! قيد المراجعة اليدوية من الأدمن");
+      toast.success(res.message || "جار العمل — تم استلام طلبك");
       navigate({ to: "/dashboard" });
     } catch (err) {
       toast.error((err as Error).message);

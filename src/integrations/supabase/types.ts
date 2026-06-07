@@ -760,7 +760,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "pro" | "user"
-      gen_status: "pending" | "in_review" | "completed" | "rejected"
+      gen_status:
+        | "pending"
+        | "in_review"
+        | "completed"
+        | "rejected"
+        | "processing"
+        | "failed"
       gen_type: "video" | "goku_voice"
       payment_status: "pending" | "approved" | "rejected"
       purchase_status: "pending" | "approved" | "rejected"
@@ -893,7 +899,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "pro", "user"],
-      gen_status: ["pending", "in_review", "completed", "rejected"],
+      gen_status: [
+        "pending",
+        "in_review",
+        "completed",
+        "rejected",
+        "processing",
+        "failed",
+      ],
       gen_type: ["video", "goku_voice"],
       payment_status: ["pending", "approved", "rejected"],
       purchase_status: ["pending", "approved", "rejected"],

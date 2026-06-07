@@ -25,6 +25,7 @@ function VideoGenPage() {
   const { user } = useAuth();
   const { data: profile } = useProfile();
   const navigate = useNavigate();
+  const submitFn = useServerFn(submitNovitaVideo);
 
   const [prompt, setPrompt] = useState("");
   const [startImage, setStartImage] = useState<File | null>(null);

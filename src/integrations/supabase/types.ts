@@ -205,6 +205,8 @@ export type Database = {
           end_image_url: string | null
           id: string
           prompt: string
+          provider: string | null
+          provider_task_id: string | null
           result_url: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -222,6 +224,8 @@ export type Database = {
           end_image_url?: string | null
           id?: string
           prompt: string
+          provider?: string | null
+          provider_task_id?: string | null
           result_url?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -239,6 +243,8 @@ export type Database = {
           end_image_url?: string | null
           id?: string
           prompt?: string
+          provider?: string | null
+          provider_task_id?: string | null
           result_url?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -754,6 +760,18 @@ export type Database = {
           _duration_seconds: number
           _processed_url: string
           _source_url: string
+        }
+        Returns: string
+      }
+      submit_novita_video: {
+        Args: {
+          _admin_notes: string
+          _duration: number
+          _end_image: string
+          _prompt: string
+          _provider_task_id: string
+          _start_image: string
+          _status: string
         }
         Returns: string
       }

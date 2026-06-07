@@ -1,9 +1,11 @@
 import { createFileRoute, redirect, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { uploadUserFile } from "@/lib/storage";
+import { submitNovitaVideo } from "@/lib/novita.functions";
 import { ArrowRight, Upload, Video, Sparkles, Coins } from "lucide-react";
 import { toast } from "sonner";
 

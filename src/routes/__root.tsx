@@ -126,6 +126,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Outlet />
+        <MonetagAutoAd />
         <Toaster richColors position="top-center" dir="rtl" />
       </AuthProvider>
     </QueryClientProvider>

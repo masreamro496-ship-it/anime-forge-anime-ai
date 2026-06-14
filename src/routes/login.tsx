@@ -70,6 +70,20 @@ function LoginPage() {
     }
   };
 
+  const handleGithub = async () => {
+    const cd = checkLoginCooldown();
+    if (cd) { toast.error(cd); return; }
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: { redirectTo: window.location.origin + (redirectTo ?? "/dashboard") },
+    });
+    if (error) {
+      toast.error("فشل تسجيل الدخول بـ GitHub: " + error.message);
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-card">

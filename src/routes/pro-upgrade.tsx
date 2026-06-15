@@ -1,10 +1,12 @@
 import { createFileRoute, redirect, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { uploadUserFile } from "@/lib/storage";
-import { Crown, Upload, ArrowRight, Copy, CheckCircle2 } from "lucide-react";
+import { Crown, Upload, ArrowRight, Copy, CheckCircle2, CreditCard } from "lucide-react";
 import { toast } from "sonner";
+import { createFatoraCheckout } from "@/lib/fatora.functions";
 
 export const Route = createFileRoute("/pro-upgrade")({
   beforeLoad: async () => {

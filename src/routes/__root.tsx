@@ -128,6 +128,9 @@ function RootComponent() {
       <AuthProvider>
         <Outlet />
         <MonetagAutoAd />
+        <div className="fixed bottom-3 left-3 z-[100]">
+          <LanguageSwitcher />
+        </div>
         <Toaster richColors position="top-center" dir="rtl" />
       </AuthProvider>
     </QueryClientProvider>

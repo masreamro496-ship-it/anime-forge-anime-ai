@@ -25,6 +25,19 @@ function ProUpgradePage() {
   const [receipt, setReceipt] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [payingPlan, setPayingPlan] = useState<string | null>(null);
+  const fatoraCheckout = useServerFn(createFatoraCheckout);
+
+  const handleFatoraPay = async (plan: "pro" | "coins_100" | "coins_500" | "coins_1000") => {
+    setPayingPlan(plan);
+    try {
+      const { url } = await fatoraCheckout({ data: { plan, origin: window.location.origin } });
+      window.location.href = url;
+    } catch (err) {
+      toast.error((err as Error).message || "تعذّر بدء الدفع");
+      setPayingPlan(null);
+    }
+  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(VODAFONE_NUMBER);

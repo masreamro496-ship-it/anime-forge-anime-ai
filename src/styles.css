@@ -110,3 +110,19 @@
     box-shadow: 0 0 0 1px var(--gold), 0 0 30px -5px var(--gold);
   }
 }
+
+/* Google Translate widget tweaks */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-gadget-icon { display: none !important; }
+body { top: 0 !important; }
+.goog-te-gadget { font-size: 0 !important; color: transparent !important; }
+.goog-te-gadget .goog-te-combo {
+  margin: 0 !important;
+  padding: 4px 8px !important;
+  border-radius: 8px !important;
+  background: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  font-size: 12px !important;
+  max-width: 140px;
+}

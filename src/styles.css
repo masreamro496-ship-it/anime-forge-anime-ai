@@ -120,9 +120,9 @@ body { top: 0 !important; }
   margin: 0 !important;
   padding: 4px 8px !important;
   border-radius: 8px !important;
-  background: hsl(var(--background)) !important;
-  color: hsl(var(--foreground)) !important;
-  border: 1px solid hsl(var(--border)) !important;
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
   font-size: 12px !important;
   max-width: 140px;
 }

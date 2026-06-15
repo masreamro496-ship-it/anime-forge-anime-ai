@@ -38,7 +38,7 @@ export const createFatoraCheckout = createServerFn({ method: "POST" })
           email: context.claims?.email ?? "customer@example.com",
         },
         language: "ar",
-        success_url: `${data.origin}/dashboard?payment=success&order=${orderId}`,
+        success_url: `${data.origin}/api/public/fatora/success?order=${orderId}`,
         failure_url: `${data.origin}/pro-upgrade?payment=failed`,
         note: plan.name,
       }),

@@ -24,6 +24,7 @@ import { Route as ShortsUploadRouteImport } from './routes/shorts.upload'
 import { Route as ShortsIdRouteImport } from './routes/shorts.$id'
 import { Route as GenerateVideoRouteImport } from './routes/generate.video'
 import { Route as GenerateGokuRouteImport } from './routes/generate.goku'
+import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/fatora/success'
 
 const WatermarkRoute = WatermarkRouteImport.update({
   id: '/watermark',
@@ -100,6 +101,11 @@ const GenerateGokuRoute = GenerateGokuRouteImport.update({
   path: '/generate/goku',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({
+  id: '/api/public/fatora/success',
+  path: '/api/public/fatora/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
   '/shorts/upload': typeof ShortsUploadRoute
+  '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
   '/shorts/upload': typeof ShortsUploadRoute
+  '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
   '/shorts/upload': typeof ShortsUploadRoute
+  '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/generate/video'
     | '/shorts/$id'
     | '/shorts/upload'
+    | '/api/public/fatora/success'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/generate/video'
     | '/shorts/$id'
     | '/shorts/upload'
+    | '/api/public/fatora/success'
   id:
     | '__root__'
     | '/'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/generate/video'
     | '/shorts/$id'
     | '/shorts/upload'
+    | '/api/public/fatora/success'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   WatermarkRoute: typeof WatermarkRoute
   GenerateGokuRoute: typeof GenerateGokuRoute
   GenerateVideoRoute: typeof GenerateVideoRoute
+  ApiPublicFatoraSuccessRoute: typeof ApiPublicFatoraSuccessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -330,6 +343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GenerateGokuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/fatora/success': {
+      id: '/api/public/fatora/success'
+      path: '/api/public/fatora/success'
+      fullPath: '/api/public/fatora/success'
+      preLoaderRoute: typeof ApiPublicFatoraSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -360,6 +380,7 @@ const rootRouteChildren: RootRouteChildren = {
   WatermarkRoute: WatermarkRoute,
   GenerateGokuRoute: GenerateGokuRoute,
   GenerateVideoRoute: GenerateVideoRoute,
+  ApiPublicFatoraSuccessRoute: ApiPublicFatoraSuccessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -10,6 +10,7 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
 import { MonetagAutoAd } from "@/components/MonetagAutoAd";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 import appCss from "../styles.css?url";
 
@@ -127,6 +128,9 @@ function RootComponent() {
       <AuthProvider>
         <Outlet />
         <MonetagAutoAd />
+        <div className="fixed bottom-3 left-3 z-[100]">
+          <LanguageSwitcher />
+        </div>
         <Toaster richColors position="top-center" dir="rtl" />
       </AuthProvider>
     </QueryClientProvider>

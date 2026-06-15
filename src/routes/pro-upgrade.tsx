@@ -155,11 +155,54 @@ function ProUpgradePage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold transition-transform hover:scale-[1.02] disabled:opacity-50"
+              className="w-full rounded-2xl bg-gradient-gold py-5 text-xl font-black text-gold-foreground shadow-gold transition-transform hover:scale-[1.02] disabled:opacity-50"
             >
               {submitting ? "جاري الإرسال..." : "إرسال طلب الترقية"}
             </button>
           </form>
+
+          <div className="mt-6 rounded-xl border-2 border-green-500/60 bg-green-500/5 p-5">
+            <div className="flex items-center gap-2 text-sm font-black text-green-500">
+              <CreditCard className="h-5 w-5" />
+              ادفع فوراً عبر Fatora (فيزا / ماستركارد / محافظ إلكترونية)
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">دفع آمن بالجنيه المصري — تفعيل تلقائي بعد التأكيد</p>
+
+            <div className="mt-4 grid gap-2">
+              <button
+                type="button"
+                onClick={() => handleFatoraPay("pro")}
+                disabled={payingPlan !== null}
+                className="w-full rounded-xl bg-green-600 py-4 text-base font-black text-white shadow-lg transition-transform hover:scale-[1.02] hover:bg-green-700 disabled:opacity-50"
+              >
+                {payingPlan === "pro" ? "جاري التحويل..." : "ترقية PRO — 50 جنيه"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFatoraPay("coins_100")}
+                disabled={payingPlan !== null}
+                className="w-full rounded-xl bg-green-600/90 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] hover:bg-green-700 disabled:opacity-50"
+              >
+                {payingPlan === "coins_100" ? "جاري التحويل..." : "شراء 100 كريديت — 25 جنيه"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFatoraPay("coins_500")}
+                disabled={payingPlan !== null}
+                className="w-full rounded-xl bg-green-600/90 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] hover:bg-green-700 disabled:opacity-50"
+              >
+                {payingPlan === "coins_500" ? "جاري التحويل..." : "شراء 500 كريديت — 100 جنيه"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFatoraPay("coins_1000")}
+                disabled={payingPlan !== null}
+                className="w-full rounded-xl bg-green-600/90 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] hover:bg-green-700 disabled:opacity-50"
+              >
+                {payingPlan === "coins_1000" ? "جاري التحويل..." : "شراء 1000 كريديت — 180 جنيه"}
+              </button>
+            </div>
+          </div>
         </div>
       </main>
     </div>

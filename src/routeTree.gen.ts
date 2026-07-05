@@ -18,6 +18,7 @@ import { Route as FreeShortsRouteImport } from './routes/free-shorts'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AudioRouteImport } from './routes/audio'
+import { Route as AnimeMarketRouteImport } from './routes/anime-market'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShortsUploadRouteImport } from './routes/shorts.upload'
@@ -71,6 +72,11 @@ const AudioRoute = AudioRouteImport.update({
   path: '/audio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnimeMarketRoute = AnimeMarketRouteImport.update({
+  id: '/anime-market',
+  path: '/anime-market',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -110,6 +116,7 @@ const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/anime-market': typeof AnimeMarketRoute
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/anime-market': typeof AnimeMarketRoute
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/anime-market': typeof AnimeMarketRoute
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/anime-market'
     | '/audio'
     | '/chat'
     | '/dashboard'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/anime-market'
     | '/audio'
     | '/chat'
     | '/dashboard'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/anime-market'
     | '/audio'
     | '/chat'
     | '/dashboard'
@@ -222,6 +234,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AnimeMarketRoute: typeof AnimeMarketRoute
   AudioRoute: typeof AudioRoute
   ChatRoute: typeof ChatRoute
   DashboardRoute: typeof DashboardRoute
@@ -301,6 +314,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AudioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/anime-market': {
+      id: '/anime-market'
+      path: '/anime-market'
+      fullPath: '/anime-market'
+      preLoaderRoute: typeof AnimeMarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -369,6 +389,7 @@ const ShortsRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AnimeMarketRoute: AnimeMarketRoute,
   AudioRoute: AudioRoute,
   ChatRoute: ChatRoute,
   DashboardRoute: DashboardRoute,

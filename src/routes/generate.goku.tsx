@@ -125,7 +125,6 @@ function GokuPage() {
             className="w-full rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold disabled:opacity-50"
           >
             {submitting ? "جاري الإرسال..." : "SEND DATA — إرسال السكريبت"}
-            {submitting ? "جاري الإرسال..." : "SEND DATA — إرسال السكريبت"}
           </button>
         </form>
 
@@ -141,6 +140,3 @@ function GokuPage() {
   );
 }
 
-    </div>
-  );
-}

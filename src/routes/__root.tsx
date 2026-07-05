@@ -9,8 +9,9 @@ import {
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
-import { MonetagAutoAd } from "@/components/MonetagAutoAd";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+
+
 
 import appCss from "../styles.css?url";
 
@@ -82,14 +83,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/yGSKrlrbAzSDaLpKFNdX3ulJxhD3/social-images/social-1780275920825-1000229179.webp" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    scripts: [
-      {
-        src: "https://quge5.com/88/tag.min.js",
-        "data-zone": "249393",
-        async: true,
-        "data-cfasync": "false",
-      },
-    ],
+    scripts: [],
+
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -127,7 +122,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Outlet />
-        <MonetagAutoAd />
+        
         <div className="fixed bottom-3 left-3 z-[100]">
           <LanguageSwitcher />
         </div>

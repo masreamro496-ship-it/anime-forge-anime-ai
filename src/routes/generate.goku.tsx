@@ -127,7 +127,16 @@ function GokuPage() {
             {submitting ? "جاري الإرسال..." : "SEND DATA — إرسال السكريبت"}
           </button>
         </form>
+
+        <Link
+          to="/anime-market"
+          className="mt-4 block rounded-2xl border-2 border-pink-500 bg-pink-500/10 p-4 text-center transition hover:scale-[1.01]"
+        >
+          <div className="text-base font-black text-pink-500">🎬 نشر فيديوهات أنمي</div>
+          <div className="mt-1 text-xs text-muted-foreground">ارفع فيديو أنمي حتى 30 دقيقة، حدّد سعرك بالكريدت، وابدأ البيع</div>
+        </Link>
       </main>
     </div>
   );
 }
+

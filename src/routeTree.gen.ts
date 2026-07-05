@@ -18,12 +18,14 @@ import { Route as FreeShortsRouteImport } from './routes/free-shorts'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AudioRouteImport } from './routes/audio'
+import { Route as AnimeMarketRouteImport } from './routes/anime-market'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShortsUploadRouteImport } from './routes/shorts.upload'
 import { Route as ShortsIdRouteImport } from './routes/shorts.$id'
 import { Route as GenerateVideoRouteImport } from './routes/generate.video'
 import { Route as GenerateGokuRouteImport } from './routes/generate.goku'
+import { Route as AnimeMarketIdRouteImport } from './routes/anime-market.$id'
 import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/fatora/success'
 
 const WatermarkRoute = WatermarkRouteImport.update({
@@ -71,6 +73,11 @@ const AudioRoute = AudioRouteImport.update({
   path: '/audio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnimeMarketRoute = AnimeMarketRouteImport.update({
+  id: '/anime-market',
+  path: '/anime-market',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -101,6 +108,11 @@ const GenerateGokuRoute = GenerateGokuRouteImport.update({
   path: '/generate/goku',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnimeMarketIdRoute = AnimeMarketIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AnimeMarketRoute,
+} as any)
 const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({
   id: '/api/public/fatora/success',
   path: '/api/public/fatora/success',
@@ -110,6 +122,7 @@ const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/anime-market': typeof AnimeMarketRouteWithChildren
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
@@ -119,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/watermark': typeof WatermarkRoute
+  '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
@@ -128,6 +142,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/anime-market': typeof AnimeMarketRouteWithChildren
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
@@ -137,6 +152,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/watermark': typeof WatermarkRoute
+  '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
@@ -147,6 +163,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/anime-market': typeof AnimeMarketRouteWithChildren
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
@@ -156,6 +173,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/watermark': typeof WatermarkRoute
+  '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
@@ -167,6 +185,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/anime-market'
     | '/audio'
     | '/chat'
     | '/dashboard'
@@ -176,6 +195,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/watermark'
+    | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
@@ -185,6 +205,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/anime-market'
     | '/audio'
     | '/chat'
     | '/dashboard'
@@ -194,6 +215,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/watermark'
+    | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
@@ -203,6 +225,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/anime-market'
     | '/audio'
     | '/chat'
     | '/dashboard'
@@ -212,6 +235,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/watermark'
+    | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
@@ -222,6 +246,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AnimeMarketRoute: typeof AnimeMarketRouteWithChildren
   AudioRoute: typeof AudioRoute
   ChatRoute: typeof ChatRoute
   DashboardRoute: typeof DashboardRoute
@@ -301,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AudioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/anime-market': {
+      id: '/anime-market'
+      path: '/anime-market'
+      fullPath: '/anime-market'
+      preLoaderRoute: typeof AnimeMarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -343,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GenerateGokuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/anime-market/$id': {
+      id: '/anime-market/$id'
+      path: '/$id'
+      fullPath: '/anime-market/$id'
+      preLoaderRoute: typeof AnimeMarketIdRouteImport
+      parentRoute: typeof AnimeMarketRoute
+    }
     '/api/public/fatora/success': {
       id: '/api/public/fatora/success'
       path: '/api/public/fatora/success'
@@ -352,6 +391,18 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AnimeMarketRouteChildren {
+  AnimeMarketIdRoute: typeof AnimeMarketIdRoute
+}
+
+const AnimeMarketRouteChildren: AnimeMarketRouteChildren = {
+  AnimeMarketIdRoute: AnimeMarketIdRoute,
+}
+
+const AnimeMarketRouteWithChildren = AnimeMarketRoute._addFileChildren(
+  AnimeMarketRouteChildren,
+)
 
 interface ShortsRouteChildren {
   ShortsIdRoute: typeof ShortsIdRoute
@@ -369,6 +420,7 @@ const ShortsRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AnimeMarketRoute: AnimeMarketRouteWithChildren,
   AudioRoute: AudioRoute,
   ChatRoute: ChatRoute,
   DashboardRoute: DashboardRoute,

@@ -38,6 +38,89 @@ export type Database = {
         }
         Relationships: []
       }
+      anime_media: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_seconds: number
+          id: string
+          kind: Database["public"]["Enums"]["anime_media_kind"]
+          price_credits: number
+          purchases_count: number
+          thumbnail_path: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          video_path: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number
+          id?: string
+          kind: Database["public"]["Enums"]["anime_media_kind"]
+          price_credits: number
+          purchases_count?: number
+          thumbnail_path?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          video_path: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number
+          id?: string
+          kind?: Database["public"]["Enums"]["anime_media_kind"]
+          price_credits?: number
+          purchases_count?: number
+          thumbnail_path?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          video_path?: string
+        }
+        Relationships: []
+      }
+      anime_media_purchases: {
+        Row: {
+          buyer_id: string
+          created_at: string
+          id: string
+          media_id: string
+          price_credits: number
+          seller_credits: number
+          seller_id: string
+        }
+        Insert: {
+          buyer_id: string
+          created_at?: string
+          id?: string
+          media_id: string
+          price_credits: number
+          seller_credits: number
+          seller_id: string
+        }
+        Update: {
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          media_id?: string
+          price_credits?: number
+          seller_credits?: number
+          seller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anime_media_purchases_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "anime_media"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audio_clips: {
         Row: {
           audio_url: string
@@ -743,6 +826,10 @@ export type Database = {
         Returns: string
       }
       generate_pro_code: { Args: never; Returns: string }
+      get_anime_media_video_path: {
+        Args: { _media_id: string }
+        Returns: string
+      }
       get_project_video_path: { Args: { _project_id: string }; Returns: string }
       has_role: {
         Args: {
@@ -752,6 +839,7 @@ export type Database = {
         Returns: boolean
       }
       promote_scheduled_shorts: { Args: never; Returns: undefined }
+      purchase_anime_media: { Args: { _media_id: string }; Returns: string }
       purchase_audio_download: { Args: { _clip_id: string }; Returns: string }
       request_purchase: { Args: { _project_id: string }; Returns: string }
       spend_chat_credits: { Args: never; Returns: undefined }
@@ -777,6 +865,7 @@ export type Database = {
       }
     }
     Enums: {
+      anime_media_kind: "anime_video" | "anime_movie"
       app_role: "admin" | "moderator" | "pro" | "user"
       gen_status:
         | "pending"
@@ -916,6 +1005,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      anime_media_kind: ["anime_video", "anime_movie"],
       app_role: ["admin", "moderator", "pro", "user"],
       gen_status: [
         "pending",

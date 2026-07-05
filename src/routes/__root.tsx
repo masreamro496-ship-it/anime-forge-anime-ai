@@ -8,7 +8,9 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/hooks/use-auth";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+
 
 
 import appCss from "../styles.css?url";

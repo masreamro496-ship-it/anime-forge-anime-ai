@@ -122,7 +122,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Outlet />
-        <MonetagAutoAd />
+        
         <div className="fixed bottom-3 left-3 z-[100]">
           <LanguageSwitcher />
         </div>

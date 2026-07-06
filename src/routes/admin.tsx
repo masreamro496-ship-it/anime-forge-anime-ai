@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPanel() {
-  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases" | "credits">("purchases");
+  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases" | "credits" | "locks" | "worldcup">("purchases");
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
@@ -40,6 +40,8 @@ function AdminPanel() {
             { k: "shorts", label: "المشاريع" },
             { k: "messages", label: "الرسائل" },
             { k: "credits", label: "منح كريديت" },
+            { k: "locks", label: "قفل/فتح الصفحات" },
+            { k: "worldcup", label: "كأس العالم" },
           ].map((t) => (
             <button
               key={t.k}
@@ -57,10 +59,13 @@ function AdminPanel() {
         {tab === "shorts" && <ShortsTable />}
         {tab === "messages" && <MessagesTable />}
         {tab === "credits" && <GrantCreditsPanel />}
+        {tab === "locks" && <SiteLocksPanel />}
+        {tab === "worldcup" && <WorldCupPanel />}
       </main>
     </div>
   );
 }
+
 
 /* ---------------- Generation requests ---------------- */
 function RequestsTable() {

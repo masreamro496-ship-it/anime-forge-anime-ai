@@ -96,12 +96,13 @@ function Landing() {
             <p className="mt-1 text-sm text-muted-foreground">معالجة متقدمة عبر Cloudinary · 15 كريديت · النتيجة خاصة بك فقط</p>
           </Link>
 
-          <a href="https://preview--anime-codeweaver.lovable.app/" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#3b82f6", background: "linear-gradient(135deg, rgba(59,130,246,0.25), transparent)" }}>
+          <a href="https://anime-forge-ai-coder.lovable.app/login" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#3b82f6", background: "linear-gradient(135deg, rgba(59,130,246,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-black text-white">New</span>
             <Rocket className="h-10 w-10" style={{ color: "#3b82f6" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#3b82f6" }}>شات برمجي</h3>
             <p className="mt-1 text-sm text-muted-foreground">منصّة برمجة كاملة · افتح المحرّر في تبويب جديد</p>
           </a>
+
 
           <a href="https://anime-key-forge.lovable.app/" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#a855f7", background: "linear-gradient(135deg, rgba(168,85,247,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#a855f7" }}>جديد</span>
@@ -137,6 +138,15 @@ function Landing() {
             <h3 className="mt-3 text-lg font-black" style={{ color: "#eab308" }}>أفلام أنمي</h3>
             <p className="mt-1 text-sm text-muted-foreground">ارفع فيلم أنمي حتى ساعتين بسعر يصل إلى 200 كريدت — عرض بجودة 480p ومشغّل احترافي مريح</p>
           </Link>
+
+          <Link to="/world-cup" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#10b981", background: "linear-gradient(135deg, rgba(16,185,129,0.30), transparent)" }}>
+            <span className="absolute right-3 top-3 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-black text-white">HOT</span>
+            <span className="text-4xl">⚽</span>
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#10b981" }}>كأس العالم</h3>
+            <p className="mt-1 text-sm text-muted-foreground">خمّن نتيجة الماتش واربح كريدت · العب ماتشات مباشرة ضد لاعبين آخرين</p>
+          </Link>
+
+
 
         </div>
       </section>

@@ -528,7 +528,7 @@ function LockRow({
   onToggle,
 }: {
   lock: { slug: string; is_locked: boolean; message: string | null };
-  onToggle: (slug: string, next: boolean, message: string | null) => Promise<void>;
+  onToggle: (slug: string, next: boolean, message: string | null) => void;
 }) {
   const [msg, setMsg] = useState(lock.message ?? "");
   return (

@@ -1,43 +1,48 @@
 import { createFileRoute, redirect, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { uploadUserFile } from "@/lib/storage";
-import { Crown, Upload, ArrowRight, Copy, CheckCircle2, CreditCard } from "lucide-react";
+import { SiteLockGate } from "@/components/SiteLockGate";
+import { Crown, Upload, ArrowRight, Copy, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import { createFatoraCheckout } from "@/lib/fatora.functions";
 
 export const Route = createFileRoute("/pro-upgrade")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/login" });
   },
-  component: ProUpgradePage,
+  component: () => (
+    <SiteLockGate slug="pro-upgrade">
+      <ProUpgradePage />
+    </SiteLockGate>
+  ),
 });
 
 const VODAFONE_NUMBER = "01080390782";
 
+type Plan = {
+  id: "pro" | "coins_100" | "coins_500" | "coins_1000";
+  label: string;
+  amountEGP: number;
+  perk: string;
+};
+
+const PLANS: Plan[] = [
+  { id: "pro", label: "ترقية PRO ذهبية", amountEGP: 50, perk: "PRO + 50 كريدت هدية" },
+  { id: "coins_100", label: "شراء 100 كريدت", amountEGP: 25, perk: "+100 كريدت" },
+  { id: "coins_500", label: "شراء 500 كريدت", amountEGP: 100, perk: "+500 كريدت" },
+  { id: "coins_1000", label: "شراء 1000 كريدت", amountEGP: 180, perk: "+1000 كريدت (وفّر 20%)" },
+];
+
 function ProUpgradePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [selected, setSelected] = useState<Plan>(PLANS[0]);
   const [opNumber, setOpNumber] = useState("");
   const [receipt, setReceipt] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [payingPlan, setPayingPlan] = useState<string | null>(null);
-  const fatoraCheckout = useServerFn(createFatoraCheckout);
-
-  const handleFatoraPay = async (plan: "pro" | "coins_100" | "coins_500" | "coins_1000") => {
-    setPayingPlan(plan);
-    try {
-      const { url } = await fatoraCheckout({ data: { plan, origin: window.location.origin } });
-      window.location.href = url;
-    } catch (err) {
-      toast.error((err as Error).message || "تعذّر بدء الدفع");
-      setPayingPlan(null);
-    }
-  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(VODAFONE_NUMBER);
@@ -57,12 +62,12 @@ function ProUpgradePage() {
       const path = await uploadUserFile("receipts", user.id, receipt, "receipt-");
       const { error } = await supabase.from("pending_payments").insert({
         user_id: user.id,
-        op_number: opNumber.trim(),
+        op_number: `${selected.id}:${opNumber.trim()}`,
         receipt_url: path,
-        amount: 50,
+        amount: selected.amountEGP,
       });
       if (error) throw error;
-      toast.success("تم إرسال طلب الترقية! سيراجعه الأدمن قريباً");
+      toast.success("تم إرسال طلبك! سيراجعه الأدمن يدوياً قريباً");
       navigate({ to: "/dashboard" });
     } catch (err) {
       toast.error((err as Error).message);
@@ -80,49 +85,54 @@ function ProUpgradePage() {
           </Link>
           <div className="flex items-center gap-2">
             <Crown className="h-5 w-5 text-gold" />
-            <span className="text-base font-black text-gradient-gold">الترقية إلى PRO</span>
+            <span className="text-base font-black text-gradient-gold">الترقية والاشتراكات</span>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto max-w-2xl px-4 py-10">
-        <div className="rounded-2xl border-2 border-gold bg-card p-8 shadow-gold">
+      <main className="container mx-auto max-w-2xl px-4 py-8">
+        <div className="rounded-2xl border-2 border-gold bg-card p-6 shadow-gold sm:p-8">
           <div className="text-center">
             <Crown className="mx-auto h-12 w-12 text-gold" />
-            <h1 className="mt-3 text-3xl font-black text-gradient-gold">باقة PRO الذهبية</h1>
-            <p className="mt-2 text-sm text-muted-foreground">انضم لنخبة المبدعين واحصل على كل المميزات</p>
+            <h1 className="mt-3 text-3xl font-black text-gradient-gold">اختر باقتك</h1>
+            <p className="mt-2 text-sm text-muted-foreground">دفع عبر فودافون كاش · تفعيل يدوي من الأدمن خلال 24 ساعة</p>
           </div>
 
-          <div className="mt-6 rounded-xl border border-gold/40 bg-gold/5 p-5">
-            <div className="text-sm font-bold text-gold">خطوات الترقية:</div>
-            <ol className="mt-3 space-y-3 text-sm">
-              <li className="flex gap-2">
-                <span className="font-black text-gold">1.</span>
-                <span>
-                  حوّل مبلغ <span className="font-black text-gold">50 جنيه مصري لا غير</span> عبر فودافون كاش إلى الرقم:
-                  <div className="mt-2 flex items-center gap-2 rounded-lg bg-background p-3">
-                    <code dir="ltr" className="flex-1 font-mono text-lg font-black text-gradient-gold">{VODAFONE_NUMBER}</code>
-                    <button type="button" onClick={handleCopy} className="rounded-md border border-border bg-card p-2 hover:bg-accent">
-                      {copied ? <CheckCircle2 className="h-4 w-4 text-gold" /> : <Copy className="h-4 w-4" />}
-                    </button>
+          {/* Plans */}
+          <div className="mt-6 grid gap-3">
+            {PLANS.map((p) => {
+              const active = selected.id === p.id;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setSelected(p)}
+                  className={`flex items-center justify-between rounded-xl border-2 p-4 text-right transition-all ${
+                    active ? "border-gold bg-gold/10 shadow-gold" : "border-border bg-background hover:border-gold/50"
+                  }`}
+                >
+                  <div>
+                    <div className={`text-base font-black ${active ? "text-gold" : ""}`}>{p.label}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">{p.perk}</div>
                   </div>
-                </span>
-              </li>
-              <li className="flex gap-2"><span className="font-black text-gold">2.</span><span>احصل على رقم العملية من رسالة التأكيد</span></li>
-              <li className="flex gap-2"><span className="font-black text-gold">3.</span><span>التقط صورة (سكرين شوت) للإيصال وارفعها هنا</span></li>
-              <li className="flex gap-2"><span className="font-black text-gold">4.</span><span>سيراجع الأدمن خلال 24 ساعة ويفعّل حسابك</span></li>
-            </ol>
+                  <div className={`text-2xl font-black ${active ? "text-gold" : "text-foreground"}`}>
+                    {p.amountEGP} <span className="text-xs font-bold">ج.م</span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
-          <div className="mt-6 rounded-xl border border-border bg-background/40 p-5">
-            <div className="text-sm font-bold">مميزات تحصل عليها فوراً بعد الاعتماد:</div>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li>✦ <span className="font-bold text-gold">+50 كريديت</span> إضافي تُضاف لحسابك</li>
-              <li>✦ كتابة سكريبتات بلا حدود للذكاء الاصطناعي</li>
-              <li>✦ تخفيضات حصرية على استهلاك الكريديت</li>
-              <li>✦ أولوية في طابور المعالجة</li>
-              <li>✦ ميزة استنساخ صوت غوكو</li>
-            </ul>
+          {/* Vodafone number */}
+          <div className="mt-6 rounded-xl border border-gold/40 bg-gold/5 p-5">
+            <div className="text-sm font-bold text-gold">حوّل مبلغ {selected.amountEGP} جنيه فودافون كاش إلى:</div>
+            <div className="mt-2 flex items-center gap-2 rounded-lg bg-background p-3">
+              <code dir="ltr" className="flex-1 font-mono text-xl font-black text-gradient-gold">{VODAFONE_NUMBER}</code>
+              <button type="button" onClick={handleCopy} className="rounded-md border border-border bg-card p-2 hover:bg-accent">
+                {copied ? <CheckCircle2 className="h-4 w-4 text-gold" /> : <Copy className="h-4 w-4" />}
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">بعد التحويل، احصل على رقم العملية من رسالة التأكيد وارفع صورة الإيصال هنا.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -157,52 +167,9 @@ function ProUpgradePage() {
               disabled={submitting}
               className="w-full rounded-2xl bg-gradient-gold py-5 text-xl font-black text-gold-foreground shadow-gold transition-transform hover:scale-[1.02] disabled:opacity-50"
             >
-              {submitting ? "جاري الإرسال..." : "إرسال طلب الترقية"}
+              {submitting ? "جاري الإرسال..." : `إرسال طلب ${selected.label}`}
             </button>
           </form>
-
-          <div className="mt-6 rounded-xl border-2 border-green-500/60 bg-green-500/5 p-5">
-            <div className="flex items-center gap-2 text-sm font-black text-green-500">
-              <CreditCard className="h-5 w-5" />
-              ادفع فوراً عبر Fatora (فيزا / ماستركارد / محافظ إلكترونية)
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">دفع آمن بالجنيه المصري — تفعيل تلقائي بعد التأكيد</p>
-
-            <div className="mt-4 grid gap-2">
-              <button
-                type="button"
-                onClick={() => handleFatoraPay("pro")}
-                disabled={payingPlan !== null}
-                className="w-full rounded-xl bg-green-600 py-4 text-base font-black text-white shadow-lg transition-transform hover:scale-[1.02] hover:bg-green-700 disabled:opacity-50"
-              >
-                {payingPlan === "pro" ? "جاري التحويل..." : "ترقية PRO — 50 جنيه"}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFatoraPay("coins_100")}
-                disabled={payingPlan !== null}
-                className="w-full rounded-xl bg-green-600/90 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] hover:bg-green-700 disabled:opacity-50"
-              >
-                {payingPlan === "coins_100" ? "جاري التحويل..." : "شراء 100 كريديت — 25 جنيه"}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFatoraPay("coins_500")}
-                disabled={payingPlan !== null}
-                className="w-full rounded-xl bg-green-600/90 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] hover:bg-green-700 disabled:opacity-50"
-              >
-                {payingPlan === "coins_500" ? "جاري التحويل..." : "شراء 500 كريديت — 100 جنيه"}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFatoraPay("coins_1000")}
-                disabled={payingPlan !== null}
-                className="w-full rounded-xl bg-green-600/90 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] hover:bg-green-700 disabled:opacity-50"
-              >
-                {payingPlan === "coins_1000" ? "جاري التحويل..." : "شراء 1000 كريديت — 180 جنيه"}
-              </button>
-            </div>
-          </div>
         </div>
       </main>
     </div>

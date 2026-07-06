@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPanel() {
-  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases" | "credits">("purchases");
+  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases" | "credits" | "locks" | "worldcup">("purchases");
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
@@ -40,6 +40,8 @@ function AdminPanel() {
             { k: "shorts", label: "المشاريع" },
             { k: "messages", label: "الرسائل" },
             { k: "credits", label: "منح كريديت" },
+            { k: "locks", label: "قفل/فتح الصفحات" },
+            { k: "worldcup", label: "كأس العالم" },
           ].map((t) => (
             <button
               key={t.k}
@@ -57,10 +59,13 @@ function AdminPanel() {
         {tab === "shorts" && <ShortsTable />}
         {tab === "messages" && <MessagesTable />}
         {tab === "credits" && <GrantCreditsPanel />}
+        {tab === "locks" && <SiteLocksPanel />}
+        {tab === "worldcup" && <WorldCupPanel />}
       </main>
     </div>
   );
 }
+
 
 /* ---------------- Generation requests ---------------- */
 function RequestsTable() {
@@ -481,5 +486,175 @@ function GrantCreditsPanel() {
         {busy ? "جاري..." : "تنفيذ"}
       </button>
     </form>
+  );
+}
+
+/* ---------------- Site Locks ---------------- */
+function SiteLocksPanel() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "site_locks"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("site_locks").select("*").order("slug");
+      if (error) throw error;
+      return data as { slug: string; is_locked: boolean; message: string | null }[];
+    },
+  });
+
+  const toggle = async (slug: string, next: boolean, message: string | null) => {
+    const { error } = await supabase
+      .from("site_locks")
+      .update({ is_locked: next, message, locked_at: next ? new Date().toISOString() : null })
+      .eq("slug", slug);
+    if (error) return toast.error(error.message);
+    toast.success(next ? `تم قفل ${slug}` : `تم فتح ${slug}`);
+    qc.invalidateQueries({ queryKey: ["admin", "site_locks"] });
+  };
+
+  if (isLoading) return <p className="text-muted-foreground">جاري التحميل...</p>;
+
+  return (
+    <div className="grid gap-3">
+      <p className="text-sm text-muted-foreground">قفل أي صفحة من الموقع مؤقتاً. سيرى المستخدمون صفحة صيانة. الأدمن يظل قادراً على الدخول.</p>
+      {data?.map((l) => (
+        <LockRow key={l.slug} lock={l} onToggle={(s,n,m) => { void toggle(s,n,m); }} />
+      ))}
+    </div>
+  );
+}
+
+function LockRow({
+  lock,
+  onToggle,
+}: {
+  lock: { slug: string; is_locked: boolean; message: string | null };
+  onToggle: (slug: string, next: boolean, message: string | null) => void;
+}) {
+  const [msg, setMsg] = useState(lock.message ?? "");
+  return (
+    <div className={`rounded-xl border p-4 ${lock.is_locked ? "border-red-500/50 bg-red-500/5" : "border-border bg-card"}`}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <code dir="ltr" className="text-sm font-black">/{lock.slug}</code>
+          <span className={`ml-2 rounded-full px-2 py-0.5 text-[10px] font-black ${lock.is_locked ? "bg-red-500/25 text-red-300" : "bg-green-500/20 text-green-300"}`}>
+            {lock.is_locked ? "مقفلة" : "مفتوحة"}
+          </span>
+        </div>
+        <button
+          onClick={() => onToggle(lock.slug, !lock.is_locked, msg.trim() || null)}
+          className={`rounded-lg px-4 py-2 text-xs font-black ${lock.is_locked ? "bg-green-600 text-white" : "bg-red-600 text-white"}`}
+        >
+          {lock.is_locked ? "فتح" : "قفل"}
+        </button>
+      </div>
+      <input
+        value={msg}
+        onChange={(e) => setMsg(e.target.value)}
+        placeholder="رسالة تُعرض للمستخدم (اختياري)"
+        className="mt-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-xs"
+      />
+    </div>
+  );
+}
+
+/* ---------------- World Cup admin ---------------- */
+function WorldCupPanel() {
+  const qc = useQueryClient();
+  const [teamA, setTeamA] = useState("");
+  const [teamB, setTeamB] = useState("");
+  const [reward, setReward] = useState("10");
+  const [busy, setBusy] = useState(false);
+
+  const matches = useQuery({
+    queryKey: ["admin", "wc_matches"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("wc_matches").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as { id: string; team_a: string; team_b: string; reward_credits: number; status: string; result_a: number | null; result_b: number | null }[];
+    },
+  });
+
+  const addMatch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!teamA.trim() || !teamB.trim()) return toast.error("ادخل الفريقين");
+    setBusy(true);
+    const { error } = await supabase.from("wc_matches").insert({
+      team_a: teamA.trim(),
+      team_b: teamB.trim(),
+      reward_credits: Math.max(1, Number(reward) || 10),
+    });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("تم إضافة الماتش");
+    setTeamA(""); setTeamB("");
+    qc.invalidateQueries({ queryKey: ["admin", "wc_matches"] });
+  };
+
+  return (
+    <div className="space-y-6">
+      <form onSubmit={addMatch} className="grid gap-3 rounded-2xl border border-border bg-card p-5 sm:grid-cols-4">
+        <input value={teamA} onChange={(e) => setTeamA(e.target.value)} placeholder="الفريق 1" className="rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+        <input value={teamB} onChange={(e) => setTeamB(e.target.value)} placeholder="الفريق 2" className="rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+        <input value={reward} onChange={(e) => setReward(e.target.value)} type="number" min={1} placeholder="جائزة الكريدت" className="rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+        <button disabled={busy} className="rounded-lg bg-gradient-gold py-2 text-sm font-black text-gold-foreground">إضافة ماتش</button>
+      </form>
+
+      <div className="space-y-2">
+        {matches.data?.map((m) => <MatchAdminRow key={m.id} match={m} onChanged={() => qc.invalidateQueries({ queryKey: ["admin", "wc_matches"] })} />)}
+        {matches.data?.length === 0 && <p className="text-sm text-muted-foreground">لا توجد ماتشات بعد</p>}
+      </div>
+    </div>
+  );
+}
+
+function MatchAdminRow({ match, onChanged }: { match: { id: string; team_a: string; team_b: string; reward_credits: number; status: string; result_a: number | null; result_b: number | null }; onChanged: () => void }) {
+  const [a, setA] = useState<string>(match.result_a?.toString() ?? "");
+  const [b, setB] = useState<string>(match.result_b?.toString() ?? "");
+  const [busy, setBusy] = useState(false);
+
+  const setResult = async () => {
+    if (a === "" || b === "") return toast.error("ادخل النتيجتين");
+    setBusy(true);
+    const { data, error } = await supabase.rpc("admin_set_wc_result", {
+      _match_id: match.id,
+      _result_a: Number(a),
+      _result_b: Number(b),
+    });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(`تم حفظ النتيجة — ${data ?? 0} فائز`);
+    onChanged();
+  };
+
+  const del = async () => {
+    if (!confirm("حذف الماتش؟")) return;
+    const { error } = await supabase.from("wc_matches").delete().eq("id", match.id);
+    if (error) return toast.error(error.message);
+    toast.success("حُذف");
+    onChanged();
+  };
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="text-sm font-bold">{match.team_a} vs {match.team_b}</div>
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-yellow-500/20 px-2 py-0.5 text-[10px] font-black text-yellow-400">جائزة {match.reward_credits}</span>
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${match.status === "finished" ? "bg-green-500/20 text-green-400" : "bg-blue-500/20 text-blue-400"}`}>
+            {match.status}
+          </span>
+        </div>
+      </div>
+      {match.status === "finished" ? (
+        <p className="mt-2 text-sm">النتيجة النهائية: <span className="font-black text-emerald-400">{match.result_a} - {match.result_b}</span></p>
+      ) : (
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <input value={a} onChange={(e) => setA(e.target.value)} type="number" min={0} placeholder="نتيجة 1" className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+          <input value={b} onChange={(e) => setB(e.target.value)} type="number" min={0} placeholder="نتيجة 2" className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+          <button disabled={busy} onClick={setResult} className="rounded-lg bg-gradient-gold px-4 py-2 text-xs font-black text-gold-foreground">حفظ النتيجة وتوزيع الكريدت</button>
+          <button onClick={del} className="rounded-lg border border-destructive bg-destructive/10 px-3 py-2 text-xs font-bold text-destructive">حذف</button>
+        </div>
+      )}
+    </div>
   );
 }

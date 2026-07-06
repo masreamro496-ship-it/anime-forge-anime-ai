@@ -137,9 +137,42 @@ function DetailPage() {
               {m.description && <p className="mt-3 whitespace-pre-line text-sm text-foreground/90">{m.description}</p>}
               {isOwner && <p className="mt-3 rounded-xl bg-primary/10 p-2 text-center text-xs text-primary">هذا المحتوى ملكك</p>}
             </div>
+
+            {/* Sticky green BUY button - only when locked and not owner */}
+            {!hasAccess && !isOwner && (
+              <>
+                <div className="h-24 sm:h-28" aria-hidden />
+                <div className="fixed inset-x-0 bottom-0 z-50 border-t-2 border-green-500/50 bg-background/95 p-3 backdrop-blur-md shadow-2xl sm:p-4">
+                  <div className="container mx-auto max-w-5xl">
+                    {user ? (
+                      <button
+                        onClick={handleBuy}
+                        disabled={buying}
+                        className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-green-500 via-green-600 to-emerald-600 py-5 text-lg font-black text-white shadow-[0_10px_40px_-10px_rgba(34,197,94,0.7)] transition-transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 sm:text-xl"
+                      >
+                        {buying ? (
+                          <Loader2 className="h-6 w-6 animate-spin" />
+                        ) : (
+                          <ShoppingCart className="h-6 w-6" />
+                        )}
+                        {buying ? "جاري الشراء..." : `اشترِ الآن بـ ${m.price_credits} كريدت — شاهد فوراً`}
+                      </button>
+                    ) : (
+                      <Link
+                        to="/login"
+                        className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 py-5 text-lg font-black text-white shadow-2xl"
+                      >
+                        سجّل دخولك للشراء
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
       </div>
     </div>
   );
 }
+

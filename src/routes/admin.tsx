@@ -517,7 +517,7 @@ function SiteLocksPanel() {
     <div className="grid gap-3">
       <p className="text-sm text-muted-foreground">قفل أي صفحة من الموقع مؤقتاً. سيرى المستخدمون صفحة صيانة. الأدمن يظل قادراً على الدخول.</p>
       {data?.map((l) => (
-        <LockRow key={l.slug} lock={l} onToggle={toggle} />
+        <LockRow key={l.slug} lock={l} onToggle={(s,n,m) => { void toggle(s,n,m); }} />
       ))}
     </div>
   );

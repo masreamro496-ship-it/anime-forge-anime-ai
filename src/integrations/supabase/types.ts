@@ -690,6 +690,33 @@ export type Database = {
           },
         ]
       }
+      site_locks: {
+        Row: {
+          is_locked: boolean
+          locked_at: string | null
+          locked_by: string | null
+          message: string | null
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          is_locked?: boolean
+          locked_at?: string | null
+          locked_by?: string | null
+          message?: string | null
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          is_locked?: boolean
+          locked_at?: string | null
+          locked_by?: string | null
+          message?: string | null
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -740,6 +767,86 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      wc_matches: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          finished_at: string | null
+          id: string
+          match_time: string | null
+          result_a: number | null
+          result_b: number | null
+          reward_credits: number
+          status: string
+          team_a: string
+          team_b: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          finished_at?: string | null
+          id?: string
+          match_time?: string | null
+          result_a?: number | null
+          result_b?: number | null
+          reward_credits?: number
+          status?: string
+          team_a: string
+          team_b: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          finished_at?: string | null
+          id?: string
+          match_time?: string | null
+          result_a?: number | null
+          result_b?: number | null
+          reward_credits?: number
+          status?: string
+          team_a?: string
+          team_b?: string
+        }
+        Relationships: []
+      }
+      wc_predictions: {
+        Row: {
+          awarded: boolean
+          created_at: string
+          guess_a: number
+          guess_b: number
+          id: string
+          match_id: string
+          user_id: string
+        }
+        Insert: {
+          awarded?: boolean
+          created_at?: string
+          guess_a: number
+          guess_b: number
+          id?: string
+          match_id: string
+          user_id: string
+        }
+        Update: {
+          awarded?: boolean
+          created_at?: string
+          guess_a?: number
+          guess_b?: number
+          id?: string
+          match_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wc_predictions_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "wc_matches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -796,6 +903,10 @@ export type Database = {
       admin_grant_credits: {
         Args: { _amount: number; _note?: string; _target_user: string }
         Returns: undefined
+      }
+      admin_set_wc_result: {
+        Args: { _match_id: string; _result_a: number; _result_b: number }
+        Returns: number
       }
       approve_purchase: { Args: { _purchase_id: string }; Returns: undefined }
       can_view_project_video: {

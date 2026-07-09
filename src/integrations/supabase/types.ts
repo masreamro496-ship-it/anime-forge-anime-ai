@@ -848,6 +848,39 @@ export type Database = {
           },
         ]
       }
+      wc_pvp_matches: {
+        Row: {
+          created_at: string
+          finished_at: string | null
+          id: string
+          players: Json
+          room_id: string
+          score_a: number
+          score_b: number
+          winner_team: string | null
+        }
+        Insert: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          players?: Json
+          room_id: string
+          score_a?: number
+          score_b?: number
+          winner_team?: string | null
+        }
+        Update: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          players?: Json
+          room_id?: string
+          score_a?: number
+          score_b?: number
+          winner_team?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       shorts_public: {
@@ -974,6 +1007,19 @@ export type Database = {
         }
         Returns: string
       }
+      wc_finish_match: {
+        Args: {
+          _players: Json
+          _room_id: string
+          _score_a: number
+          _score_b: number
+          _winner_team: string
+          _winners: string[]
+        }
+        Returns: undefined
+      }
+      wc_pay_entry: { Args: { _room_id: string }; Returns: undefined }
+      wc_refund_entry: { Args: { _room_id: string }; Returns: undefined }
     }
     Enums: {
       anime_media_kind: "anime_video" | "anime_movie"

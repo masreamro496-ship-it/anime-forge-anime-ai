@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPanel() {
-  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases" | "credits" | "locks" | "worldcup">("purchases");
+  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases" | "credits" | "locks" | "worldcup" | "mods">("purchases");
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
@@ -42,6 +42,7 @@ function AdminPanel() {
             { k: "credits", label: "منح كريديت" },
             { k: "locks", label: "قفل/فتح الصفحات" },
             { k: "worldcup", label: "كأس العالم" },
+            { k: "mods", label: "المشرفون" },
           ].map((t) => (
             <button
               key={t.k}
@@ -61,7 +62,56 @@ function AdminPanel() {
         {tab === "credits" && <GrantCreditsPanel />}
         {tab === "locks" && <SiteLocksPanel />}
         {tab === "worldcup" && <WorldCupPanel />}
+        {tab === "mods" && <ModeratorsPanel />}
       </main>
+    </div>
+  );
+}
+
+function ModeratorsPanel() {
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const run = async (fn: "promote_to_moderator" | "demote_moderator") => {
+    if (!email.trim()) return;
+    setBusy(true);
+    try {
+      const { error } = await (supabase as any).rpc(fn, { _email: email.trim() });
+      if (error) throw error;
+      toast.success(fn === "promote_to_moderator" ? "تمت الترقية إلى مشرف" : "تم عزل المشرف");
+      setEmail("");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally { setBusy(false); }
+  };
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5 max-w-lg">
+      <h2 className="mb-1 text-lg font-black">ترقية / عزل مشرف</h2>
+      <p className="mb-4 text-xs text-muted-foreground">
+        المشرف يحصل على كل صلاحيات الأدمن + شارة ذهبية VIP في التواصل الاجتماعي.
+      </p>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="ايميل المستخدم"
+        className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm mb-3"
+      />
+      <div className="flex gap-2">
+        <button
+          disabled={busy}
+          onClick={() => run("promote_to_moderator")}
+          className="flex-1 rounded-lg bg-gradient-to-r from-yellow-500 to-amber-600 py-2 text-sm font-black text-black shadow-lg disabled:opacity-50"
+        >
+          ⭐ ترقية لمشرف
+        </button>
+        <button
+          disabled={busy}
+          onClick={() => run("demote_moderator")}
+          className="flex-1 rounded-lg border border-red-500/40 bg-red-500/10 py-2 text-sm font-black text-red-400 disabled:opacity-50"
+        >
+          عزل
+        </button>
+      </div>
     </div>
   );
 }

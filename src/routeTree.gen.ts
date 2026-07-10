@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WorldCupRouteImport } from './routes/world-cup'
 import { Route as WatermarkRouteImport } from './routes/watermark'
 import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -22,6 +21,7 @@ import { Route as AudioRouteImport } from './routes/audio'
 import { Route as AnimeMarketRouteImport } from './routes/anime-market'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorldCupIndexRouteImport } from './routes/world-cup.index'
 import { Route as WorldCupPlayRouteImport } from './routes/world-cup.play'
 import { Route as ShortsUploadRouteImport } from './routes/shorts.upload'
 import { Route as ShortsIdRouteImport } from './routes/shorts.$id'
@@ -30,11 +30,6 @@ import { Route as GenerateGokuRouteImport } from './routes/generate.goku'
 import { Route as AnimeMarketIdRouteImport } from './routes/anime-market.$id'
 import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/fatora/success'
 
-const WorldCupRoute = WorldCupRouteImport.update({
-  id: '/world-cup',
-  path: '/world-cup',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const WatermarkRoute = WatermarkRouteImport.update({
   id: '/watermark',
   path: '/watermark',
@@ -95,10 +90,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorldCupIndexRoute = WorldCupIndexRouteImport.update({
+  id: '/world-cup/',
+  path: '/world-cup/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WorldCupPlayRoute = WorldCupPlayRouteImport.update({
-  id: '/play',
-  path: '/play',
-  getParentRoute: () => WorldCupRoute,
+  id: '/world-cup/play',
+  path: '/world-cup/play',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShortsUploadRoute = ShortsUploadRouteImport.update({
   id: '/upload',
@@ -144,13 +144,13 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/watermark': typeof WatermarkRoute
-  '/world-cup': typeof WorldCupRouteWithChildren
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
   '/shorts/upload': typeof ShortsUploadRoute
   '/world-cup/play': typeof WorldCupPlayRoute
+  '/world-cup/': typeof WorldCupIndexRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRoutesByTo {
@@ -166,13 +166,13 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/watermark': typeof WatermarkRoute
-  '/world-cup': typeof WorldCupRouteWithChildren
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
   '/shorts/upload': typeof ShortsUploadRoute
   '/world-cup/play': typeof WorldCupPlayRoute
+  '/world-cup': typeof WorldCupIndexRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRoutesById {
@@ -189,13 +189,13 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/watermark': typeof WatermarkRoute
-  '/world-cup': typeof WorldCupRouteWithChildren
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
   '/shorts/upload': typeof ShortsUploadRoute
   '/world-cup/play': typeof WorldCupPlayRoute
+  '/world-cup/': typeof WorldCupIndexRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRouteTypes {
@@ -213,13 +213,13 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/watermark'
-    | '/world-cup'
     | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
     | '/shorts/upload'
     | '/world-cup/play'
+    | '/world-cup/'
     | '/api/public/fatora/success'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -235,13 +235,13 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/watermark'
-    | '/world-cup'
     | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
     | '/shorts/upload'
     | '/world-cup/play'
+    | '/world-cup'
     | '/api/public/fatora/success'
   id:
     | '__root__'
@@ -257,13 +257,13 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/watermark'
-    | '/world-cup'
     | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
     | '/shorts/upload'
     | '/world-cup/play'
+    | '/world-cup/'
     | '/api/public/fatora/success'
   fileRoutesById: FileRoutesById
 }
@@ -280,21 +280,15 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ShortsRoute: typeof ShortsRouteWithChildren
   WatermarkRoute: typeof WatermarkRoute
-  WorldCupRoute: typeof WorldCupRouteWithChildren
   GenerateGokuRoute: typeof GenerateGokuRoute
   GenerateVideoRoute: typeof GenerateVideoRoute
+  WorldCupPlayRoute: typeof WorldCupPlayRoute
+  WorldCupIndexRoute: typeof WorldCupIndexRoute
   ApiPublicFatoraSuccessRoute: typeof ApiPublicFatoraSuccessRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/world-cup': {
-      id: '/world-cup'
-      path: '/world-cup'
-      fullPath: '/world-cup'
-      preLoaderRoute: typeof WorldCupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/watermark': {
       id: '/watermark'
       path: '/watermark'
@@ -379,12 +373,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/world-cup/': {
+      id: '/world-cup/'
+      path: '/world-cup'
+      fullPath: '/world-cup/'
+      preLoaderRoute: typeof WorldCupIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/world-cup/play': {
       id: '/world-cup/play'
-      path: '/play'
+      path: '/world-cup/play'
       fullPath: '/world-cup/play'
       preLoaderRoute: typeof WorldCupPlayRouteImport
-      parentRoute: typeof WorldCupRoute
+      parentRoute: typeof rootRouteImport
     }
     '/shorts/upload': {
       id: '/shorts/upload'
@@ -456,18 +457,6 @@ const ShortsRouteChildren: ShortsRouteChildren = {
 const ShortsRouteWithChildren =
   ShortsRoute._addFileChildren(ShortsRouteChildren)
 
-interface WorldCupRouteChildren {
-  WorldCupPlayRoute: typeof WorldCupPlayRoute
-}
-
-const WorldCupRouteChildren: WorldCupRouteChildren = {
-  WorldCupPlayRoute: WorldCupPlayRoute,
-}
-
-const WorldCupRouteWithChildren = WorldCupRoute._addFileChildren(
-  WorldCupRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
@@ -481,9 +470,10 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ShortsRoute: ShortsRouteWithChildren,
   WatermarkRoute: WatermarkRoute,
-  WorldCupRoute: WorldCupRouteWithChildren,
   GenerateGokuRoute: GenerateGokuRoute,
   GenerateVideoRoute: GenerateVideoRoute,
+  WorldCupPlayRoute: WorldCupPlayRoute,
+  WorldCupIndexRoute: WorldCupIndexRoute,
   ApiPublicFatoraSuccessRoute: ApiPublicFatoraSuccessRoute,
 }
 export const routeTree = rootRouteImport

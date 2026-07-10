@@ -7,7 +7,7 @@ import { SiteLockGate } from "@/components/SiteLockGate";
 import { ArrowRight, Trophy, Volume2, VolumeX, CheckCircle2, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/world-cup")({
+export const Route = createFileRoute("/world-cup/")({
   head: () => ({
     meta: [
       { title: "كأس العالم — خمّن واربح كريدت" },

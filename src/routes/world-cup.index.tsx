@@ -7,7 +7,7 @@ import { SiteLockGate } from "@/components/SiteLockGate";
 import { ArrowRight, Trophy, Volume2, VolumeX, CheckCircle2, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/world-cup")({
+export const Route = createFileRoute("/world-cup/")({
   head: () => ({
     meta: [
       { title: "كأس العالم — خمّن واربح كريدت" },
@@ -136,6 +136,15 @@ function WorldCupPage() {
             <Users className="h-4 w-4" /> ابدأ اللعب الآن
           </Link>
         </div>
+
+        <Link
+          to="/pro-upgrade"
+          className="mt-3 block rounded-2xl border-2 border-yellow-500/50 bg-gradient-to-r from-yellow-500/15 to-amber-500/15 p-4 text-center hover:scale-[1.01] transition-transform"
+        >
+          <span className="text-xl">⭐</span>
+          <span className="mr-2 font-black text-yellow-400">الترقية والاشتراكات</span>
+          <p className="mt-1 text-xs text-muted-foreground">افتح PRO لمزايا إضافية وكريدت أكثر</p>
+        </Link>
       </section>
 
       {/* Open matches */}

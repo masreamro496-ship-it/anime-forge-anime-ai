@@ -213,6 +213,48 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_room_messages: {
+        Row: {
+          avatar_url: string | null
+          content: string | null
+          created_at: string
+          display_name: string
+          expires_at: string
+          id: string
+          is_admin: boolean
+          is_moderator: boolean
+          media_path: string | null
+          media_type: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          content?: string | null
+          created_at?: string
+          display_name: string
+          expires_at?: string
+          id?: string
+          is_admin?: boolean
+          is_moderator?: boolean
+          media_path?: string | null
+          media_type?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          content?: string | null
+          created_at?: string
+          display_name?: string
+          expires_at?: string
+          id?: string
+          is_admin?: boolean
+          is_moderator?: boolean
+          media_path?: string | null
+          media_type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       credit_transactions: {
         Row: {
           amount: number
@@ -969,6 +1011,7 @@ export type Database = {
         }
         Returns: string
       }
+      demote_moderator: { Args: { _email: string }; Returns: string }
       generate_pro_code: { Args: never; Returns: string }
       get_anime_media_video_path: {
         Args: { _media_id: string }
@@ -983,8 +1026,10 @@ export type Database = {
         Returns: boolean
       }
       promote_scheduled_shorts: { Args: never; Returns: undefined }
+      promote_to_moderator: { Args: { _email: string }; Returns: string }
       purchase_anime_media: { Args: { _media_id: string }; Returns: string }
       purchase_audio_download: { Args: { _clip_id: string }; Returns: string }
+      purge_expired_chat: { Args: never; Returns: undefined }
       request_purchase: { Args: { _project_id: string }; Returns: string }
       spend_chat_credits: { Args: never; Returns: undefined }
       spend_watermark_credits: {

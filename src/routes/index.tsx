@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film } from "lucide-react";
+import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -146,7 +146,12 @@ function Landing() {
             <p className="mt-1 text-sm text-muted-foreground">خمّن نتيجة الماتش واربح كريدت · العب ماتشات مباشرة ضد لاعبين آخرين</p>
           </Link>
 
-
+          <Link to="/social" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#06b6d4", background: "linear-gradient(135deg, rgba(6,182,212,0.30), transparent)" }}>
+            <span className="absolute right-3 top-3 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-black text-white">LIVE</span>
+            <MessageCircle className="h-9 w-9" style={{ color: "#06b6d4" }} />
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#06b6d4" }}>تواصل اجتماعي</h3>
+            <p className="mt-1 text-sm text-muted-foreground">دردشة مباشرة مع كل الزوار · صور · صوت · ملفات · تُحذف بعد 10 ساعات</p>
+          </Link>
 
         </div>
       </section>

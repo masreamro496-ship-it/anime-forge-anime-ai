@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WatermarkRouteImport } from './routes/watermark'
+import { Route as SocialRouteImport } from './routes/social'
 import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
@@ -33,6 +34,11 @@ import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/
 const WatermarkRoute = WatermarkRouteImport.update({
   id: '/watermark',
   path: '/watermark',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocialRoute = SocialRouteImport.update({
+  id: '/social',
+  path: '/social',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShortsRoute = ShortsRouteImport.update({
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
+  '/social': typeof SocialRoute
   '/watermark': typeof WatermarkRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
+  '/social': typeof SocialRoute
   '/watermark': typeof WatermarkRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
+  '/social': typeof SocialRoute
   '/watermark': typeof WatermarkRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
@@ -212,6 +221,7 @@ export interface FileRouteTypes {
     | '/pro-upgrade'
     | '/profile'
     | '/shorts'
+    | '/social'
     | '/watermark'
     | '/anime-market/$id'
     | '/generate/goku'
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/pro-upgrade'
     | '/profile'
     | '/shorts'
+    | '/social'
     | '/watermark'
     | '/anime-market/$id'
     | '/generate/goku'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/pro-upgrade'
     | '/profile'
     | '/shorts'
+    | '/social'
     | '/watermark'
     | '/anime-market/$id'
     | '/generate/goku'
@@ -279,6 +291,7 @@ export interface RootRouteChildren {
   ProUpgradeRoute: typeof ProUpgradeRoute
   ProfileRoute: typeof ProfileRoute
   ShortsRoute: typeof ShortsRouteWithChildren
+  SocialRoute: typeof SocialRoute
   WatermarkRoute: typeof WatermarkRoute
   GenerateGokuRoute: typeof GenerateGokuRoute
   GenerateVideoRoute: typeof GenerateVideoRoute
@@ -294,6 +307,13 @@ declare module '@tanstack/react-router' {
       path: '/watermark'
       fullPath: '/watermark'
       preLoaderRoute: typeof WatermarkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social': {
+      id: '/social'
+      path: '/social'
+      fullPath: '/social'
+      preLoaderRoute: typeof SocialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shorts': {
@@ -469,6 +489,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProUpgradeRoute: ProUpgradeRoute,
   ProfileRoute: ProfileRoute,
   ShortsRoute: ShortsRouteWithChildren,
+  SocialRoute: SocialRoute,
   WatermarkRoute: WatermarkRoute,
   GenerateGokuRoute: GenerateGokuRoute,
   GenerateVideoRoute: GenerateVideoRoute,

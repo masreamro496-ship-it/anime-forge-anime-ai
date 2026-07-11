@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle } from "lucide-react";
+import { InstallAppButton } from "@/components/InstallAppButton";
+
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -154,7 +156,11 @@ function Landing() {
           </Link>
 
         </div>
+        <div className="mt-6">
+          <InstallAppButton />
+        </div>
       </section>
+
 
       {/* Quick info */}
       <section className="container mx-auto px-4 py-8">

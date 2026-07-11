@@ -87,6 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -94,6 +95,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap",
       },
     ],
+
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -123,9 +125,10 @@ function RootComponent() {
       <AuthProvider>
         <Outlet />
         
-        <div className="fixed bottom-3 left-3 z-[100]">
+        <div className="fixed top-2 left-2 z-[100] scale-75 origin-top-left opacity-70 hover:opacity-100 transition-opacity">
           <LanguageSwitcher />
         </div>
+
         <Toaster richColors position="top-center" dir="rtl" />
       </AuthProvider>
     </QueryClientProvider>

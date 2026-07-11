@@ -1,600 +1,903 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ClientOnly } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import * as THREE from "three";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { wcPayEntry, wcFinishMatch } from "@/lib/wc-pvp.functions";
 import { toast } from "sonner";
-import { ArrowRight, Users, Play, Zap, Clock } from "lucide-react";
+import { ArrowLeft, Users, Play, LogOut, Zap } from "lucide-react";
+import { ChibiCharacter, type CharState } from "@/components/wc/ChibiCharacter";
 
 export const Route = createFileRoute("/world-cup/play")({
-  head: () => ({ meta: [{ title: "كأس العالم — العب مباشر" }] }),
+  head: () => ({ meta: [{ title: "كأس العالم — لعبة 3D أونلاين" }] }),
   component: PlayPage,
 });
 
-const CHARACTERS = [
-  { id: "flame", name: "لهب", emoji: "🔥", color: "#f97316", bg: "from-orange-500 to-red-600" },
-  { id: "storm", name: "عاصفة", emoji: "⚡", color: "#eab308", bg: "from-yellow-400 to-amber-600" },
-  { id: "shadow", name: "ظل", emoji: "🌙", color: "#8b5cf6", bg: "from-purple-500 to-indigo-700" },
-  { id: "ice", name: "جليد", emoji: "❄️", color: "#38bdf8", bg: "from-sky-400 to-blue-600" },
-];
-
-type Phase = "select" | "lobby" | "playing" | "finished";
-type PresenceP = { user_id: string; name: string; char: string; joined_at: number };
-
 function PlayPage() {
+  return (
+    <ClientOnly fallback={<div className="min-h-screen flex items-center justify-center bg-black text-white">جاري تحميل اللعبة...</div>}>
+      <PlayInner />
+    </ClientOnly>
+  );
+}
+
+// ============ Constants ============
+const FIELD_W = 30; // X
+const FIELD_H = 18; // Z
+const GOAL_W = 5;
+const PLAYER_SPEED = 5.2;
+const STUN_MS = 5000;
+const MATCH_MS = 5 * 60 * 1000;
+const ENTRY_COST = 50;
+const REWARD = 80;
+
+type Phase = "menu" | "lobby" | "playing" | "finished";
+type Presence = { user_id: string; name: string; joined_at: number };
+type NetPlayer = {
+  user_id: string;
+  name: string;
+  team: "red" | "blue";
+  x: number;
+  z: number;
+  ry: number;
+  state: CharState;
+  stunnedUntil: number;
+};
+
+// ============ Main ============
+function PlayInner() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [phase, setPhase] = useState<Phase>("select");
-  const [charId, setCharId] = useState<string>("flame");
-  const [players, setPlayers] = useState<PresenceP[]>([]);
+  const [phase, setPhase] = useState<Phase>("menu");
+  const [cap, setCap] = useState<number>(2);
+  const [players, setPlayers] = useState<Presence[]>([]);
   const [roomId, setRoomId] = useState<string>("");
-  const [finalResult, setFinalResult] = useState<{ team: string; a: number; b: number } | null>(null);
+  const [isHost, setIsHost] = useState(false);
+  const [result, setResult] = useState<{ winner: string; a: number; b: number } | null>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const payEntry = useServerFn(wcPayEntry);
+  const finishMatch = useServerFn(wcFinishMatch);
+
+  // Force landscape
+  useEffect(() => {
+    if (phase === "playing") {
+      try {
+        (screen.orientation as unknown as { lock?: (o: string) => Promise<void> }).lock?.("landscape").catch(() => {});
+      } catch { /* noop */ }
+    }
+  }, [phase]);
 
   useEffect(() => {
     if (!user) {
       toast.error("سجّل دخولك أولاً");
-      navigate({ to: "/auth" });
+      navigate({ to: "/login" });
     }
   }, [user, navigate]);
 
-  const enterLobby = useCallback(async () => {
+  const leaveLobby = useCallback(() => {
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+    setPlayers([]);
+    setRoomId("");
+    setIsHost(false);
+    setPhase("menu");
+  }, []);
+
+  const joinLobby = useCallback(async () => {
     if (!user) return;
-    const rid = `wc-lobby-v1`;
+    const rid = `wc-lobby-cap${cap}-v3`;
     setRoomId(rid);
+    const name = user.email?.split("@")[0] || "Player";
     const ch = supabase.channel(rid, { config: { presence: { key: user.id } } });
     channelRef.current = ch;
     ch.on("presence", { event: "sync" }, () => {
-      const state = ch.presenceState() as Record<string, PresenceP[]>;
-      const list: PresenceP[] = Object.values(state).flat().sort((a, b) => a.joined_at - b.joined_at).slice(0, 8);
+      const state = ch.presenceState() as Record<string, Presence[]>;
+      const list = Object.values(state).flat().sort((a, b) => a.joined_at - b.joined_at).slice(0, cap);
       setPlayers(list);
+      if (list[0]?.user_id === user.id) setIsHost(true);
     });
-    ch.on("broadcast", { event: "match_start" }, (payload) => {
-      const p = payload.payload as { room_id: string; players: PresenceP[] };
-      setRoomId(p.room_id);
-      setPlayers(p.players);
+    ch.on("broadcast", { event: "start" }, () => {
       setPhase("playing");
     });
     await ch.subscribe(async (status) => {
       if (status === "SUBSCRIBED") {
-        await ch.track({
-          user_id: user.id,
-          name: user.email?.split("@")[0] ?? "لاعب",
-          char: charId,
-          joined_at: Date.now(),
-        } satisfies PresenceP);
+        await ch.track({ user_id: user.id, name, joined_at: Date.now() });
       }
     });
     setPhase("lobby");
-  }, [user, charId]);
+  }, [user, cap]);
 
-  useEffect(() => () => { channelRef.current?.unsubscribe(); }, []);
-
-  const payEntry = useServerFn(wcPayEntry);
-  const isHost = players.length > 0 && players[0].user_id === user?.id;
-  const canStart = isHost && players.length === 8;
-
-  const startMatch = async () => {
-    if (!canStart || !channelRef.current) return;
-    const matchRoom = `wc-match-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const startMatch = useCallback(async () => {
+    if (!isHost || players.length < cap) return;
     try {
-      await payEntry({ data: { room_id: matchRoom } });
+      await payEntry({ data: { room_id: roomId } });
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error("رصيدك غير كافي (50 كريدت)");
       return;
     }
-    await channelRef.current.send({
-      type: "broadcast",
-      event: "match_start",
-      payload: { room_id: matchRoom, players },
-    });
-  };
+    channelRef.current?.send({ type: "broadcast", event: "start", payload: {} });
+  }, [isHost, players.length, cap, payEntry, roomId]);
 
-  if (!user) return null;
+  const onMatchEnd = useCallback(async (scoreA: number, scoreB: number, myTeam: "red" | "blue", allPlayers: NetPlayer[]) => {
+    const winnerTeam = scoreA > scoreB ? "A" : scoreB > scoreA ? "B" : "draw";
+    const winners = allPlayers.filter((p) => (winnerTeam === "A" ? p.team === "red" : winnerTeam === "B" ? p.team === "blue" : false)).map((p) => p.user_id);
+    setResult({ winner: winnerTeam === "draw" ? "تعادل" : winnerTeam === "A" ? "الفريق الأحمر" : "الفريق الأزرق", a: scoreA, b: scoreB });
+    setPhase("finished");
+    // Only host reports to server (idempotent RPC)
+    if (isHost) {
+      try {
+        await finishMatch({
+          data: {
+            room_id: roomId + "-" + Date.now(),
+            winner_team: winnerTeam,
+            score_a: scoreA,
+            score_b: scoreB,
+            winners,
+            players: allPlayers,
+          },
+        });
+      } catch (e) { console.warn(e); }
+    }
+    // Toast
+    const iWon = (winnerTeam === "A" && myTeam === "red") || (winnerTeam === "B" && myTeam === "blue");
+    toast[iWon ? "success" : "info"](iWon ? `فزت! +${REWARD} كريدت` : winnerTeam === "draw" ? "تعادل" : "خسرت");
+  }, [isHost, roomId, finishMatch]);
 
+  if (phase === "menu") return <MenuScreen cap={cap} setCap={setCap} onJoin={joinLobby} />;
+  if (phase === "lobby") return <LobbyScreen players={players} cap={cap} isHost={isHost} onStart={startMatch} onLeave={leaveLobby} selfId={user?.id || ""} />;
+  if (phase === "playing") return <GameScene roomId={roomId} presences={players} selfId={user!.id} selfName={user?.email?.split("@")[0] || "Player"} isHost={isHost} onEnd={onMatchEnd} onExit={leaveLobby} />;
+  return <FinishedScreen result={result} onAgain={() => { setResult(null); setPhase("menu"); }} />;
+}
+
+// ============ Menu ============
+function MenuScreen({ cap, setCap, onJoin }: { cap: number; setCap: (n: number) => void; onJoin: () => void }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-emerald-950/40 to-slate-950">
-      <header className="sticky top-0 z-40 border-b border-emerald-500/30 bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto flex items-center justify-between px-4 py-3">
-          <Link to="/world-cup" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowRight className="h-4 w-4 rotate-180" /> رجوع
-          </Link>
-          <span className="font-black text-emerald-400">⚽ ماتش مباشر</span>
-          <span className="text-xs text-muted-foreground">{phase === "playing" ? "جاري اللعب" : phase === "lobby" ? `${players.length}/8` : ""}</span>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 flex flex-col">
+      <header className="p-4 flex items-center justify-between">
+        <Link to="/world-cup" className="flex items-center gap-2 text-white/80 hover:text-white text-sm">
+          <ArrowLeft className="h-4 w-4" /> رجوع
+        </Link>
+        <h1 className="text-lg font-black text-yellow-400">⚽ كأس العالم PvP</h1>
+        <div className="w-16" />
       </header>
-
-      {phase === "select" && (
-        <section className="container mx-auto max-w-3xl px-4 py-8">
-          <h1 className="mb-2 text-center text-2xl font-black text-white">اختر شخصيتك</h1>
-          <p className="mb-6 text-center text-sm text-muted-foreground">ادفع 50 كريدت. الفائز يأخذ 80 كريدت.</p>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {CHARACTERS.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => setCharId(c.id)}
-                className={`group relative overflow-hidden rounded-2xl border-4 p-4 text-center transition-all ${
-                  charId === c.id ? "border-emerald-400 scale-105 shadow-[0_0_30px_-5px_rgba(52,211,153,0.6)]" : "border-white/10"
-                } bg-gradient-to-b ${c.bg}`}
-              >
-                <div className="text-6xl">{c.emoji}</div>
-                <div className="mt-2 text-lg font-black text-white drop-shadow">{c.name}</div>
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={enterLobby}
-            className="mt-8 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-4 text-lg font-black text-white shadow-lg hover:scale-105 transition-transform"
-          >
-            <Play className="inline h-5 w-5 ml-1" /> ابحث عن ماتش
-          </button>
-        </section>
-      )}
-
-      {phase === "lobby" && (
-        <Lobby players={players} me={user.id} isHost={isHost} canStart={canStart} onStart={startMatch} onLeave={() => { channelRef.current?.unsubscribe(); setPhase("select"); }} />
-      )}
-
-      {phase === "playing" && (
-        <FootballMatch
-          roomId={roomId}
-          me={user.id}
-          myChar={charId}
-          players={players}
-          onFinish={async (winnerTeam, scoreA, scoreB) => {
-            const teamA = players.slice(0, 4).map((p) => p.user_id);
-            const teamB = players.slice(4, 8).map((p) => p.user_id);
-            const winners = winnerTeam === "A" ? teamA : winnerTeam === "B" ? teamB : [];
-            // Only host reports result
-            if (players[0].user_id === user.id) {
-              try {
-                await wcFinishMatch({ data: {
-                  room_id: roomId, winner_team: winnerTeam, score_a: scoreA, score_b: scoreB,
-                  winners, players,
-                } });
-              } catch (e) { console.error(e); }
-            }
-            setFinalResult({ team: winnerTeam, a: scoreA, b: scoreB });
-            setPhase("finished");
-          }}
-        />
-      )}
-
-      {phase === "finished" && finalResult && (
-        <section className="container mx-auto max-w-md px-4 py-16 text-center">
-          <div className="text-8xl">{finalResult.team === "draw" ? "🤝" : "🏆"}</div>
-          <h2 className="mt-4 text-3xl font-black text-white">
-            {finalResult.team === "draw" ? "تعادل!" : `فاز الفريق ${finalResult.team}`}
-          </h2>
-          <p className="mt-2 text-xl text-emerald-400">النتيجة: {finalResult.a} - {finalResult.b}</p>
-          <Link to="/world-cup" className="mt-6 inline-block rounded-xl bg-emerald-600 px-6 py-3 font-black text-white">
-            رجوع
-          </Link>
-        </section>
-      )}
+      <div className="flex-1 flex flex-col items-center justify-center px-4">
+        <div className="text-6xl mb-4 animate-bounce">⚽</div>
+        <h2 className="text-2xl font-black text-white mb-2">اختر عدد اللاعبين</h2>
+        <p className="text-sm text-white/60 mb-6">تكلفة الدخول: {ENTRY_COST} كريدت · الجائزة: {REWARD} للفائز</p>
+        <div className="grid grid-cols-4 gap-2 mb-8 w-full max-w-md">
+          {[2, 4, 6, 8].map((n) => (
+            <button
+              key={n}
+              onClick={() => setCap(n)}
+              className={`aspect-square rounded-2xl border-2 font-black text-3xl transition-all ${
+                cap === n ? "bg-yellow-500 border-yellow-300 text-black scale-110 shadow-2xl" : "bg-white/5 border-white/20 text-white/70"
+              }`}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={onJoin}
+          className="w-full max-w-md rounded-2xl bg-gradient-to-r from-yellow-400 to-amber-500 py-5 text-xl font-black text-black shadow-2xl hover:scale-105 transition"
+        >
+          <Play className="inline h-6 w-6 ml-2" /> ابدأ اللعب
+        </button>
+      </div>
     </div>
   );
 }
 
-function Lobby({ players, me, isHost, canStart, onStart, onLeave }: {
-  players: PresenceP[]; me: string; isHost: boolean; canStart: boolean; onStart: () => void; onLeave: () => void;
+// ============ Lobby ============
+function LobbyScreen({ players, cap, isHost, onStart, onLeave, selfId }: {
+  players: Presence[]; cap: number; isHost: boolean; onStart: () => void; onLeave: () => void; selfId: string;
 }) {
+  const full = players.length >= cap;
   return (
-    <section className="container mx-auto max-w-3xl px-4 py-8">
-      <div className="rounded-2xl border-2 border-emerald-500/40 bg-emerald-500/5 p-6 text-center">
-        <div className="animate-pulse text-5xl">⏳</div>
-        <h2 className="mt-3 text-xl font-black text-emerald-400">
-          {players.length < 8 ? `جاري انتظار 8 لاعبين حقيقيين (${players.length}/8)` : "اكتمل العدد! جاهزين للبدء"}
-        </h2>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800">
-          <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all" style={{ width: `${(players.length / 8) * 100}%` }} />
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-stone-900 via-neutral-900 to-stone-950 flex flex-col relative overflow-hidden">
+      {/* Ambient dark warehouse feel */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(255,180,50,0.08),transparent_60%)]" />
+      <header className="relative p-3 flex items-center justify-between">
+        <button onClick={onLeave} className="flex items-center gap-1 text-white/80 text-sm">
+          <LogOut className="h-4 w-4" /> خروج
+        </button>
+        <div className="text-2xl font-black text-white">{players.length}/{cap}</div>
+        <div className="text-xs text-white/60">Lobby</div>
+      </header>
+      <div className="absolute top-16 left-3 bg-black/60 backdrop-blur rounded-lg p-2 min-w-[140px]">
+        <div className="text-xs text-white/70 mb-1 text-center">اللاعبين</div>
+        {players.map((p) => (
+          <div key={p.user_id} className={`text-xs py-0.5 ${p.user_id === selfId ? "text-yellow-400 font-bold" : "text-white/80"}`}>
+            Lv1 {p.name}
+          </div>
+        ))}
+        {Array.from({ length: cap - players.length }).map((_, i) => (
+          <div key={i} className="text-xs py-0.5 text-white/30">-- انتظار --</div>
+        ))}
       </div>
-
-      <div className="mt-6 grid grid-cols-4 gap-3">
-        {Array.from({ length: 8 }).map((_, i) => {
-          const p = players[i];
-          const c = p ? CHARACTERS.find((x) => x.id === p.char) : null;
-          return (
-            <div key={i} className={`aspect-square rounded-xl border-2 p-2 text-center flex flex-col items-center justify-center ${p ? "border-emerald-400/50" : "border-dashed border-white/10"}`}>
-              {p && c ? (
-                <>
-                  <div className="text-4xl">{c.emoji}</div>
-                  <div className="mt-1 truncate text-xs font-bold text-white">{p.name}{p.user_id === me && " (أنت)"}</div>
-                  <div className={`mt-1 text-[10px] font-black ${i < 4 ? "text-red-400" : "text-blue-400"}`}>فريق {i < 4 ? "A" : "B"}</div>
-                </>
-              ) : (
-                <span className="text-xs text-muted-foreground">في الانتظار...</span>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {isHost && (
+      {full && isHost && (
         <button
           onClick={onStart}
-          disabled={!canStart}
-          className="mt-6 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-4 text-lg font-black text-white shadow-lg disabled:opacity-40"
+          className="absolute top-16 left-1/2 -translate-x-1/2 rounded-xl bg-gradient-to-b from-yellow-300 to-amber-600 px-8 py-3 font-black text-black shadow-2xl animate-pulse"
         >
-          {canStart ? "🚀 ابدأ الماتش (50 كريدت)" : `في انتظار ${8 - players.length} لاعبين`}
+          Start Game
         </button>
       )}
-      {!isHost && players.length === 8 && (
-        <p className="mt-6 text-center text-sm text-muted-foreground">في انتظار قائد الغرفة ليبدأ الماتش...</p>
+      {full && !isHost && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 rounded-xl bg-black/70 px-6 py-3 text-yellow-300 font-bold">
+          ينتظر بدء المضيف...
+        </div>
       )}
-      <button onClick={onLeave} className="mt-3 w-full rounded-xl border border-red-500/40 py-2 text-sm text-red-400">
-        خروج
-      </button>
-    </section>
+      {/* Character preview */}
+      <div className="flex-1 relative">
+        <Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 2, 4], fov: 40 }}>
+          <ambientLight intensity={0.4} />
+          <spotLight position={[3, 8, 3]} angle={0.5} penumbra={0.5} intensity={1.5} castShadow />
+          <ChibiCharacter position={[0, 0, 0]} rotationY={0} state="idle" team="red" isSelf />
+          <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+            <planeGeometry args={[20, 20]} />
+            <meshStandardMaterial color="#3a2a1a" roughness={0.9} />
+          </mesh>
+        </Canvas>
+      </div>
+    </div>
   );
 }
 
-// ==================== FOOTBALL MATCH ====================
-type PlayerState = { x: number; y: number; vx: number; vy: number; char: string; team: "A" | "B"; name: string; stunUntil: number };
-type BallState = { x: number; y: number; vx: number; vy: number };
+// ============ Finished ============
+function FinishedScreen({ result, onAgain }: { result: { winner: string; a: number; b: number } | null; onAgain: () => void }) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-emerald-950 flex flex-col items-center justify-center p-4 text-white">
+      <div className="text-7xl mb-4">🏆</div>
+      <h2 className="text-3xl font-black text-yellow-400 mb-2">{result?.winner ?? "انتهت المباراة"}</h2>
+      <div className="text-6xl font-black mb-6">
+        <span className="text-red-400">{result?.a ?? 0}</span>
+        <span className="mx-4 text-white/50">-</span>
+        <span className="text-blue-400">{result?.b ?? 0}</span>
+      </div>
+      <button onClick={onAgain} className="rounded-2xl bg-yellow-500 text-black font-black px-8 py-4 text-lg">
+        العب مرة أخرى
+      </button>
+    </div>
+  );
+}
 
-const FIELD_W = 800;
-const FIELD_H = 500;
-const MATCH_SECONDS = 180;
-const SKILL_COOLDOWN = 8000;
-const SKILL_RADIUS = 80;
-const STUN_DURATION = 2500;
-
-function FootballMatch({ roomId, me, myChar, players, onFinish }: {
-  roomId: string; me: string; myChar: string; players: PresenceP[];
-  onFinish: (winnerTeam: "A" | "B" | "draw", a: number, b: number) => void;
+// ============ Game Scene ============
+function GameScene({ roomId, presences, selfId, selfName, isHost, onEnd, onExit }: {
+  roomId: string; presences: Presence[]; selfId: string; selfName: string; isHost: boolean;
+  onEnd: (a: number, b: number, myTeam: "red" | "blue", players: NetPlayer[]) => void;
+  onExit: () => void;
 }) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const isHost = players[0].user_id === me;
-  const chRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-  const stateRef = useRef<{
-    players: Map<string, PlayerState>;
-    ball: BallState;
-    scoreA: number;
-    scoreB: number;
-    timeLeft: number;
-    goalFlash: number;
-  }>({
-    players: new Map(),
-    ball: { x: FIELD_W / 2, y: FIELD_H / 2, vx: 0, vy: 0 },
-    scoreA: 0, scoreB: 0, timeLeft: MATCH_SECONDS, goalFlash: 0,
-  });
-  const inputRef = useRef({ dx: 0, dy: 0, kick: false, skillAt: 0 });
-  const [, force] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(MATCH_SECONDS);
-  const [scores, setScores] = useState({ a: 0, b: 0 });
+  // Assign teams deterministically by presence order
+  const teamMap = useMemo(() => {
+    const m = new Map<string, "red" | "blue">();
+    presences.forEach((p, i) => m.set(p.user_id, i % 2 === 0 ? "red" : "blue"));
+    return m;
+  }, [presences]);
+  const myTeam = teamMap.get(selfId) || "red";
+
+  // Player states (self is authoritative locally; others come via broadcast)
+  const playersRef = useRef<Map<string, NetPlayer>>(new Map());
+  const ballRef = useRef({ x: 0, z: 0, vx: 0, vz: 0, y: 0.4 });
+  const [scoreA, setScoreA] = useState(0);
+  const [scoreB, setScoreB] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(MATCH_MS);
   const [goalMsg, setGoalMsg] = useState<string>("");
-  const [skillReady, setSkillReady] = useState(true);
-  const skillLastRef = useRef(0);
+  const [stones, setStones] = useState(3);
+  const stonesRef = useRef<Array<{ x: number; z: number; vx: number; vz: number; owner: string; life: number }>>([]);
+  const stonesVersion = useRef(0);
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const startTimeRef = useRef<number>(Date.now());
+  const endedRef = useRef(false);
 
-  // Init player positions
+  // Controls state
+  const joyRef = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
+  const camYawRef = useRef(0);
+  const jumpingRef = useRef(false);
+  const jumpVelRef = useRef(0);
+  const kickRef = useRef(false);
+  const throwRef = useRef(false);
+
+  // Initialize players
   useEffect(() => {
-    players.forEach((p, i) => {
-      const team: "A" | "B" = i < 4 ? "A" : "B";
-      const idx = i % 4;
-      const x = team === "A" ? 100 + idx * 40 : FIELD_W - 100 - idx * 40;
-      const y = 80 + idx * 100;
-      stateRef.current.players.set(p.user_id, {
-        x, y, vx: 0, vy: 0, char: p.char, team, name: p.name, stunUntil: 0,
+    presences.forEach((p, i) => {
+      const team = i % 2 === 0 ? "red" : "blue";
+      const side = team === "red" ? -1 : 1;
+      const startX = side * (FIELD_W / 4);
+      const startZ = ((i % 4) - 1.5) * 2;
+      playersRef.current.set(p.user_id, {
+        user_id: p.user_id,
+        name: p.name,
+        team,
+        x: startX,
+        z: startZ,
+        ry: team === "red" ? Math.PI / 2 : -Math.PI / 2,
+        state: "idle",
+        stunnedUntil: 0,
       });
     });
-    force((n) => n + 1);
-  }, [players]);
+  }, [presences]);
 
-  // Realtime channel for game
+  // Realtime channel for movement/ball
   useEffect(() => {
-    const ch = supabase.channel(roomId, { config: { broadcast: { self: false } } });
-    chRef.current = ch;
+    const gameRoom = roomId + "-game";
+    const ch = supabase.channel(gameRoom, { config: { broadcast: { self: false } } });
+    channelRef.current = ch;
 
-    ch.on("broadcast", { event: "pos" }, (payload) => {
-      const { uid, x, y, vx, vy } = payload.payload as { uid: string; x: number; y: number; vx: number; vy: number };
-      const p = stateRef.current.players.get(uid);
-      if (p) { p.x = x; p.y = y; p.vx = vx; p.vy = vy; }
+    ch.on("broadcast", { event: "pos" }, ({ payload }) => {
+      const p = payload as NetPlayer;
+      playersRef.current.set(p.user_id, p);
     });
-    ch.on("broadcast", { event: "skill" }, (payload) => {
-      const { uid } = payload.payload as { uid: string };
-      const caster = stateRef.current.players.get(uid);
-      if (!caster) return;
-      stateRef.current.players.forEach((p, pid) => {
-        if (pid === uid || p.team === caster.team) return;
-        const dx = p.x - caster.x, dy = p.y - caster.y;
-        if (Math.hypot(dx, dy) < SKILL_RADIUS) p.stunUntil = Date.now() + STUN_DURATION;
-      });
+    ch.on("broadcast", { event: "ball" }, ({ payload }) => {
+      if (isHost) return; // host is authoritative
+      Object.assign(ballRef.current, payload);
     });
-    ch.on("broadcast", { event: "ball" }, (payload) => {
-      if (isHost) return;
-      stateRef.current.ball = payload.payload as BallState;
-    });
-    ch.on("broadcast", { event: "goal" }, (payload) => {
-      const { team, a, b } = payload.payload as { team: "A" | "B"; a: number; b: number };
-      stateRef.current.scoreA = a; stateRef.current.scoreB = b; stateRef.current.goalFlash = Date.now() + 2000;
-      setScores({ a, b });
-      setGoalMsg(`GOOOOL! فريق ${team}`);
+    ch.on("broadcast", { event: "goal" }, ({ payload }) => {
+      const p = payload as { team: "A" | "B"; a: number; b: number };
+      setScoreA(p.a); setScoreB(p.b);
+      setGoalMsg(p.team === "A" ? "GOOOOL أحمر!" : "GOOOOL أزرق!");
       setTimeout(() => setGoalMsg(""), 2000);
-      stateRef.current.ball = { x: FIELD_W / 2, y: FIELD_H / 2, vx: 0, vy: 0 };
     });
+    ch.on("broadcast", { event: "stone" }, ({ payload }) => {
+      stonesRef.current.push(payload as { x: number; z: number; vx: number; vz: number; owner: string; life: number });
+      stonesVersion.current++;
+    });
+    ch.on("broadcast", { event: "hit" }, ({ payload }) => {
+      const p = payload as { target: string; until: number };
+      const pl = playersRef.current.get(p.target);
+      if (pl) { pl.stunnedUntil = p.until; pl.state = "stunned"; }
+    });
+
     ch.subscribe();
-    return () => { ch.unsubscribe(); };
+    return () => { supabase.removeChannel(ch); };
   }, [roomId, isHost]);
 
-  // Input handlers
+  // Broadcast my position throttled
   useEffect(() => {
-    const keys: Record<string, boolean> = {};
-    const kd = (e: KeyboardEvent) => {
-      keys[e.key.toLowerCase()] = true;
-      if (e.key === " ") castSkill();
-    };
-    const ku = (e: KeyboardEvent) => { keys[e.key.toLowerCase()] = false; };
-    window.addEventListener("keydown", kd);
-    window.addEventListener("keyup", ku);
-    const tick = setInterval(() => {
-      let dx = 0, dy = 0;
-      if (keys["arrowup"] || keys["w"]) dy = -1;
-      if (keys["arrowdown"] || keys["s"]) dy = 1;
-      if (keys["arrowleft"] || keys["a"]) dx = -1;
-      if (keys["arrowright"] || keys["d"]) dx = 1;
-      inputRef.current.dx = dx; inputRef.current.dy = dy;
-    }, 30);
-    return () => { window.removeEventListener("keydown", kd); window.removeEventListener("keyup", ku); clearInterval(tick); };
-  }, []);
+    const id = setInterval(() => {
+      const me = playersRef.current.get(selfId);
+      if (me && channelRef.current) {
+        channelRef.current.send({ type: "broadcast", event: "pos", payload: me });
+      }
+    }, 60);
+    return () => clearInterval(id);
+  }, [selfId]);
 
-  const castSkill = () => {
-    if (Date.now() - skillLastRef.current < SKILL_COOLDOWN) return;
-    skillLastRef.current = Date.now();
-    setSkillReady(false);
-    setTimeout(() => setSkillReady(true), SKILL_COOLDOWN);
-    chRef.current?.send({ type: "broadcast", event: "skill", payload: { uid: me } });
-    // Apply locally
-    const caster = stateRef.current.players.get(me);
-    if (caster) {
-      stateRef.current.players.forEach((p, pid) => {
-        if (pid === me || p.team === caster.team) return;
-        const dx = p.x - caster.x, dy = p.y - caster.y;
-        if (Math.hypot(dx, dy) < SKILL_RADIUS) p.stunUntil = Date.now() + STUN_DURATION;
+  // Host broadcasts ball
+  useEffect(() => {
+    if (!isHost) return;
+    const id = setInterval(() => {
+      if (channelRef.current) {
+        channelRef.current.send({ type: "broadcast", event: "ball", payload: ballRef.current });
+      }
+    }, 80);
+    return () => clearInterval(id);
+  }, [isHost]);
+
+  // Match timer
+  useEffect(() => {
+    const id = setInterval(() => {
+      const elapsed = Date.now() - startTimeRef.current;
+      const left = Math.max(0, MATCH_MS - elapsed);
+      setTimeLeft(left);
+      if (left === 0 && !endedRef.current) {
+        endedRef.current = true;
+        onEnd(scoreA, scoreB, myTeam, Array.from(playersRef.current.values()));
+      }
+    }, 500);
+    return () => clearInterval(id);
+  }, [scoreA, scoreB, myTeam, onEnd]);
+
+  // Ensure self is initialized
+  useEffect(() => {
+    if (!playersRef.current.has(selfId)) {
+      playersRef.current.set(selfId, {
+        user_id: selfId, name: selfName, team: myTeam,
+        x: myTeam === "red" ? -6 : 6, z: 0,
+        ry: myTeam === "red" ? Math.PI / 2 : -Math.PI / 2,
+        state: "idle", stunnedUntil: 0,
       });
     }
+  }, [selfId, selfName, myTeam]);
+
+  const doJump = () => {
+    if (!jumpingRef.current) {
+      jumpingRef.current = true;
+      jumpVelRef.current = 6.5;
+    }
+  };
+  const doKick = () => { kickRef.current = true; setTimeout(() => { kickRef.current = false; }, 200); };
+  const doThrow = () => {
+    if (stones <= 0) return;
+    setStones((s) => s - 1);
+    const me = playersRef.current.get(selfId);
+    if (!me || !channelRef.current) return;
+    const speed = 15;
+    const st = { x: me.x, z: me.z, vx: Math.sin(me.ry) * speed, vz: Math.cos(me.ry) * speed, owner: selfId, life: 1.5 };
+    stonesRef.current.push(st);
+    channelRef.current.send({ type: "broadcast", event: "stone", payload: st });
+    throwRef.current = true; setTimeout(() => { throwRef.current = false; }, 200);
   };
 
-  // Timer
-  useEffect(() => {
-    const t = setInterval(() => setTimeLeft((s) => Math.max(0, s - 1)), 1000);
-    return () => clearInterval(t);
-  }, []);
+  const registerGoal = useCallback((team: "A" | "B") => {
+    if (!isHost) return;
+    const newA = team === "A" ? scoreA + 1 : scoreA;
+    const newB = team === "B" ? scoreB + 1 : scoreB;
+    setScoreA(newA); setScoreB(newB);
+    setGoalMsg(team === "A" ? "GOOOOL أحمر!" : "GOOOOL أزرق!");
+    setTimeout(() => setGoalMsg(""), 2000);
+    channelRef.current?.send({ type: "broadcast", event: "goal", payload: { team, a: newA, b: newB } });
+    ballRef.current.x = 0; ballRef.current.z = 0; ballRef.current.vx = 0; ballRef.current.vz = 0;
+  }, [isHost, scoreA, scoreB]);
 
-  useEffect(() => {
-    if (timeLeft === 0) {
-      const { scoreA, scoreB } = stateRef.current;
-      const winner = scoreA > scoreB ? "A" : scoreB > scoreA ? "B" : "draw";
-      onFinish(winner, scoreA, scoreB);
-    }
-  }, [timeLeft, onFinish]);
-
-  // Game loop
-  useEffect(() => {
-    let raf = 0;
-    let lastBroadcast = 0;
-    let lastBallBroadcast = 0;
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
-
-    const loop = () => {
-      const now = Date.now();
-      const me_p = stateRef.current.players.get(me);
-      if (me_p && me_p.stunUntil < now) {
-        const speed = 3;
-        me_p.vx = inputRef.current.dx * speed;
-        me_p.vy = inputRef.current.dy * speed;
-        me_p.x = Math.max(20, Math.min(FIELD_W - 20, me_p.x + me_p.vx));
-        me_p.y = Math.max(20, Math.min(FIELD_H - 20, me_p.y + me_p.vy));
-      } else if (me_p) { me_p.vx = 0; me_p.vy = 0; }
-
-      // Broadcast my position 15 fps
-      if (me_p && now - lastBroadcast > 66) {
-        lastBroadcast = now;
-        chRef.current?.send({ type: "broadcast", event: "pos", payload: { uid: me, x: me_p.x, y: me_p.y, vx: me_p.vx, vy: me_p.vy } });
-      }
-
-      // Host: ball physics + collision
-      if (isHost) {
-        const b = stateRef.current.ball;
-        b.x += b.vx; b.y += b.vy;
-        b.vx *= 0.98; b.vy *= 0.98;
-        if (b.x < 12 || b.x > FIELD_W - 12) {
-          // goal check y between goal
-          if (b.y > FIELD_H / 2 - 60 && b.y < FIELD_H / 2 + 60) {
-            const team: "A" | "B" = b.x < 12 ? "B" : "A";
-            if (team === "A") stateRef.current.scoreA++; else stateRef.current.scoreB++;
-            const { scoreA, scoreB } = stateRef.current;
-            setScores({ a: scoreA, b: scoreB });
-            setGoalMsg(`GOOOOL! فريق ${team}`);
-            stateRef.current.goalFlash = now + 2000;
-            setTimeout(() => setGoalMsg(""), 2000);
-            b.x = FIELD_W / 2; b.y = FIELD_H / 2; b.vx = 0; b.vy = 0;
-            chRef.current?.send({ type: "broadcast", event: "goal", payload: { team, a: scoreA, b: scoreB } });
-          } else { b.vx *= -0.8; b.x = Math.max(12, Math.min(FIELD_W - 12, b.x)); }
-        }
-        if (b.y < 12 || b.y > FIELD_H - 12) { b.vy *= -0.8; b.y = Math.max(12, Math.min(FIELD_H - 12, b.y)); }
-
-        // Player-ball collisions
-        stateRef.current.players.forEach((p) => {
-          if (p.stunUntil > now) return;
-          const dx = b.x - p.x, dy = b.y - p.y;
-          const d = Math.hypot(dx, dy);
-          if (d < 24) {
-            const push = 6 / Math.max(1, d);
-            b.vx = dx * push + p.vx * 0.5;
-            b.vy = dy * push + p.vy * 0.5;
-          }
-        });
-
-        if (now - lastBallBroadcast > 50) {
-          lastBallBroadcast = now;
-          chRef.current?.send({ type: "broadcast", event: "ball", payload: b });
-        }
-      }
-
-      // Render
-      drawField(ctx, stateRef.current, me);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, [me, isHost]);
-
-  const mins = Math.floor(timeLeft / 60);
-  const secs = timeLeft % 60;
+  const mm = String(Math.floor(timeLeft / 60000)).padStart(2, "0");
+  const ss = String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, "0");
 
   return (
-    <div className="relative">
-      {/* HUD */}
-      <div className="sticky top-14 z-30 mx-auto flex max-w-3xl items-center justify-between gap-2 px-3 py-2">
-        <div className="rounded-lg bg-red-500/20 px-3 py-1 text-lg font-black text-red-400">A: {scores.a}</div>
-        <div className="flex items-center gap-1 rounded-lg bg-slate-900/80 px-3 py-1 font-mono text-white">
-          <Clock className="h-3 w-3" /> {mins}:{secs.toString().padStart(2, "0")}
-        </div>
-        <div className="rounded-lg bg-blue-500/20 px-3 py-1 text-lg font-black text-blue-400">B: {scores.b}</div>
-      </div>
-
-      <div className="relative mx-auto max-w-3xl px-2">
-        <canvas
-          ref={canvasRef}
-          width={FIELD_W}
-          height={FIELD_H}
-          className="w-full rounded-xl border-2 border-emerald-500/30 shadow-2xl"
-          style={{ aspectRatio: `${FIELD_W}/${FIELD_H}`, touchAction: "none" }}
+    <div className="fixed inset-0 bg-black overflow-hidden select-none touch-none">
+      <Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 12, 14], fov: 55 }} gl={{ antialias: true }}>
+        <SceneContent
+          playersRef={playersRef}
+          ballRef={ballRef}
+          stonesRef={stonesRef}
+          selfId={selfId}
+          joyRef={joyRef}
+          camYawRef={camYawRef}
+          jumpingRef={jumpingRef}
+          jumpVelRef={jumpVelRef}
+          kickRef={kickRef}
+          isHost={isHost}
+          onGoal={registerGoal}
         />
-        {goalMsg && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-5xl font-black text-yellow-400 drop-shadow-[0_0_20px_rgba(250,204,21,0.8)] animate-pulse sm:text-7xl">
-              {goalMsg}
-            </div>
+      </Canvas>
+
+      {/* HUD Top */}
+      <div className="absolute top-0 left-0 right-0 p-3 pointer-events-none">
+        <div className="flex items-center justify-between">
+          <button onClick={onExit} className="pointer-events-auto rounded-lg bg-black/60 backdrop-blur px-3 py-1.5 text-white text-xs flex items-center gap-1">
+            <LogOut className="h-3 w-3" /> خروج
+          </button>
+          <div className="rounded-2xl bg-black/70 backdrop-blur px-5 py-2 flex items-center gap-4">
+            <span className="text-red-400 text-2xl font-black">{scoreA}</span>
+            <span className="text-white/40 text-xl">-</span>
+            <span className="text-blue-400 text-2xl font-black">{scoreB}</span>
           </div>
-        )}
+          <div className="rounded-lg bg-black/60 backdrop-blur px-3 py-1.5 text-yellow-300 font-mono font-bold">
+            {mm}:{ss}
+          </div>
+        </div>
       </div>
 
-      {/* Controls */}
-      <div className="fixed bottom-4 left-0 right-0 z-40 flex items-end justify-between px-6">
-        <Joystick onMove={(dx, dy) => { inputRef.current.dx = dx; inputRef.current.dy = dy; }} />
+      {/* Goal message */}
+      {goalMsg && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="text-6xl font-black text-yellow-400 animate-bounce drop-shadow-[0_0_20px_rgba(234,179,8,0.8)]">
+            {goalMsg}
+          </div>
+        </div>
+      )}
+
+      {/* Camera swipe area (top half — behind joystick / buttons) */}
+      <CameraSwipe camYawRef={camYawRef} />
+
+      {/* Joystick left */}
+      <Joystick joyRef={joyRef} />
+
+      {/* Action buttons right */}
+      <div className="absolute bottom-6 right-4 flex flex-col gap-3 pointer-events-auto">
         <button
-          onClick={castSkill}
-          disabled={!skillReady}
-          className={`flex h-20 w-20 items-center justify-center rounded-full border-4 text-3xl font-black shadow-2xl transition-all ${
-            skillReady ? "border-yellow-400 bg-gradient-to-br from-yellow-500 to-orange-600 text-white animate-pulse" : "border-slate-600 bg-slate-800 text-slate-500"
-          }`}
-          aria-label="skill"
+          onClick={doThrow}
+          disabled={stones <= 0}
+          className="w-16 h-16 rounded-full bg-white/20 backdrop-blur border-2 border-white/40 text-white text-xs font-bold flex flex-col items-center justify-center disabled:opacity-30"
         >
-          <Zap className="h-8 w-8" />
+          <span className="text-lg">🪨</span>
+          <span>{stones}</span>
+        </button>
+        <button
+          onClick={doJump}
+          className="w-16 h-16 rounded-full bg-white/20 backdrop-blur border-2 border-white/40 text-white flex items-center justify-center"
+        >
+          <span className="text-2xl">⬆️</span>
+        </button>
+        <button
+          onClick={doKick}
+          className="w-20 h-20 rounded-full bg-gradient-to-b from-yellow-400 to-amber-600 border-2 border-yellow-200 text-black flex items-center justify-center shadow-2xl"
+        >
+          <span className="text-3xl">⚽</span>
         </button>
       </div>
     </div>
   );
 }
 
-function Joystick({ onMove }: { onMove: (dx: number, dy: number) => void }) {
-  const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
-  const baseRef = useRef<HTMLDivElement | null>(null);
+// ============ Camera swipe ============
+function CameraSwipe({ camYawRef }: { camYawRef: React.MutableRefObject<number> }) {
+  const startX = useRef(0);
+  const startY = useRef(0);
+  const activeTouch = useRef<number | null>(null);
 
-  const handle = (clientX: number, clientY: number) => {
-    const rect = baseRef.current!.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    let dx = clientX - cx, dy = clientY - cy;
-    const mag = Math.hypot(dx, dy);
-    const max = 40;
-    if (mag > max) { dx = (dx / mag) * max; dy = (dy / mag) * max; }
-    setDrag({ x: dx, y: dy });
-    onMove(mag < 8 ? 0 : dx / max, mag < 8 ? 0 : dy / max);
+  const onStart = (e: React.TouchEvent) => {
+    const t = e.changedTouches[0];
+    activeTouch.current = t.identifier;
+    startX.current = t.clientX;
+    startY.current = t.clientY;
   };
+  const onMove = (e: React.TouchEvent) => {
+    for (const t of Array.from(e.changedTouches)) {
+      if (t.identifier === activeTouch.current) {
+        const dx = t.clientX - startX.current;
+        startX.current = t.clientX;
+        startY.current = t.clientY;
+        camYawRef.current += dx * 0.008;
+      }
+    }
+  };
+  const onEnd = () => { activeTouch.current = null; };
 
   return (
     <div
-      ref={baseRef}
-      className="relative h-24 w-24 rounded-full border-4 border-white/30 bg-slate-900/60 backdrop-blur"
-      onTouchStart={(e) => { const t = e.touches[0]; handle(t.clientX, t.clientY); }}
-      onTouchMove={(e) => { const t = e.touches[0]; handle(t.clientX, t.clientY); }}
-      onTouchEnd={() => { setDrag(null); onMove(0, 0); }}
-      onMouseDown={(e) => handle(e.clientX, e.clientY)}
-      onMouseMove={(e) => { if (e.buttons) handle(e.clientX, e.clientY); }}
-      onMouseUp={() => { setDrag(null); onMove(0, 0); }}
-      onMouseLeave={() => { setDrag(null); onMove(0, 0); }}
+      className="absolute inset-0 pointer-events-auto"
+      style={{ touchAction: "none" }}
+      onTouchStart={onStart}
+      onTouchMove={onMove}
+      onTouchEnd={onEnd}
+      onTouchCancel={onEnd}
+      onMouseDown={(e) => { startX.current = e.clientX; activeTouch.current = -1; }}
+      onMouseMove={(e) => {
+        if (activeTouch.current === -1) {
+          const dx = e.clientX - startX.current;
+          startX.current = e.clientX;
+          camYawRef.current += dx * 0.008;
+        }
+      }}
+      onMouseUp={onEnd}
+      onMouseLeave={onEnd}
+    />
+  );
+}
+
+// ============ Joystick ============
+function Joystick({ joyRef }: { joyRef: React.MutableRefObject<{ dx: number; dy: number }> }) {
+  const [knob, setKnob] = useState({ x: 0, y: 0 });
+  const baseRef = useRef<HTMLDivElement>(null);
+  const activeTouch = useRef<number | null>(null);
+  const radius = 45;
+
+  const update = (cx: number, cy: number) => {
+    if (!baseRef.current) return;
+    const r = baseRef.current.getBoundingClientRect();
+    const centerX = r.left + r.width / 2;
+    const centerY = r.top + r.height / 2;
+    let dx = cx - centerX;
+    let dy = cy - centerY;
+    const dist = Math.hypot(dx, dy);
+    if (dist > radius) { dx = (dx / dist) * radius; dy = (dy / dist) * radius; }
+    setKnob({ x: dx, y: dy });
+    joyRef.current.dx = dx / radius;
+    joyRef.current.dy = dy / radius;
+  };
+  const stop = () => {
+    setKnob({ x: 0, y: 0 });
+    joyRef.current.dx = 0; joyRef.current.dy = 0;
+    activeTouch.current = null;
+  };
+  return (
+    <div
+      className="absolute bottom-8 left-6 pointer-events-auto z-20"
+      style={{ touchAction: "none" }}
+      onTouchStart={(e) => {
+        e.stopPropagation();
+        const t = e.changedTouches[0];
+        activeTouch.current = t.identifier;
+        update(t.clientX, t.clientY);
+      }}
+      onTouchMove={(e) => {
+        e.stopPropagation();
+        for (const t of Array.from(e.changedTouches)) {
+          if (t.identifier === activeTouch.current) update(t.clientX, t.clientY);
+        }
+      }}
+      onTouchEnd={(e) => { e.stopPropagation(); stop(); }}
+      onTouchCancel={stop}
     >
-      <div
-        className="absolute h-12 w-12 rounded-full bg-emerald-500 shadow-lg transition-transform"
-        style={{ left: "50%", top: "50%", transform: `translate(-50%, -50%) translate(${drag?.x ?? 0}px, ${drag?.y ?? 0}px)` }}
-      />
+      <div ref={baseRef} className="w-32 h-32 rounded-full bg-black/50 border-2 border-white/40 backdrop-blur relative">
+        <div
+          className="absolute w-14 h-14 rounded-full bg-white/70 border-2 border-white shadow-lg"
+          style={{ left: `calc(50% - 28px + ${knob.x}px)`, top: `calc(50% - 28px + ${knob.y}px)` }}
+        />
+      </div>
     </div>
   );
 }
 
-function drawField(ctx: CanvasRenderingContext2D, state: {
-  players: Map<string, PlayerState>; ball: BallState; goalFlash: number;
-}, me: string) {
-  ctx.fillStyle = "#0a3d1a";
-  ctx.fillRect(0, 0, FIELD_W, FIELD_H);
-  // Stripes
-  for (let i = 0; i < 8; i++) {
-    ctx.fillStyle = i % 2 ? "#0d4a20" : "#0a3d1a";
-    ctx.fillRect((FIELD_W / 8) * i, 0, FIELD_W / 8, FIELD_H);
-  }
-  // Border + center
-  ctx.strokeStyle = "#ffffff88";
-  ctx.lineWidth = 2;
-  ctx.strokeRect(10, 10, FIELD_W - 20, FIELD_H - 20);
-  ctx.beginPath(); ctx.moveTo(FIELD_W / 2, 10); ctx.lineTo(FIELD_W / 2, FIELD_H - 10); ctx.stroke();
-  ctx.beginPath(); ctx.arc(FIELD_W / 2, FIELD_H / 2, 50, 0, Math.PI * 2); ctx.stroke();
-  // Goals
-  ctx.strokeStyle = "#fff";
-  ctx.lineWidth = 4;
-  ctx.strokeRect(0, FIELD_H / 2 - 60, 12, 120);
-  ctx.strokeRect(FIELD_W - 12, FIELD_H / 2 - 60, 12, 120);
+// ============ 3D Scene Content ============
+function SceneContent({
+  playersRef, ballRef, stonesRef, selfId, joyRef, camYawRef, jumpingRef, jumpVelRef, kickRef, isHost, onGoal,
+}: {
+  playersRef: React.MutableRefObject<Map<string, NetPlayer>>;
+  ballRef: React.MutableRefObject<{ x: number; z: number; vx: number; vz: number; y: number }>;
+  stonesRef: React.MutableRefObject<Array<{ x: number; z: number; vx: number; vz: number; owner: string; life: number }>>;
+  selfId: string;
+  joyRef: React.MutableRefObject<{ dx: number; dy: number }>;
+  camYawRef: React.MutableRefObject<number>;
+  jumpingRef: React.MutableRefObject<boolean>;
+  jumpVelRef: React.MutableRefObject<number>;
+  kickRef: React.MutableRefObject<boolean>;
+  isHost: boolean;
+  onGoal: (team: "A" | "B") => void;
+}) {
+  const { camera } = useThree();
+  const yRef = useRef(0);
+  const [, force] = useState(0);
+  useEffect(() => { const id = setInterval(() => force((n) => n + 1), 100); return () => clearInterval(id); }, []);
 
-  const now = Date.now();
-  if (state.goalFlash > now) {
-    ctx.fillStyle = `rgba(250,204,21,${(state.goalFlash - now) / 2000 * 0.3})`;
-    ctx.fillRect(0, 0, FIELD_W, FIELD_H);
-  }
+  useFrame((_, delta) => {
+    const dt = Math.min(delta, 0.05);
+    const me = playersRef.current.get(selfId);
+    if (!me) return;
 
-  // Players
-  state.players.forEach((p, uid) => {
-    const c = CHARACTERS.find((x) => x.id === p.char);
-    const color = c?.color ?? "#fff";
-    const stunned = p.stunUntil > now;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 18, 0, Math.PI * 2);
-    ctx.fillStyle = p.team === "A" ? "#dc2626" : "#2563eb";
-    ctx.fill();
-    ctx.strokeStyle = uid === me ? "#facc15" : color;
-    ctx.lineWidth = uid === me ? 4 : 2;
-    ctx.stroke();
-    ctx.fillStyle = "#fff";
-    ctx.font = "bold 18px sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(c?.emoji ?? "⚽", p.x, p.y);
-    if (stunned) {
-      ctx.fillStyle = "#facc15";
-      ctx.font = "16px sans-serif";
-      ctx.fillText("💫", p.x, p.y - 22);
+    // Stun check
+    const stunned = me.stunnedUntil > Date.now();
+    const speedMul = stunned ? 0.3 : 1;
+
+    // Movement — joystick relative to camera yaw
+    const dx = joyRef.current.dx;
+    const dy = joyRef.current.dy;
+    const mag = Math.hypot(dx, dy);
+    if (mag > 0.1) {
+      const yaw = camYawRef.current;
+      // dy negative = up on screen = forward
+      const forwardX = -Math.sin(yaw);
+      const forwardZ = -Math.cos(yaw);
+      const rightX = Math.cos(yaw);
+      const rightZ = -Math.sin(yaw);
+      const moveX = (forwardX * -dy + rightX * dx) * PLAYER_SPEED * speedMul * dt;
+      const moveZ = (forwardZ * -dy + rightZ * dx) * PLAYER_SPEED * speedMul * dt;
+      me.x = Math.max(-FIELD_W / 2 + 0.5, Math.min(FIELD_W / 2 - 0.5, me.x + moveX));
+      me.z = Math.max(-FIELD_H / 2 + 0.5, Math.min(FIELD_H / 2 - 0.5, me.z + moveZ));
+      me.ry = Math.atan2(moveX, moveZ);
+      me.state = stunned ? "stunned" : "run";
+    } else {
+      me.state = stunned ? "stunned" : "idle";
     }
-    // Name
-    ctx.fillStyle = "#fff";
-    ctx.font = "10px sans-serif";
-    ctx.fillText(p.name.slice(0, 8), p.x, p.y + 30);
+
+    // Jump
+    if (jumpingRef.current) {
+      yRef.current += jumpVelRef.current * dt;
+      jumpVelRef.current -= 18 * dt;
+      if (yRef.current <= 0) { yRef.current = 0; jumpingRef.current = false; jumpVelRef.current = 0; }
+      if (me.state !== "stunned") me.state = "jump";
+    }
+
+    // Kick — impulse ball if close
+    if (kickRef.current) {
+      const dxb = ballRef.current.x - me.x;
+      const dzb = ballRef.current.z - me.z;
+      const d = Math.hypot(dxb, dzb);
+      if (d < 1.3) {
+        const power = 14;
+        ballRef.current.vx = Math.sin(me.ry) * power;
+        ballRef.current.vz = Math.cos(me.ry) * power;
+      }
+      if (me.state !== "stunned") me.state = "kick";
+    }
+
+    // Camera — orbit around player, independent yaw
+    const camDist = 8;
+    const camHeight = 5;
+    const cx = me.x + Math.sin(camYawRef.current) * camDist;
+    const cz = me.z + Math.cos(camYawRef.current) * camDist;
+    camera.position.set(cx, camHeight, cz);
+    camera.lookAt(me.x, 1.5, me.z);
+
+    // Ball physics (host only)
+    if (isHost) {
+      const b = ballRef.current;
+      b.x += b.vx * dt;
+      b.z += b.vz * dt;
+      b.vx *= 0.985; b.vz *= 0.985;
+      // Walls (short sides have goal opening)
+      if (Math.abs(b.x) > FIELD_W / 2 - 0.3) {
+        // Goal check
+        if (Math.abs(b.z) < GOAL_W / 2) {
+          onGoal(b.x > 0 ? "A" : "B"); // ball went past +X = team red (A) scored
+        } else {
+          b.x = Math.sign(b.x) * (FIELD_W / 2 - 0.3);
+          b.vx *= -0.7;
+        }
+      }
+      if (Math.abs(b.z) > FIELD_H / 2 - 0.3) {
+        b.z = Math.sign(b.z) * (FIELD_H / 2 - 0.3);
+        b.vz *= -0.7;
+      }
+      // Push against players
+      for (const p of playersRef.current.values()) {
+        const dxb = b.x - p.x;
+        const dzb = b.z - p.z;
+        const d = Math.hypot(dxb, dzb);
+        if (d < 0.7 && d > 0.01) {
+          const push = 3;
+          b.vx += (dxb / d) * push * dt * 5;
+          b.vz += (dzb / d) * push * dt * 5;
+        }
+      }
+    }
+
+    // Stones physics
+    const stones = stonesRef.current;
+    for (let i = stones.length - 1; i >= 0; i--) {
+      const s = stones[i];
+      s.x += s.vx * dt; s.z += s.vz * dt; s.life -= dt;
+      // hit players
+      for (const p of playersRef.current.values()) {
+        if (p.user_id === s.owner) continue;
+        const d = Math.hypot(s.x - p.x, s.z - p.z);
+        if (d < 0.7) {
+          if (p.user_id === selfId) {
+            p.stunnedUntil = Date.now() + STUN_MS;
+            p.state = "stunned";
+          }
+          s.life = 0;
+        }
+      }
+      if (s.life <= 0 || Math.abs(s.x) > FIELD_W / 2 || Math.abs(s.z) > FIELD_H / 2) {
+        stones.splice(i, 1);
+      }
+    }
   });
 
-  // Ball
-  ctx.beginPath();
-  ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
-  ctx.fillStyle = "#fff";
-  ctx.fill();
-  ctx.strokeStyle = "#000";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.fillStyle = "#000";
-  ctx.font = "bold 12px sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("⚽", state.ball.x, state.ball.y);
+  // Extract latest snapshots for rendering
+  const allPlayers = Array.from(playersRef.current.values());
+  const b = ballRef.current;
+  const stones = stonesRef.current;
+
+  return (
+    <>
+      {/* Lights */}
+      <ambientLight intensity={0.35} color="#a3c9ff" />
+      <directionalLight
+        position={[10, 20, 5]}
+        intensity={1.4}
+        castShadow
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-camera-left={-20}
+        shadow-camera-right={20}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
+      />
+      <pointLight position={[0, 8, 0]} intensity={1} color="#fff5c8" distance={30} />
+      <hemisphereLight args={["#87ceeb", "#2f4030", 0.4]} />
+
+      {/* Sky/background */}
+      <color attach="background" args={["#0b1220"]} />
+      <fog attach="fog" args={["#0b1220", 25, 60]} />
+
+      {/* Field */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[FIELD_W, FIELD_H]} />
+        <meshStandardMaterial color="#1e6b2a" roughness={0.9} />
+      </mesh>
+      {/* Center circle */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+        <ringGeometry args={[2.9, 3, 64]} />
+        <meshBasicMaterial color="white" />
+      </mesh>
+      {/* Center line */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+        <planeGeometry args={[0.1, FIELD_H]} />
+        <meshBasicMaterial color="white" />
+      </mesh>
+      {/* Goals */}
+      <Goal x={-FIELD_W / 2} color="#c8102e" />
+      <Goal x={FIELD_W / 2} color="#1e4d9e" />
+      {/* Walls */}
+      <Walls />
+      {/* Crowd (billboard planes) */}
+      <Crowd />
+
+      {/* Ball */}
+      <mesh position={[b.x, b.y + 0.4, b.z]} castShadow>
+        <sphereGeometry args={[0.4, 24, 24]} />
+        <meshStandardMaterial color="white" roughness={0.4} />
+      </mesh>
+
+      {/* Ball shadow disc */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[b.x, 0.02, b.z]}>
+        <circleGeometry args={[0.35, 16]} />
+        <meshBasicMaterial color="#000" transparent opacity={0.35} />
+      </mesh>
+
+      {/* Players */}
+      {allPlayers.map((p) => (
+        <ChibiCharacter
+          key={p.user_id}
+          position={[p.x, p.user_id === selfId ? yRef.current : 0, p.z]}
+          rotationY={p.ry}
+          state={p.stunnedUntil > Date.now() ? "stunned" : p.state}
+          team={p.team}
+          isSelf={p.user_id === selfId}
+        />
+      ))}
+
+      {/* Stones */}
+      {stones.map((s, i) => (
+        <mesh key={i} position={[s.x, 0.4, s.z]} castShadow>
+          <dodecahedronGeometry args={[0.25]} />
+          <meshStandardMaterial color="#6b6b6b" roughness={0.8} />
+        </mesh>
+      ))}
+    </>
+  );
+}
+
+function Goal({ x, color }: { x: number; color: string }) {
+  const sign = Math.sign(x);
+  return (
+    <group position={[x, 0, 0]}>
+      {/* Posts */}
+      <mesh position={[0, 1.2, -GOAL_W / 2]} castShadow>
+        <cylinderGeometry args={[0.1, 0.1, 2.4, 12]} />
+        <meshStandardMaterial color="white" />
+      </mesh>
+      <mesh position={[0, 1.2, GOAL_W / 2]} castShadow>
+        <cylinderGeometry args={[0.1, 0.1, 2.4, 12]} />
+        <meshStandardMaterial color="white" />
+      </mesh>
+      {/* Crossbar */}
+      <mesh position={[0, 2.4, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.1, 0.1, GOAL_W, 12]} />
+        <meshStandardMaterial color="white" />
+      </mesh>
+      {/* Net back */}
+      <mesh position={[sign * 0.8, 1.2, 0]}>
+        <planeGeometry args={[GOAL_W, 2.4]} />
+        <meshStandardMaterial color={color} transparent opacity={0.3} side={THREE.DoubleSide} />
+      </mesh>
+    </group>
+  );
+}
+
+function Walls() {
+  const wallMat = new THREE.MeshStandardMaterial({ color: "#3a3a48", roughness: 0.8 });
+  return (
+    <>
+      <mesh position={[0, 2, -FIELD_H / 2 - 0.5]} receiveShadow>
+        <boxGeometry args={[FIELD_W + 2, 4, 0.5]} />
+        <primitive object={wallMat} attach="material" />
+      </mesh>
+      <mesh position={[0, 2, FIELD_H / 2 + 0.5]} receiveShadow>
+        <boxGeometry args={[FIELD_W + 2, 4, 0.5]} />
+        <primitive object={wallMat} attach="material" />
+      </mesh>
+    </>
+  );
+}
+
+function Crowd() {
+  const positions = useMemo(() => {
+    const arr: Array<[number, number, number, string]> = [];
+    const colors = ["#f97316", "#eab308", "#3b82f6", "#ef4444", "#22c55e", "#8b5cf6"];
+    for (let i = 0; i < 40; i++) {
+      const x = (Math.random() - 0.5) * (FIELD_W + 4);
+      const z = (Math.random() < 0.5 ? -1 : 1) * (FIELD_H / 2 + 1.5 + Math.random() * 1.5);
+      arr.push([x, 1, z, colors[i % colors.length]]);
+    }
+    return arr;
+  }, []);
+  return (
+    <>
+      {positions.map(([x, y, z, c], i) => (
+        <mesh key={i} position={[x, y, z]}>
+          <capsuleGeometry args={[0.2, 0.5, 4, 8]} />
+          <meshStandardMaterial color={c} roughness={0.7} />
+        </mesh>
+      ))}
+    </>
+  );
 }

@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+
 
 
 
@@ -124,10 +124,8 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Outlet />
-        
-        <div className="fixed top-2 left-2 z-[100] scale-75 origin-top-left opacity-70 hover:opacity-100 transition-opacity">
-          <LanguageSwitcher />
-        </div>
+
+
 
         <Toaster richColors position="top-center" dir="rtl" />
       </AuthProvider>

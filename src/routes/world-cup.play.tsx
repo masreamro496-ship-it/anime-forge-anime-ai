@@ -61,14 +61,19 @@ function PlayInner() {
   const payEntry = useServerFn(wcPayEntry);
   const finishMatch = useServerFn(wcFinishMatch);
 
-  // Force landscape
+  // Force landscape + fullscreen when the match starts
   useEffect(() => {
     if (phase === "playing") {
+      try {
+        const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> };
+        (el.requestFullscreen?.() ?? el.webkitRequestFullscreen?.())?.catch(() => {});
+      } catch { /* noop */ }
       try {
         (screen.orientation as unknown as { lock?: (o: string) => Promise<void> }).lock?.("landscape").catch(() => {});
       } catch { /* noop */ }
     }
   }, [phase]);
+
 
   useEffect(() => {
     if (!user) {

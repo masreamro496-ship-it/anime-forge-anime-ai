@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle } from "lucide-react";
+import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
+import gameComingSoon from "@/assets/game-coming-soon.jpg";
+
 
 
 export const Route = createFileRoute("/")({
@@ -156,9 +158,36 @@ function Landing() {
           </Link>
 
         </div>
-        <div className="mt-6">
+        <div className="mt-6 space-y-3">
           <InstallAppButton />
+
+          <a
+            href="https://anime-forge-glb-1440p.lovable.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full rounded-2xl border-2 border-fuchsia-500/60 bg-gradient-to-r from-fuchsia-500/20 to-pink-500/20 py-4 text-base font-black text-fuchsia-300 flex items-center justify-center gap-2 hover:scale-[1.01] transition"
+          >
+            <Palette className="h-5 w-5" />
+            صنع شخصيات وأنميشن — مجاني بالكامل
+          </a>
+
+          <div className="rounded-2xl border-2 border-sky-500/60 bg-gradient-to-br from-sky-500/15 to-indigo-500/10 p-4">
+            <div className="flex items-center gap-2 text-sky-300 font-black text-base mb-3">
+              <Smartphone className="h-5 w-5" />
+              اللعبة ستنزل على تلفونك قريباً
+            </div>
+            <img
+              src={gameComingSoon}
+              alt="معاينة محرّر اللعبة — قطع وتصميمات"
+              className="w-full rounded-xl border border-sky-500/30"
+              loading="lazy"
+            />
+            <p className="mt-2 text-xs text-muted-foreground">
+              محرّر ثلاثي الأبعاد كامل · قطع وتصميمات جاهزة · نسخة تلفون قريباً
+            </p>
+          </div>
         </div>
+
       </section>
 
 

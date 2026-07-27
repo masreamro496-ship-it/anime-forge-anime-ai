@@ -20,7 +20,7 @@ function Landing() {
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <Link to="/" className="flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-gold" />
-            <span className="text-xl font-black text-gradient-gold">منصة فودافون كاش</span>
+            <span className="text-xl font-black text-gradient-gold">انمي فورج</span>
           </Link>
           <nav className="flex items-center gap-2">
             <Link to="/audio" className="hidden sm:inline-flex rounded-lg border border-border bg-card px-3 py-2 text-xs font-bold">

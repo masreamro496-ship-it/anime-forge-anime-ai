@@ -1,3 +1,4 @@
+-- 1. إنشاء جدول المهمات إذا لم يكن موجوداً
 create table if not exists public.task_submissions (
   id uuid default gen_random_uuid() primary key,
   user_id uuid,
@@ -9,12 +10,8 @@ create table if not exists public.task_submissions (
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
 
-alter table public.task_submissions enable row level security;
+-- 2. تعطيل نظام الحماية RLS تماماً للجدول لمنع أي حظر للزوار
+alter table public.task_submissions disable row level security;
 
-drop policy if exists "Allow all operations" on public.task_submissions;
-
-create policy "Allow all operations"
-on public.task_submissions
-for all
-using (true)
-with check (true);
+-- 3. إعطاء صلاحية كاملة للزوار والمستخدمين للإدخال والقراءة
+grant all on public.task_submissions to anon, authenticated, service_role;

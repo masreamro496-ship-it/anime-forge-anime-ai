@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone } from "lucide-react";
+import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone, Heart } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import gameComingSoon from "@/assets/game-coming-soon.jpg";
 

@@ -31,19 +31,23 @@ function TasksPage() {
     }
   };
 
-  const handleSubmit = async (taskId: string, taskTitle: string) => {
+    const handleSubmit = async (taskId: string, taskTitle: string) => {
     const selectedFile = files[taskId];
     const textProof = proofs[taskId];
 
-    if (!selectedFile && !textProof) return;
+    if (!selectedFile && !textProof) {
+      alert("يرجى إرفاق صورة الإثبات أو وضع رابط المنشور أولاً.");
+      return;
+    }
+
     setLoading({ ...loading, [taskId]: true });
 
     try {
-      let finalProofUrl = textProof || "";
+      let finalProofUrl = textProof || '';
 
-      // رفع الصورة إلى قاعدة البيانات في حال تم إرفاق ملف/سكرين شوت
+      // 1. رفع الصورة في حال اختيار ملف
       if (selectedFile) {
-        const fileExt = selectedFile.name.split(".").pop();
+        const fileExt = selectedFile.name.split('.').pop();
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
         const filePath = `task-proofs/${fileName}`;
 
@@ -52,17 +56,21 @@ function TasksPage() {
           .upload(filePath, selectedFile);
 
         if (!uploadError) {
-          const { data } = supabase.storage.from("public").getPublicUrl(filePath);
+          const { data } = supabase.storage
+            .from("public")
+            .getPublicUrl(filePath);
+
           finalProofUrl = data.publicUrl;
         } else {
-          // في حال لم يكتمل الرفع في المجلد، نحفظ رابط مؤقت من السيرفر
-          finalProofUrl = URL.createObjectURL(selectedFile);
+          console.error("Storage upload error:", uploadError);
         }
       }
 
+      // 2. جلب بيانات المستخدم
       const { data: userData } = await supabase.auth.getUser();
 
-      const { error } = await supabase.from("task_submissions").insert({
+      // 3. إدخال الإثبات في قاعدة البيانات
+      const { error: dbError } = await supabase.from("task_submissions").insert({
         user_id: userData?.user?.id || null,
         user_email: userData?.user?.email || "زائر / غير معروف",
         task_id: taskId,
@@ -71,18 +79,20 @@ function TasksPage() {
         status: "pending",
       });
 
-      if (!error) {
-        setSubmitted({ ...submitted, [taskId]: true });
+      if (dbError) {
+        console.error("Database insert error:", dbError);
+        alert("حدث خطأ أثناء حفظ الإثبات. حاول مرة أخرى.");
       } else {
-        alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+        setSubmitted({ ...submitted, [taskId]: true });
       }
-    } catch (e) {
-      console.error(e);
-      alert("حدث خطأ في عملية رفع الملف.");
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      alert("حدث خطأ غير متوقع أثناء إرسال المهمة.");
     } finally {
       setLoading({ ...loading, [taskId]: false });
     }
   };
+
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4 max-w-4xl mx-auto pb-20">

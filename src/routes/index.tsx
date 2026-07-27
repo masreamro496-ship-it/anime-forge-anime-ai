@@ -169,16 +169,19 @@ function Landing() {
         </p>
       </Link>
 
-{/* زر التبرع */}
-<div className="text-center my-8">
-  <Link 
-    to="/donate" 
-    className="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 rounded-full font-bold text-white shadow-lg"
-  >
-    <Heart className="w-5 h-5 fill-white animate-pulse" />
-    <span>دعم المنصة والتبرع ❤️</span>
-  </Link>
-</div>
+      {/* زر التبرع والدعم المباشر */}
+      <div className="text-center my-8">
+        <a 
+          href="https://wa.me/?text=أرغب%20في%20دعم%20منصة%20أنمي%20فورج" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-500 rounded-full font-bold text-white shadow-lg transition-all"
+        >
+          <Heart className="w-5 h-5 fill-white animate-pulse" />
+          <span>دعم المنصة والتبرع ❤️</span>
+        </a>
+      </div>
+
 
 
 </div>

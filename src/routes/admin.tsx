@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPanel() {
-  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases" | "credits" | "locks" | "worldcup" | "mods" | "tasks">("requests");
+  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases" | "credits" | "locks" | "worldcup" | "mods" | "tasks" | "donations">("requests");
 
   return (
     <div className="min-h-screen">
@@ -45,7 +45,8 @@ function AdminPanel() {
             { k: "worldcup", label: "كأس العالم" },
             { k: "mods", label: "المشرفون" },
       { k: "tasks", label: "🎯 طلبات المهمات" },
-          ].map((t) => (
+       { k: "donations", label: "التبرعات ❤️" },
+    ].map((t) => (
             <button
               key={t.k}
               onClick={() => setTab(t.k as typeof tab)}
@@ -66,7 +67,89 @@ function AdminPanel() {
         {tab === "worldcup" && <WorldCupPanel />}
         {tab === "mods" && <ModeratorsPanel />}
         {tab === "tasks" && <TaskSubmissionsAdminView />}
+        {tab === "donations" && <DonationsAdminView />}
       </main>
+    </div>
+  );
+}
+function DonationsAdminView() {
+  const [donations, setDonations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchDonations = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from('donations')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (data) setDonations(data);
+    setLoading(false);
+  };
+
+  React.useEffect(() => {
+    fetchDonations();
+  }, []);
+
+  const handleStatus = async (id: string, status: 'approved' | 'rejected') => {
+    const { error } = await supabase
+      .from('donations')
+      .update({ status })
+      .eq('id', id);
+
+    if (!error) {
+      toast.success(status === 'approved' ? 'تم قبول التبرع بنجاح ✅' : 'تم رفض التبرع ❌');
+      fetchDonations();
+    } else {
+      toast.error('حدث خطأ أثناء التحديث');
+    }
+  };
+
+  if (loading) return <div className="text-center py-8 text-slate-400">جاري تحميل طلبات التبرع...</div>;
+
+  return (
+    <div className="space-y-4 dir-rtl">
+      <h2 className="text-xl font-bold text-rose-400 mb-4">طلبات التبرعات ❤️ ({donations.length})</h2>
+      {donations.length === 0 ? (
+        <p className="text-slate-400">لا توجد طلبات تبرع حالياً.</p>
+      ) : (
+        donations.map((item) => (
+          <div key={item.id} className="p-4 bg-slate-900 border border-slate-800 rounded-xl flex flex-wrap items-center justify-between gap-4 shadow-lg">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-lg text-emerald-400">{item.amount} ج.م</span>
+                <span className="text-sm text-slate-300">({item.user_email || 'زائر'})</span>
+                <span className={`text-xs px-2 py-0.5 rounded ${
+                  item.status === 'approved' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                  item.status === 'rejected' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                }`}>
+                  {item.status === 'approved' ? 'مقبول' : item.status === 'rejected' ? 'مرفوض' : 'قيد الانتظار'}
+                </span>
+              </div>
+              <p className="text-sm text-slate-400">رقم العملية: <code className="bg-slate-950 px-2 py-1 rounded text-rose-300 font-mono">{item.transaction_number}</code></p>
+              {item.receipt_url && (
+                <a href={item.receipt_url} target="_blank" rel="noreferrer" className="inline-block text-xs text-blue-400 underline hover:text-blue-300 mt-1">
+                  عرض صورة الإيصال 🖼️
+                </a>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => handleStatus(item.id, 'approved')} 
+                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition shadow"
+              >
+                قبول ✅
+              </button>
+              <button 
+                onClick={() => handleStatus(item.id, 'rejected')} 
+                className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition shadow"
+              >
+                رفض ❌
+              </button>
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 }

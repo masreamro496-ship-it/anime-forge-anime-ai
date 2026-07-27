@@ -217,7 +217,7 @@ function Landing() {
         <div className="grid gap-4 md:grid-cols-3">
           {[
             { icon: Upload, title: "ارفع مشروعك", desc: "فيديو حتى دقيقتين (مجاني) أو 30 دقيقة (Pro)" },
-            { icon: DollarSign, title: "حدّد سعرك", desc: "بالدولار + رقم فودافون كاش" },
+            { icon: DollarSign, title: "حدّد سعرك", desc: "بالجنيه + رقم فودافون كاش" },
             { icon: Play, title: "وافق على التفعيل", desc: "بعد تحويل المشتري، تفعّل الفيديو له فوراً" },
           ].map(({ icon: Icon, title, desc }) => (
             <div key={title} className="rounded-2xl border border-border bg-card p-5 shadow-card">
@@ -230,7 +230,7 @@ function Landing() {
       </section>
 
       <footer className="border-t border-border/50 py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} منصة فودافون كاش — جميع الحقوق محفوظة
+        © {new Date().getFullYear()} منصة انمي فورج — جميع الحقوق محفوظة
       </footer>
     </div>
   );

@@ -1,6 +1,6 @@
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { signedUrl, uploadUserFile, publicUrl } from "@/lib/storage";
 import { ShieldCheck, ArrowRight, Check, X, ExternalLink, Upload } from "lucide-react";
@@ -44,9 +44,9 @@ function AdminPanel() {
             { k: "locks", label: "قفل/فتح الصفحات" },
             { k: "worldcup", label: "كأس العالم" },
             { k: "mods", label: "المشرفون" },
-      { k: "tasks", label: "🎯 طلبات المهمات" },
-       { k: "donations", label: "التبرعات ❤️" },
-    ].map((t) => (
+            { k: "tasks", label: "🎯 طلبات المهمات" },
+            { k: "donations", label: "التبرعات ❤️" },
+          ].map((t) => (
             <button
               key={t.k}
               onClick={() => setTab(t.k as typeof tab)}
@@ -72,6 +72,7 @@ function AdminPanel() {
     </div>
   );
 }
+
 function DonationsAdminView() {
   const [donations, setDonations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,7 +87,7 @@ function DonationsAdminView() {
     setLoading(false);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchDonations();
   }, []);
 
@@ -201,6 +202,7 @@ function ModeratorsPanel() {
     </div>
   );
 }
+
 function TaskSubmissionsAdminView() {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -879,3 +881,4 @@ function MatchAdminRow({ match, onChanged }: { match: { id: string; team_a: stri
     </div>
   );
 }
+

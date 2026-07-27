@@ -156,6 +156,18 @@ function Landing() {
             <h3 className="mt-3 text-lg font-black" style={{ color: "#06b6d4" }}>تواصل اجتماعي</h3>
             <p className="mt-1 text-sm text-muted-foreground">دردشة مباشرة مع كل الزوار · صور · صوت · ملفات · تُحذف بعد 10 ساعات</p>
           </Link>
+{/* كرت المهمات والمكافآت */}
+<Link to="/tasks" className="group relative overflow-hidden rounded-2xl border-2 border-purple-500/80 bg-gradient-to-br from-purple-950/40 via-purple-900/20 to-purple-950/40 p-4 transition-transform hover:scale-[1.01] block my-3">
+  <span className="absolute right-3 top-3 rounded-full bg-purple-500 px-2 py-0.5 text-[10px] font-black text-white animate-pulse">
+    اربح كريدت
+  </span>
+  <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>
+    🎯 مركز المهمات والمكافآت
+  </h3>
+  <p className="mt-1 text-sm text-muted-foreground">
+    أكمل المهمات اليومية، شارك الموقع، واربح كريدت مجاني لحسابك فوراً!
+  </p>
+</Link>
 
         </div>
         <div className="mt-6 space-y-3">

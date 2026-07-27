@@ -115,6 +115,91 @@ function ModeratorsPanel() {
     </div>
   );
 }
+function TaskSubmissionsAdminView() {
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSubmissions = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("task_submissions")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setSubmissions(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchSubmissions();
+  }, []);
+
+  const updateStatus = async (id: string, status: "approved" | "rejected") => {
+    await supabase.from("task_submissions").update({ status }).eq("id", id);
+    fetchSubmissions();
+  };
+
+  const isImage = (url: string) => {
+    return url?.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || url?.includes("task-proofs") || url?.startsWith("blob:");
+  };
+
+  if (loading) return <p className="text-xs text-muted-foreground">جاري تحميل مهمات وسكرين شوت المستخدمين...</p>;
+
+  return (
+    <div className="space-y-3">
+      <h2 className="text-lg font-bold text-yellow-400">🎯 طلبات المهمات والسكرين شوت</h2>
+      {submissions.length === 0 ? (
+        <p className="text-xs text-muted-foreground">لا توجد طلبات مهمات حتى الآن.</p>
+      ) : (
+        submissions.map((sub) => (
+          <div key={sub.id} className="p-3.5 rounded-xl border border-border bg-card/60 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
+            <div className="space-y-1.5 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-sm text-purple-300">{sub.task_title}</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold ${
+                  sub.status === 'approved' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                  sub.status === 'rejected' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                  'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                }`}>
+                  {sub.status === 'approved' ? 'مقبول' : sub.status === 'rejected' ? 'مرفوض' : 'معلق'}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">البريد: {sub.user_email}</p>
+
+              {/* إذا كانت صورة/سكرين شوت نعرضها له مباشرة، وإلا نعرض رابط */}
+              {isImage(sub.proof_link) ? (
+                <div className="mt-2">
+                  <a href={sub.proof_link} target="_blank" rel="noreferrer" className="inline-block group">
+                    <img
+                      src={sub.proof_link}
+                      alt="الإثبات / سكرين شوت"
+                      className="w-32 h-24 object-cover rounded-lg border border-purple-500/40 group-hover:opacity-80 transition-all"
+                    />
+                    <span className="text-[10px] text-purple-400 underline block mt-1">اضغط لفتح السكرين شوت بحجم كامل 🔍</span>
+                  </a>
+                </div>
+              ) : (
+                <a href={sub.proof_link} target="_blank" rel="noreferrer" className="text-xs text-blue-400 underline block break-all mt-1">
+                  {sub.proof_link}
+                </a>
+              )}
+            </div>
+
+            {sub.status === "pending" && (
+              <div className="flex gap-2">
+                <button onClick={() => updateStatus(sub.id, "approved")} className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold">
+                  قبول
+                </button>
+                <button onClick={() => updateStatus(sub.id, "rejected")} className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold">
+                  رفض
+                </button>
+              </div>
+            )}
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
 
 
 /* ---------------- Generation requests ---------------- */

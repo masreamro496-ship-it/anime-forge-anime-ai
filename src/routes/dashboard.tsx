@@ -47,11 +47,11 @@ function Dashboard() {
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <Link to="/" className="flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-gold" />
-            <span className="text-xl font-black text-gradient-gold">شاهد أنمي الآن</span>
+            <span className="text-xl font-black text-gradient-gold">انمي فورج</span>
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/" className="flex items-center gap-1 rounded-lg border border-border bg-card px-3 py-2 text-xs font-bold hover:bg-accent">
-              ← العودة لمنصّة فودافون كاش
+             العودة لانمي فورج
             </Link>
             {data?.isAdmin && (
               <Link to="/admin" className="flex items-center gap-1 rounded-lg border border-gold/50 bg-gold/10 px-3 py-2 text-sm font-bold text-gold">

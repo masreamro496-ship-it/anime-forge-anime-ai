@@ -1,17 +1,17 @@
--- 1. إنشاء جدول المهمات إذا لم يكن موجوداً
-create table if not exists public.task_submissions (
-  id uuid default gen_random_uuid() primary key,
-  user_id uuid,
-  user_email text,
-  task_id text,
-  task_title text,
-  proof_link text,
-  status text default 'pending',
-  created_at timestamp with time zone default timezone('utc'::text, now())
+-- 1. إنشاء جدول المهمات مع كافة الأعمدة المطلوبة
+CREATE TABLE IF NOT EXISTS public.task_submissions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID,
+  user_email TEXT,
+  task_id TEXT,
+  task_title TEXT,
+  proof_link TEXT,
+  status TEXT DEFAULT 'pending',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
--- 2. تعطيل نظام الحماية RLS تماماً للجدول لمنع أي حظر للزوار
-alter table public.task_submissions disable row level security;
+-- 2. تعطيل نظام الحماية RLS لمنع حظر أي مستخدم
+ALTER TABLE public.task_submissions DISABLE ROW LEVEL SECURITY;
 
--- 3. إعطاء صلاحية كاملة للزوار والمستخدمين للإدخال والقراءة
-grant all on public.task_submissions to anon, authenticated, service_role;
+-- 3. منح الصلاحيات الكاملة للزوار والمستخدمين
+GRANT ALL ON public.task_submissions TO anon, authenticated, service_role;

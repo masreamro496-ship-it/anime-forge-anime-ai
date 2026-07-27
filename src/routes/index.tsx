@@ -3,6 +3,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone, Heart } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import gameComingSoon from "@/assets/game-coming-soon.jpg";
+// استدعاء مكون تغيير اللغة
+import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -16,10 +18,16 @@ function Landing() {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/60 backdrop-blur-md">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
-          <Link to="/" className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-gold" />
-            <span className="text-xl font-black text-gradient-gold">انمي فورج</span>
-          </Link>
+          
+          {/* تم وضع اللوجو وزر الترجمة 🌐 هنا بجانب بعضهما */}
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2">
+              <Sparkles className="h-6 w-6 text-gold" />
+              <span className="text-xl font-black text-gradient-gold">انمي فورج</span>
+            </Link>
+            <GlobalLanguageSelector />
+          </div>
+
           <nav className="flex items-center gap-2">
             <Link to="/audio" className="hidden sm:inline-flex rounded-lg border border-border bg-card px-3 py-2 text-xs font-bold">
               الصوتيات

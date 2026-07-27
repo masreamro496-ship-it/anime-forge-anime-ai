@@ -1,9 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone, Heart } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import gameComingSoon from "@/assets/game-coming-soon.jpg";
-// استدعاء مكون تغيير اللغة
 import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
 
 export const Route = createFileRoute("/")({
@@ -12,6 +11,17 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   const { user } = useAuth();
+  // 1. استدعاء أداة التوجيه لنقل المستخدم لصفحة الدخول
+  const navigate = useNavigate();
+
+  // 2. سكربت الحماية: يمنع فتح الرابط لو المستخدم مش مسجل دخول
+  const handleProtectedClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!user) {
+      e.preventDefault(); // يمنع فتح الرابط الخارجي
+      alert("برجاء تسجيل الدخول أولاً لتتمكن من الدخول إلى هذه المنصة!"); // رسالة التنبيه
+      navigate({ to: "/login" }); // يوجهه فوراً لصفحة الدخول
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -19,7 +29,7 @@ function Landing() {
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/60 backdrop-blur-md">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           
-          {/* تم وضع اللوجو وزر الترجمة 🌐 هنا بجانب بعضهما */}
+          {/* اللوجو وزر الترجمة */}
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2">
               <Sparkles className="h-6 w-6 text-gold" />
@@ -106,28 +116,32 @@ function Landing() {
             <p className="mt-1 text-sm text-muted-foreground">معالجة متقدمة عبر Cloudinary · 15 كريديت · النتيجة خاصة بك فقط</p>
           </Link>
 
-          <a href="https://anime-forge-ai-coder.lovable.app/login" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#3b82f6", background: "linear-gradient(135deg, rgba(59,130,246,0.25), transparent)" }}>
+          {/* إضافة onClick للحماية هنا */}
+          <a href="https://anime-forge-ai-coder.lovable.app/login" onClick={handleProtectedClick} target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#3b82f6", background: "linear-gradient(135deg, rgba(59,130,246,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-black text-white">New</span>
             <Rocket className="h-10 w-10" style={{ color: "#3b82f6" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#3b82f6" }}>شات برمجي</h3>
             <p className="mt-1 text-sm text-muted-foreground">منصّة برمجة كاملة · افتح المحرّر في تبويب جديد</p>
           </a>
 
-          <a href="https://anime-key-forge.lovable.app/" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#a855f7", background: "linear-gradient(135deg, rgba(168,85,247,0.25), transparent)" }}>
+          {/* إضافة onClick للحماية هنا */}
+          <a href="https://anime-key-forge.lovable.app/" onClick={handleProtectedClick} target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#a855f7", background: "linear-gradient(135deg, rgba(168,85,247,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#a855f7" }}>جديد</span>
             <Sparkles className="h-10 w-10" style={{ color: "#a855f7" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>إنشاء مفتاح</h3>
             <p className="mt-1 text-sm text-muted-foreground">منصّة Anime Key Forge لتوليد المفاتيح</p>
           </a>
 
-          <a href="https://anime-forge-4k-art.lovable.app/" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#f97316", background: "linear-gradient(135deg, rgba(249,115,22,0.25), transparent)" }}>
+          {/* إضافة onClick للحماية هنا */}
+          <a href="https://anime-forge-4k-art.lovable.app/" onClick={handleProtectedClick} target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#f97316", background: "linear-gradient(135deg, rgba(249,115,22,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#f97316" }}>جديد</span>
             <Wand2 className="h-10 w-10" style={{ color: "#f97316" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#f97316" }}>توليد جودة أنمي صورية خيالية</h3>
             <p className="mt-1 text-sm text-muted-foreground">صور أنمي بجودة 4K · افتح المولّد في تبويب جديد</p>
           </a>
 
-          <a href="https://anime-forge-dummling.lovable.app/" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#22c55e", background: "linear-gradient(135deg, rgba(34,197,94,0.25), transparent)" }}>
+          {/* إضافة onClick للحماية هنا */}
+          <a href="https://anime-forge-dummling.lovable.app/" onClick={handleProtectedClick} target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#22c55e", background: "linear-gradient(135deg, rgba(34,197,94,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#22c55e" }}>جديد</span>
             <Film className="h-10 w-10" style={{ color: "#22c55e" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#22c55e" }}>دبلجة فيديوهات</h3>
@@ -175,7 +189,7 @@ function Landing() {
             </p>
           </Link>
 
-          {/* زر التبرع والدعم المباشر */}
+          {/* زر الدعم المباشر - تركته بدون حماية لأن ده تبرع ويفضل يكون مفتوح للكل */}
           <div className="text-center my-8">
             <a 
               href="https://wa.me/?text=أرغب%20في%20دعم%20منصة%20أنمي%20فورج" 
@@ -192,8 +206,10 @@ function Landing() {
         <div className="mt-6 space-y-3">
           <InstallAppButton />
 
+          {/* إضافة onClick للحماية هنا */}
           <a
             href="https://anime-forge-glb-1440p.lovable.app/"
+            onClick={handleProtectedClick}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full rounded-2xl border-2 border-fuchsia-500/60 bg-gradient-to-r from-fuchsia-500/20 to-pink-500/20 py-4 text-base font-black text-fuchsia-300 flex items-center justify-center gap-2 hover:scale-[1.01] transition"

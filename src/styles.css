@@ -126,3 +126,13 @@ body { top: 0 !important; }
   font-size: 12px !important;
   max-width: 140px;
 }
+/* إخفاء شارة Lovable مجاناً */
+a[href*="lovable.dev"],
+div:has(> a[href*="lovable.dev"]),
+button:has(a[href*="lovable.dev"]),
+#lovable-badge {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}

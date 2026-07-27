@@ -4,8 +4,6 @@ import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, M
 import { InstallAppButton } from "@/components/InstallAppButton";
 import gameComingSoon from "@/assets/game-coming-soon.jpg";
 
-
-
 export const Route = createFileRoute("/")({
   component: Landing,
 });
@@ -107,7 +105,6 @@ function Landing() {
             <p className="mt-1 text-sm text-muted-foreground">منصّة برمجة كاملة · افتح المحرّر في تبويب جديد</p>
           </a>
 
-
           <a href="https://anime-key-forge.lovable.app/" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#a855f7", background: "linear-gradient(135deg, rgba(168,85,247,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#a855f7" }}>جديد</span>
             <Sparkles className="h-10 w-10" style={{ color: "#a855f7" }} />
@@ -156,40 +153,34 @@ function Landing() {
             <h3 className="mt-3 text-lg font-black" style={{ color: "#06b6d4" }}>تواصل اجتماعي</h3>
             <p className="mt-1 text-sm text-muted-foreground">دردشة مباشرة مع كل الزوار · صور · صوت · ملفات · تُحذف بعد 10 ساعات</p>
           </Link>
-      {/* كرت المهمات والمكافآت */}
-      <Link to="/tasks" className="group relative overflow-hidden rounded-2xl border-2 border-purple-500/80 bg-slate-900 p-5 transition-transform hover:scale-[1.01]">
-        <span className="absolute right-3 top-3 rounded-full bg-purple-500 px-2 py-0.5 text-[10px] font-black text-white animate-pulse">
-          اربح كريديت
-        </span>
-        <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>
-          مركز المهمات والمكافآت 🎯
-        </h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          أكمل المهمات اليومية، شارك الموقع، واربح كريديت مجاني لحسابك فوراً
-        </p>
-      </Link>
 
-      {/* زر التبرع والدعم المباشر */}
-      <div className="text-center my-8">
-        <a 
-          href="https://wa.me/?text=أرغب%20في%20دعم%20منصة%20أنمي%20فورج" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-500 rounded-full font-bold text-white shadow-lg transition-all"
-        >
-          <Heart className="w-5 h-5 fill-white animate-pulse" />
-          <span>دعم المنصة والتبرع ❤️</span>
-        </a>
-      </div>
+          {/* كرت المهمات والمكافآت */}
+          <Link to="/tasks" className="group relative overflow-hidden rounded-2xl border-2 border-purple-500/80 bg-slate-900 p-5 transition-transform hover:scale-[1.01]">
+            <span className="absolute right-3 top-3 rounded-full bg-purple-500 px-2 py-0.5 text-[10px] font-black text-white animate-pulse">
+              اربح كريديت
+            </span>
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>
+              مركز المهمات والمكافآت 🎯
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              أكمل المهمات اليومية، شارك الموقع، واربح كريديت مجاني لحسابك فوراً
+            </p>
+          </Link>
 
-
-
-</div>
-
-
-
-
+          {/* زر التبرع والدعم المباشر */}
+          <div className="text-center my-8">
+            <a 
+              href="https://wa.me/?text=أرغب%20في%20دعم%20منصة%20أنمي%20فورج" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-500 rounded-full font-bold text-white shadow-lg transition-all"
+            >
+              <Heart className="w-5 h-5 fill-white animate-pulse" />
+              <span>دعم المنصة والتبرع ❤️</span>
+            </a>
+          </div>
         </div>
+
         <div className="mt-6 space-y-3">
           <InstallAppButton />
 
@@ -219,9 +210,7 @@ function Landing() {
             </p>
           </div>
         </div>
-
       </section>
-
 
       {/* Quick info */}
       <section className="container mx-auto px-4 py-8">

@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Heart, Upload, CheckCircle, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+
+export const Route = createFileRoute('/donate')({
+  component: Donate,
+});
 
 const TIERS = [
-  { amount: 30, title: 'داعم أنمي مبتدئ ☕', color: 'from-blue-600 to-cyan-500' },
-  { amount: 60, title: 'داعم برنزي 🥉', color: 'from-amber-600 to-orange-500' },
+  { amount: 30, title: 'داعم أنمي مبتدئ 🧪', color: 'from-blue-600 to-cyan-500' },
+  { amount: 60, title: 'داعم برونزي 🥉', color: 'from-amber-600 to-orange-500' },
   { amount: 90, title: 'داعم فضي 🥈', color: 'from-slate-400 to-slate-200 text-black' },
   { amount: 120, title: 'داعم ذهبي خارق 🥇', color: 'from-yellow-500 to-amber-300 text-black font-bold' },
 ];
 
-export default function Donate() {
+function Donate() {
   const navigate = useNavigate();
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [txNumber, setTxNumber] = useState('');

@@ -17,7 +17,8 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPanel() {
-  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases" | "credits" | "locks" | "worldcup" | "mods">("purchases");
+  const [tab, setTab] = useState<"requests" | "payments" | "messages" | "shorts" | "purchases" | "credits" | "locks" | "worldcup" | "mods" | "tasks">("requests");
+
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
@@ -43,6 +44,7 @@ function AdminPanel() {
             { k: "locks", label: "قفل/فتح الصفحات" },
             { k: "worldcup", label: "كأس العالم" },
             { k: "mods", label: "المشرفون" },
+      { k: "tasks", label: "🎯 طلبات المهمات" },
           ].map((t) => (
             <button
               key={t.k}
@@ -63,6 +65,7 @@ function AdminPanel() {
         {tab === "locks" && <SiteLocksPanel />}
         {tab === "worldcup" && <WorldCupPanel />}
         {tab === "mods" && <ModeratorsPanel />}
+        {tab === "tasks" && <TaskSubmissionsAdminView />}
       </main>
     </div>
   );

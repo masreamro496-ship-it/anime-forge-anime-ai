@@ -253,7 +253,6 @@ function TaskSubmissionsAdminView() {
               </div>
               <p className="text-xs text-muted-foreground">البريد: {sub.user_email}</p>
 
-              {/* إذا كانت صورة/سكرين شوت نعرضها له مباشرة، وإلا نعرض رابط */}
               {isImage(sub.proof_link) ? (
                 <div className="mt-2">
                   <a href={sub.proof_link} target="_blank" rel="noreferrer" className="inline-block group">
@@ -289,8 +288,6 @@ function TaskSubmissionsAdminView() {
   );
 }
 
-
-/* ---------------- Generation requests ---------------- */
 function RequestsTable() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
@@ -342,7 +339,6 @@ function RequestRow({ row, expanded, onToggle, onChange }: { row: any; expanded:
       const path = await uploadUserFile("gen-outputs", row.user_id, resultFile, "result-");
       const url = publicUrl("gen-outputs", path);
 
-      // Deduct credits from the user's balance
       const { data: bal } = await supabase.from("credits").select("balance").eq("user_id", row.user_id).maybeSingle();
       const newBalance = Math.max(0, Number(bal?.balance ?? 0) - Number(row.credits_charged ?? 0));
       await supabase.from("credits").update({ balance: newBalance }).eq("user_id", row.user_id);
@@ -467,7 +463,6 @@ function RequestRow({ row, expanded, onToggle, onChange }: { row: any; expanded:
   );
 }
 
-/* ---------------- Payments ---------------- */
 function PaymentsTable() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
@@ -487,7 +482,6 @@ function PaymentsTable() {
 
   const approve = async (p: any) => {
     try {
-      // Grant PRO + 50 credits
       await supabase.from("profiles").update({ is_pro: true, pro_expires_at: null }).eq("id", p.user_id);
       await supabase.from("user_roles").insert({ user_id: p.user_id, role: "pro" });
       const { data: bal } = await supabase.from("credits").select("balance").eq("user_id", p.user_id).maybeSingle();
@@ -555,7 +549,6 @@ function PaymentsTable() {
   );
 }
 
-/* ---------------- User messages ---------------- */
 function MessagesTable() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
@@ -590,7 +583,6 @@ function MessagesTable() {
   );
 }
 
-/* ---------------- Shorts moderation ---------------- */
 function ShortsTable() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
@@ -672,7 +664,7 @@ function PurchasesTable() {
 }
 
 function GrantCreditsPanel() {
-  const [userId, setUserId] = useState("");
+  const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -681,9 +673,12 @@ function GrantCreditsPanel() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const amt = Number(amount);
-    if (!userId.trim() || !amt) return toast.error("ادخل user_id وقيمة");
+    if (!email.trim() || !amt) return toast.error("ادخل الإيميل وقيمة الكريديت");
     setBusy(true);
-    const res = await sb.rpc("admin_grant_credits", { _target_user: userId.trim(), _amount: amt, _note: note || null });
+    
+    // تم تغيير تمرير المتغير إلى _email، تأكد من تحديث دالة الـ RPC في قاعدة البيانات إذا كانت تقبل _target_user
+    const res = await sb.rpc("admin_grant_credits", { _email: email.trim(), _amount: amt, _note: note || null });
+    
     setBusy(false);
     if (res.error) return toast.error(res.error.message);
     toast.success(`تم منح ${amt} كريديت`);
@@ -692,10 +687,16 @@ function GrantCreditsPanel() {
 
   return (
     <form onSubmit={submit} className="max-w-xl space-y-4 rounded-2xl border border-border bg-card p-6">
-      <h3 className="text-lg font-black">منح / خصم كريديت لأي مستخدم</h3>
+      <h3 className="text-lg font-black">منح / خصم كريديت عبر الإيميل</h3>
       <div>
-        <label className="text-xs font-bold">User ID (UUID)</label>
-        <input value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="00000000-0000-0000-0000-000000000000" className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 font-mono text-xs" />
+        <label className="text-xs font-bold">البريد الإلكتروني للمستخدم</label>
+        <input 
+          type="email" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+          placeholder="user@example.com" 
+          className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-xs" 
+        />
       </div>
       <div>
         <label className="text-xs font-bold">الكمية (سالب للخصم)</label>
@@ -712,7 +713,6 @@ function GrantCreditsPanel() {
   );
 }
 
-/* ---------------- Site Locks ---------------- */
 function SiteLocksPanel() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
@@ -780,7 +780,6 @@ function LockRow({
   );
 }
 
-/* ---------------- World Cup admin ---------------- */
 function WorldCupPanel() {
   const qc = useQueryClient();
   const [teamA, setTeamA] = useState("");

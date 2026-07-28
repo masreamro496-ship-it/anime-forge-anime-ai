@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { uploadUserFile } from "@/lib/storage";
 import { SiteLockGate } from "@/components/SiteLockGate";
-import { Crown, Upload, ArrowRight, Copy, CheckCircle2 } from "lucide-react";
+import { Crown, Upload, ArrowRight, Copy, CheckCircle, CreditCard, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/pro-upgrade")({
@@ -21,137 +21,176 @@ export const Route = createFileRoute("/pro-upgrade")({
 
 const VODAFONE_NUMBER = "01080390782";
 
-type Plan = {
-  id: "pro" | "coins_100" | "coins_500" | "coins_1000";
-  label: string;
-  amountEGP: number;
-  perk: string;
-};
+// دالة إنشاء الفاتورة في NOWPayments
+async function createInvoice(userId: string, priceUsd: number, description: string) {
+  try {
+    const orderId = `pkg_${userId || "guest"}_${Date.now()}`;
+    const response = await fetch("https://api.nowpayments.io/v1/invoice", {
+      method: "POST",
+      headers: {
+        "x-api-key": "HJB6ZHJ-3T9MZF5-JNDXWVP-3HKEKKJ",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        price_amount: priceUsd,
+        price_currency: "usd",
+        order_id: orderId,
+        order_description: description,
+        success_url: typeof window !== "undefined" ? `${window.location.origin}/dashboard?payment=success&orderId=${orderId}` : "",
+        cancel_url: typeof window !== "undefined" ? window.location.origin : "",
+      }),
+    });
 
-const PLANS: Plan[] = [
-  { id: "pro", label: "ترقية PRO ذهبية", amountEGP: 50, perk: "PRO + 50 كريدت هدية" },
-  { id: "coins_100", label: "شراء 100 كريدت", amountEGP: 25, perk: "+100 كريدت" },
-  { id: "coins_500", label: "شراء 500 كريدت", amountEGP: 100, perk: "+500 كريدت" },
-  { id: "coins_1000", label: "شراء 1000 كريدت", amountEGP: 180, perk: "+1000 كريدت (وفّر 20%)" },
-];
+    const data = await response.json();
+    if (data && data.invoice_url) {
+      return data.invoice_url;
+    }
+    return null;
+  } catch (error) {
+    console.error("Payment error:", error);
+    return null;
+  }
+}
 
 function ProUpgradePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<Plan>(PLANS[0]);
+
+  // حالات الدفع الإلكتروني (NOWPayments)
+  const [loadingPkg, setLoadingPkg] = useState<string | null>(null);
+
+  // حالات فودافون كاش (رفع الإيصال)
   const [opNumber, setOpNumber] = useState("");
   const [receipt, setReceipt] = useState<File | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [submittingVodafone, setSubmittingVodafone] = useState(false);
 
-  const handleCopy = () => {
+  // نسخ رقم فودافون
+  const copyVodafoneNumber = () => {
     navigator.clipboard.writeText(VODAFONE_NUMBER);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    toast.success("تم نسخ رقم فودافون كاش بنجاح 📱");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // معالجة الدفع الإلكتروني
+  const handlePurchase = async (pkgKey: string, priceUsd: number, desc: string) => {
+    setLoadingPkg(pkgKey);
+    const userId = user?.id || "guest";
+    const invoiceUrl = await createInvoice(userId, priceUsd, desc);
+    setLoadingPkg(null);
+
+    if (invoiceUrl) {
+      window.location.href = invoiceUrl;
+    } else {
+      toast.error("حدث خطأ أثناء إنشاء فاتورة الدفع، يرجى المحاولة مرة أخرى.");
+    }
+  };
+
+  // معالجة إرسال إيصال فودافون كاش
+  const handleVodafoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
     if (opNumber.trim().length < 4) return toast.error("أدخل رقم العملية بشكل صحيح");
     if (!receipt) return toast.error("الرجاء رفع صورة الإيصال");
     if (receipt.size > 5 * 1024 * 1024) return toast.error("حجم الصورة يجب أن لا يتجاوز 5MB");
 
-    setSubmitting(true);
+    setSubmittingVodafone(true);
     try {
       const path = await uploadUserFile("receipts", user.id, receipt, "receipt-");
       const { error } = await supabase.from("pending_payments").insert({
         user_id: user.id,
-        op_number: `${selected.id}:${opNumber.trim()}`,
+        op_number: `pro_weekly:${opNumber.trim()}`,
         receipt_url: path,
-        amount: selected.amountEGP,
+        amount: 50,
       });
       if (error) throw error;
-      toast.success("تم إرسال طلبك! سيراجعه الأدمن يدوياً قريباً");
+      toast.success("تم إرسال طلبك! سيراجع الأدمن البيانات ويفعّل الاشتراك قريباً");
       navigate({ to: "/dashboard" });
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
-      setSubmitting(false);
+      setSubmittingVodafone(false);
     }
   };
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-border/50 backdrop-blur-md bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between px-4 py-4">
-          <Link to="/dashboard" className="flex items-center gap-2 text-sm font-bold">
-            <ArrowRight className="h-4 w-4" /> العودة للوحة
-          </Link>
-          <div className="flex items-center gap-2">
-            <Crown className="h-5 w-5 text-gold" />
-            <span className="text-base font-black text-gradient-gold">الترقية والاشتراكات</span>
-          </div>
+    <div className="min-h-screen bg-background text-foreground py-10 px-4">
+      <div className="container mx-auto max-w-3xl">
+        {/* زر العودة */}
+        <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground mb-6">
+          <ArrowRight className="h-4 w-4" /> العودة لصفحة التحكم
+        </Link>
+
+        {/* العنوان الرئيسي */}
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-black text-gradient-gold sm:text-4xl flex items-center justify-center gap-2">
+            <Crown className="h-8 w-8 text-gold" /> متجر الترقية والاشتراكات
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            اختر طريقة الدفع المناسبة لك لشحن الكريديت أو تفعيل باقة PRO
+          </p>
         </div>
-      </header>
 
-      <main className="container mx-auto max-w-2xl px-4 py-8">
-        <div className="rounded-2xl border-2 border-gold bg-card p-6 shadow-gold sm:p-8">
-          <div className="text-center">
-            <Crown className="mx-auto h-12 w-12 text-gold" />
-            <h1 className="mt-3 text-3xl font-black text-gradient-gold">اختر باقتك</h1>
-            <p className="mt-2 text-sm text-muted-foreground">دفع عبر فودافون كاش · تفعيل يدوي من الأدمن خلال 24 ساعة</p>
+        {/* قسم فودافون كاش (اشتراك PRO الأسبوعي - 50 ج) */}
+        <section className="rounded-3xl border-2 border-red-500/50 bg-gradient-to-br from-red-950/40 via-background to-amber-950/20 p-6 shadow-2xl mb-8 relative overflow-hidden">
+          <div className="absolute top-0 left-0 bg-red-600 text-white text-xs font-black px-4 py-1 rounded-br-xl">
+            متاح للمصريين 🇪🇬
           </div>
 
-          {/* Plans */}
-          <div className="mt-6 grid gap-3">
-            {PLANS.map((p) => {
-              const active = selected.id === p.id;
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => setSelected(p)}
-                  className={`flex items-center justify-between rounded-xl border-2 p-4 text-right transition-all ${
-                    active ? "border-gold bg-gold/10 shadow-gold" : "border-border bg-background hover:border-gold/50"
-                  }`}
-                >
-                  <div>
-                    <div className={`text-base font-black ${active ? "text-gold" : ""}`}>{p.label}</div>
-                    <div className="mt-1 text-xs text-muted-foreground">{p.perk}</div>
-                  </div>
-                  <div className={`text-2xl font-black ${active ? "text-gold" : "text-foreground"}`}>
-                    {p.amountEGP} <span className="text-xs font-bold">ج.م</span>
-                  </div>
-                </button>
-              );
-            })}
+          <h2 className="text-2xl font-black text-red-400 flex items-center gap-2 mt-2 mb-3">
+            <Crown className="h-6 w-6 text-yellow-400" /> اشتراك PRO الأسبوعي (50 جنيه مصري)
+          </h2>
+
+          <p className="text-sm text-muted-foreground mb-4">
+            قم بتحويل مبلغ <span className="font-bold text-foreground">50 جنيه مصري</span> عبر فودافون كاش للرقم التالي ثم ارفع الإيصال أدناه:
+          </p>
+
+          {/* رقم فودافون كاش */}
+          <div className="flex items-center justify-between rounded-2xl border-2 border-yellow-500/50 bg-black/50 p-4 mb-5">
+            <button
+              type="button"
+              onClick={copyVodafoneNumber}
+              className="flex items-center gap-1.5 rounded-xl bg-gradient-gold px-4 py-2 text-xs font-black text-gold-foreground shadow-gold hover:brightness-110 transition"
+            >
+              <Copy className="h-4 w-4" /> نسخ الرقم
+            </button>
+            <span className="font-mono text-2xl font-black tracking-widest text-gold" dir="ltr">
+              {VODAFONE_NUMBER}
+            </span>
           </div>
 
-          {/* Vodafone number */}
-          <div className="mt-6 rounded-xl border border-gold/40 bg-gold/5 p-5">
-            <div className="text-sm font-bold text-gold">حوّل مبلغ {selected.amountEGP} جنيه فودافون كاش إلى:</div>
-            <div className="mt-2 flex items-center gap-2 rounded-lg bg-background p-3">
-              <code dir="ltr" className="flex-1 font-mono text-xl font-black text-gradient-gold">{VODAFONE_NUMBER}</code>
-              <button type="button" onClick={handleCopy} className="rounded-md border border-border bg-card p-2 hover:bg-accent">
-                {copied ? <CheckCircle2 className="h-4 w-4 text-gold" /> : <Copy className="h-4 w-4" />}
-              </button>
+          {/* المميزات */}
+          <div className="space-y-2 mb-6 text-sm font-bold">
+            <div className="flex items-center gap-2 text-green-400">
+              <CheckCircle className="h-4 w-4 shrink-0" />
+              <span>احصل على 100 كريديت يومياً (لمدة أسبوع كامل)</span>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">بعد التحويل، احصل على رقم العملية من رسالة التأكيد وارفع صورة الإيصال هنا.</p>
+            <div className="flex items-center gap-2 text-green-400">
+              <CheckCircle className="h-4 w-4 shrink-0" />
+              <span>فتح ميزة استنساخ صوت غوكو حصرياً</span>
+            </div>
+            <div className="flex items-center gap-2 text-green-400">
+              <CheckCircle className="h-4 w-4 shrink-0" />
+              <span>أولوية التوليد والحصول على شارة VIP</span>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          {/* نموذج رفع الإيصال ورقم العملية */}
+          <form onSubmit={handleVodafoneSubmit} className="space-y-4 border-t border-border/50 pt-5">
             <div>
-              <label className="text-sm font-bold">رقم العملية</label>
+              <label className="text-xs font-bold text-muted-foreground block mb-1">رقم العملية (من رسالة التحويل)</label>
               <input
                 value={opNumber}
                 onChange={(e) => setOpNumber(e.target.value)}
                 placeholder="مثال: 1234567890"
-                className="mt-1 w-full rounded-lg border border-input bg-background px-4 py-3 text-base"
+                className="w-full rounded-xl border border-input bg-background/80 px-4 py-2.5 text-sm font-mono focus:border-gold outline-none"
                 required
               />
             </div>
 
             <div>
-              <label className="text-sm font-bold">صورة الإيصال</label>
-              <label className="mt-1 flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-border bg-background/40 p-6 hover:border-gold">
-                <Upload className="h-6 w-6 text-gold" />
-                <span className="text-sm">{receipt?.name ?? "اضغط لرفع صورة الإيصال (PNG / JPG)"}</span>
+              <label className="text-xs font-bold text-muted-foreground block mb-1">صورة الإيصال</label>
+              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-background/40 p-4 hover:border-gold transition">
+                <Upload className="h-5 w-5 text-gold" />
+                <span className="text-xs font-bold">{receipt?.name ?? "اضغط لرفع صورة الإيصال (PNG / JPG)"}</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -164,14 +203,90 @@ function ProUpgradePage() {
 
             <button
               type="submit"
-              disabled={submitting}
-              className="w-full rounded-2xl bg-gradient-gold py-5 text-xl font-black text-gold-foreground shadow-gold transition-transform hover:scale-[1.02] disabled:opacity-50"
+              disabled={submittingVodafone}
+              className="w-full rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold hover:brightness-110 disabled:opacity-50 transition"
             >
-              {submitting ? "جاري الإرسال..." : `إرسال طلب ${selected.label}`}
+              {submittingVodafone ? "جاري إرسال الطلب..." : "تأكيد وإرسال طلب فودافون كاش"}
             </button>
           </form>
+        </section>
+
+        {/* قسم شراء الكريديت أونلاين (NOWPayments / الفيزا والعملات الرقمية) */}
+        <section className="rounded-3xl border border-border bg-card p-6 shadow-xl">
+          <h2 className="text-2xl font-black mb-1 flex items-center gap-2 text-blue-400">
+            <CreditCard className="h-6 w-6" /> شراء كريديت إضافي (دفع إلكتروني آلي)
+          </h2>
+          <p className="text-xs text-muted-foreground mb-6">الدفع مشفر وآمن 100% عبر الفيزا أو العملات الرقمية من خلال بوابة NOWPayments.</p>
+
+          <div className="space-y-4">
+            {/* الباقة الأولى: 100 كريديت */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-border bg-background p-5 hover:border-blue-500/50 transition">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-black text-blue-400">100 كريديت</span>
+                  <span className="text-xs bg-blue-500/10 text-blue-400 font-bold px-2 py-0.5 rounded-full">حوالي 25 ج.م</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">تتيح لك توليد فيديوهات واستخدام أدوات الذكاء الاصطناعي</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handlePurchase("100cr", 0.50, "شراء 100 كريديت - أنمي فورج")}
+                disabled={loadingPkg === "100cr"}
+                className="w-full sm:w-auto min-w-[140px] rounded-xl bg-blue-600 hover:bg-blue-500 px-5 py-2.5 text-sm font-black text-white shadow-lg disabled:opacity-50 transition"
+              >
+                {loadingPkg === "100cr" ? "جاري التحضير..." : "شراء بـ $0.50"}
+              </button>
+            </div>
+
+            {/* الباقة الثانية: 500 كريديت */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border-2 border-purple-500/50 bg-purple-500/5 p-5 relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-black px-3 py-0.5 rounded-bl-lg">
+                الأكثر شعبية 💥
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-black text-purple-400">500 كريديت</span>
+                  <span className="text-xs bg-purple-500/20 text-purple-300 font-bold px-2 py-0.5 rounded-full">حوالي 175 ج.م</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">القيمة الأفضل لصانعي المحتوى والمصممين</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handlePurchase("500cr", 3.75, "شراء 500 كريديت - أنمي فورج")}
+                disabled={loadingPkg === "500cr"}
+                className="w-full sm:w-auto min-w-[140px] rounded-xl bg-purple-600 hover:bg-purple-500 px-5 py-2.5 text-sm font-black text-white shadow-lg disabled:opacity-50 transition"
+              >
+                {loadingPkg === "500cr" ? "جاري التحضير..." : "شراء بـ $3.75"}
+              </button>
+            </div>
+
+            {/* الباقة الثالثة: 1000 كريديت */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border-2 border-gold bg-gold/5 p-5">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-black text-gold">1000 كريديت</span>
+                  <span className="text-xs bg-gold/20 text-gold font-bold px-2 py-0.5 rounded-full">حوالي 350 ج.م</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">باقة المحترفين والشحن الأكبر عبر فاتورة 7 دولار</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handlePurchase("1000cr", 7.00, "شراء 1000 كريديت - أنمي فورج")}
+                disabled={loadingPkg === "1000cr"}
+                className="w-full sm:w-auto min-w-[140px] rounded-xl bg-gradient-gold px-5 py-2.5 text-sm font-black text-gold-foreground shadow-gold disabled:opacity-50 hover:brightness-110 transition"
+              >
+                {loadingPkg === "1000cr" ? "جاري التحضير..." : "شراء بـ $7.00"}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* ضمان وأمان */}
+        <div className="mt-8 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <ShieldCheck className="h-4 w-4 text-green-400" /> جميع عمليات الدفع آمنة ومشفرة 100%
         </div>
-      </main>
+      </div>
     </div>
   );
 }
+

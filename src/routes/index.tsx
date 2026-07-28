@@ -1,16 +1,56 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone, Heart } from "lucide-react";
+import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone, Heart, CreditCard } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
 import gameComingSoon from "@/assets/game-coming-soon.jpg";
+import { useState } from "react";
 
 export const Route = createFileRoute("/")({
   component: Landing,
 });
 
+async function createPayment(priceAmount: number, orderId: string) {
+  try {
+    const response = await fetch('https://api.nowpayments.io/v1/payment', {
+      method: 'POST',
+      headers: {
+        'x-api-key': 'HJB6ZHJ-3T9MZF5-JNDXWVP-3HKEKKJ',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        price_amount: priceAmount,
+        price_currency: 'usd',
+        pay_currency: 'usdtbsc',
+        order_id: orderId,
+        order_description: 'ترقية ودعم مدفوعات منصة انمي فورج'
+      })
+    });
+
+    const data = await response.json();
+    return data.invoice_url;
+  } catch (error) {
+    console.error("Payment error:", error);
+    return null;
+  }
+}
+
 function Landing() {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+
+  const handleCheckout = async (amount: number, planName: string) => {
+    setLoading(true);
+    const orderId = "order_" + Date.now();
+    const paymentUrl = await createPayment(amount, orderId);
+    setLoading(false);
+    
+    if (paymentUrl) {
+      window.location.href = paymentUrl;
+    } else {
+      alert("حدث خطأ أثناء إنشاء رابط الدفع، يرجى المحاولة مرة أخرى.");
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -83,6 +123,35 @@ function Landing() {
               سجّل وابدأ البيع
             </Link>
           )}
+        </div>
+      </section>
+
+      {/* قسم الترقية والمدفوعات الإلكترونية الجديد */}
+      <section className="container mx-auto px-4 py-8">
+        <div className="rounded-3xl border-2 border-gold/60 bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-gold/20 p-6 md:p-8 text-center shadow-gold">
+          <div className="inline-flex items-center gap-1 rounded-full bg-gold px-3.5 py-1 text-xs font-black text-gold-foreground mb-3">
+            <CreditCard className="h-4 w-4" /> مدفوعات فورية آمنة
+          </div>
+          <h2 className="text-2xl md:text-3xl font-black text-gradient-gold">ترقية حسابك وباقات Pro</h2>
+          <p className="mt-2 text-sm text-muted-foreground max-w-xl mx-auto">
+            احصل على مميزات غير محدودة، رفع فيديوهات لمدة 30 دقيقة، وصلاحيات متقدمة عبر الدفع الإلكتروني الفوري.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-4">
+            <button
+              onClick={() => handleCheckout(10, "باقتك الشهرية Pro")}
+              disabled={loading}
+              className="rounded-2xl bg-gradient-gold px-6 py-3.5 text-sm font-black text-gold-foreground shadow-gold hover:scale-105 transition disabled:opacity-50"
+            >
+              {loading ? "جاري تجهيز الدفع..." : "ترقية باقة Pro بسعر 10$"}
+            </button>
+            <button
+              onClick={() => handleCheckout(25, "الباقة الشاملة VIP")}
+              disabled={loading}
+              className="rounded-2xl border-2 border-gold bg-background px-6 py-3.5 text-sm font-black text-gold hover:bg-gold/10 transition disabled:opacity-50"
+            >
+              {loading ? "جاري تجهيز الدفع..." : "الباقة الشاملة VIP بسعر 25$"}
+            </button>
+          </div>
         </div>
       </section>
 

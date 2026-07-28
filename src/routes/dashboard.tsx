@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { Crown, Sparkles, LogOut, Coins, ShieldCheck, Video, Mic, Receipt, Clock, CheckCircle2, XCircle, Play, DollarSign, Check, Gift, KeyRound, Copy } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdminChatBox } from "@/components/AdminChatBox";
 import { toast } from "sonner";
 
@@ -19,7 +19,42 @@ export const Route = createFileRoute("/dashboard")({
 function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const { data, isLoading } = useProfile();
+
+  // --- تفعيل تلقائي لباقة Pro بعد إتمام الدفع بالفيزا / الدولار عبر NOWPayments ---
+  useEffect(() => {
+    const handlePaymentSuccess = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isSuccess = urlParams.get("payment") === "success";
+      const orderId = urlParams.get("orderId");
+
+      if (isSuccess && user) {
+        try {
+          // تحديث ملف المستخدم في Supabase إلى Pro
+          const { error } = await supabase
+            .from("profiles")
+            .update({ is_pro: true })
+            .eq("id", user.id);
+
+          if (!error) {
+            toast.success("🎉 تم تفعيل باقة PRO لحسابك بنجاح!");
+            // إعادة تنشيط استعلامات البيانات لتحديث الواجهة فوراً
+            qc.invalidateQueries({ queryKey: ["profile", user.id] });
+            
+            // إزالة معلمات الدفع من رابط الصفحة
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } else {
+            console.error("خطأ تحديث قاعدة البيانات:", error);
+          }
+        } catch (err) {
+          console.error("خطأ أثناء تفعيل Pro:", err);
+        }
+      }
+    };
+
+    handlePaymentSuccess();
+  }, [user, qc]);
 
   const { data: requests } = useQuery({
     queryKey: ["my-requests", user?.id],
@@ -93,8 +128,8 @@ function Dashboard() {
             <div className={`mt-3 text-2xl font-black ${isPro ? "text-gradient-gold" : ""}`}>{isPro ? "PRO" : "مجاني"}</div>
             <p className="mt-1 text-[11px] text-muted-foreground">{isPro ? "2 مشاريع · حتى 30 د · 360p" : "مشروع واحد · 1-10 د · 360p"}</p>
             {!isPro && (
-              <Link to="/pro-upgrade" className="mt-3 inline-block rounded-lg bg-gradient-gold px-3 py-1 text-[11px] font-black text-gold-foreground shadow-gold">
-                ترقية
+              <Link to="/" className="mt-3 inline-block rounded-lg bg-gradient-gold px-3 py-1 text-[11px] font-black text-gold-foreground shadow-gold">
+                ترقية بـ 1$
               </Link>
             )}
           </div>
@@ -110,7 +145,6 @@ function Dashboard() {
         {isPro && <ProCodeCard />}
 
         <PendingSales />
-
 
         {/* Quick actions */}
         <h2 className="mt-10 mb-4 text-xl font-black">أنشئ محتوى الآن</h2>
@@ -338,3 +372,4 @@ function ProCodeCard() {
     </section>
   );
 }
+

@@ -171,8 +171,8 @@ function Landing() {
             </p>
           </Link>
 
-          {/* زر التبرع والدعم المباشر */}
-          <div className="text-center my-8 md:col-span-2">
+          {/* أزرار التبرع ودعم المنصة */}
+          <div className="text-center my-8 md:col-span-2 flex flex-col items-center gap-4">
             <a 
               href="https://wa.me/?text=أرغب%20في%20دعم%20منصة%20أنمي%20فورج" 
               target="_blank" 
@@ -181,6 +181,16 @@ function Landing() {
             >
               <Heart className="w-5 h-5 fill-white animate-pulse" />
               <span>دعم المنصة والتبرع ❤️</span>
+            </a>
+
+            {/* الزر الجديد: قراءة القرآن الكريم */}
+            <a
+              href="https://anime-forge-quran.lovable.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full max-w-sm py-3.5 px-6 rounded-2xl font-black text-white bg-gradient-to-r from-yellow-500 via-purple-500 to-amber-400 hover:opacity-90 hover:scale-[1.02] transition-all duration-300 text-center shadow-lg border border-yellow-400/50 text-lg"
+            >
+              📖 قراءة القران الكريم
             </a>
           </div>
         </div>

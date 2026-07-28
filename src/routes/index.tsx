@@ -1,66 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone, Heart, CreditCard, Globe, Crown } from "lucide-react";
+import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone, Heart, Crown } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
 import gameComingSoon from "@/assets/game-coming-soon.jpg";
-import { useState } from "react";
 
 export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-// دالة إنشاء الفاتورة المصححة لـ NOWPayments بقيمة 1 دولار للترقية
-async function createProPayment(userId: string) {
-  try {
-    const orderId = `pro_${userId || 'guest'}_${Date.now()}`;
-    const response = await fetch('https://api.nowpayments.io/v1/invoice', {
-      method: 'POST',
-      headers: {
-        'x-api-key': 'HJB6ZHJ-3T9MZF5-JNDXWVP-3HKEKKJ',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        price_amount: 1, // تم ضبط القيمة على 1 دولار فقط
-        price_currency: 'usd',
-        order_id: orderId,
-        order_description: 'ترقية حساب Pro فورية - منصة انمي فورج',
-        success_url: typeof window !== 'undefined' ? `${window.location.origin}/dashboard?payment=success&orderId=${orderId}` : '',
-        cancel_url: typeof window !== 'undefined' ? window.location.origin : ''
-      })
-    });
-
-    const data = await response.json();
-    console.log("NOWPayments Pro Invoice Response:", data);
-
-    if (data && data.invoice_url) {
-      return data.invoice_url;
-    } else {
-      console.error("NOWPayments Error Payload:", data);
-      return null;
-    }
-  } catch (error) {
-    console.error("Payment error:", error);
-    return null;
-  }
-}
-
 function Landing() {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
-
-  const handleProUpgrade = async () => {
-    setLoading(true);
-    const userId = user?.id || "guest";
-    const paymentUrl = await createProPayment(userId);
-    setLoading(false);
-    
-    if (paymentUrl) {
-      window.location.href = paymentUrl;
-    } else {
-      alert("حدث خطأ أثناء إنشاء فاتورة الدفع، يرجى المحاولة مرة أخرى.");
-    }
-  };
 
   return (
     <div className="min-h-screen">
@@ -136,42 +86,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* قسم الترقية والدفع المباشر تحت رقم فودافون كاش */}
-      <section className="container mx-auto px-4 py-4">
-        <div className="rounded-2xl border-2 border-amber-500/40 bg-card p-6 shadow-md max-w-2xl mx-auto">
-          <h3 className="text-lg font-black text-center mb-2">الدفع المحلي والعالمي</h3>
-          
-          {/* صندوق فودافون كاش */}
-          <div className="rounded-xl border border-gold/30 bg-gold/5 p-4 text-center">
-            <p className="text-sm font-bold text-muted-foreground">حوّل مبلغ 50 جنيه فودافون كاش إلى الرقم:</p>
-            <div className="my-2 inline-flex items-center gap-2 rounded-lg bg-background border border-gold px-4 py-2 text-xl font-black text-gold">
-              <span>01080390782</span>
-            </div>
-            <p className="text-xs text-muted-foreground">بعد التحويل، ارفع صورة الإيصال أو ادخل رقم العملية لتأكيد الشحن.</p>
-          </div>
-
-          {/* الفاصل الخياري */}
-          <div className="relative my-6 text-center">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
-            <span className="relative bg-card px-3 text-xs font-bold text-muted-foreground">أو ترقية Pro فورية بالفيزا / الدولار</span>
-          </div>
-
-          {/* زر الترقية لـ Pro بسعر 1 دولار مباشرة */}
-          <div className="flex flex-col items-center justify-center gap-3">
-            <button
-              onClick={handleProUpgrade}
-              disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-r from-amber-500 via-gold to-yellow-500 px-6 py-3.5 text-base font-black text-black shadow-lg hover:brightness-110 transition disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              <Crown className="h-5 w-5 fill-black" />
-              {loading ? "جاري تحضير رابط الدفع..." : "ترقية حسابك إلى Pro بسعر $1 دولار فقط (تفعيل فورى)"}
-            </button>
-            <p className="text-xs text-muted-foreground">الدفع يتم عبر بوابة NOWPayments المشفرة بالفيزا أو العملات الرقمية.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Audio + Watermark cards */}
+      {/* Main Grid */}
       <section className="container mx-auto px-4 pb-10">
         <div className="grid gap-4 md:grid-cols-2">
           <Link to="/audio" className="group rounded-2xl border border-border bg-card p-6 transition-colors hover:border-gold">
@@ -255,6 +170,18 @@ function Landing() {
               أكمل المهمات اليومية، شارك الموقع، واربح كريديت مجاني لحسابك فوراً
             </p>
           </Link>
+
+          {/* 🔥 زر الترقية والاشتراكات الجديد باللونين الأحمر والذهبي 🔥 */}
+          <div className="md:col-span-2">
+            <Link
+              to="/pro-upgrade"
+              className="flex items-center justify-center gap-3 w-full rounded-2xl bg-gradient-to-r from-red-600 via-amber-500 to-yellow-500 p-5 text-xl font-black text-white shadow-xl hover:brightness-110 hover:scale-[1.01] transition-all duration-300 border border-yellow-400/50"
+            >
+              <Crown className="h-7 w-7 text-yellow-200 fill-yellow-200 animate-bounce" />
+              <span>ترقية والاشتراكات 👑</span>
+              <Sparkles className="h-6 w-6 text-yellow-200" />
+            </Link>
+          </div>
 
           {/* أزرار التبرع ودعم المنصة */}
           <div className="text-center my-8 md:col-span-2 flex flex-col items-center gap-4">

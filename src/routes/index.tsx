@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone, Heart, CreditCard, Globe } from "lucide-react";
+import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone, Heart, CreditCard, Globe, Crown } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
 import gameComingSoon from "@/assets/game-coming-soon.jpg";
@@ -10,10 +10,10 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-// دالة إنشاء الفاتورة المصححة لـ NOWPayments
-async function createPayment(priceAmount: number, orderId: string) {
+// دالة إنشاء الفاتورة المصححة لـ NOWPayments بقيمة 1 دولار للترقية
+async function createProPayment(userId: string) {
   try {
-    // تم تغيير النقطة إلى /v1/invoice لتوليد رابط الفاتورة الصحيح
+    const orderId = `pro_${userId || 'guest'}_${Date.now()}`;
     const response = await fetch('https://api.nowpayments.io/v1/invoice', {
       method: 'POST',
       headers: {
@@ -21,17 +21,17 @@ async function createPayment(priceAmount: number, orderId: string) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        price_amount: priceAmount,
+        price_amount: 1, // تم ضبط القيمة على 1 دولار فقط
         price_currency: 'usd',
         order_id: orderId,
-        order_description: 'ترقية ودعم مدفوعات منصة انمي فورج',
-        success_url: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : '',
+        order_description: 'ترقية حساب Pro فورية - منصة انمي فورج',
+        success_url: typeof window !== 'undefined' ? `${window.location.origin}/dashboard?payment=success&orderId=${orderId}` : '',
         cancel_url: typeof window !== 'undefined' ? window.location.origin : ''
       })
     });
 
     const data = await response.json();
-    console.log("NOWPayments Response:", data);
+    console.log("NOWPayments Pro Invoice Response:", data);
 
     if (data && data.invoice_url) {
       return data.invoice_url;
@@ -48,18 +48,17 @@ async function createPayment(priceAmount: number, orderId: string) {
 function Landing() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [customAmount, setCustomAmount] = useState<number>(5);
 
-  const handleCheckout = async (amount: number, planName: string) => {
+  const handleProUpgrade = async () => {
     setLoading(true);
-    const orderId = "order_" + Date.now();
-    const paymentUrl = await createPayment(amount, orderId);
+    const userId = user?.id || "guest";
+    const paymentUrl = await createProPayment(userId);
     setLoading(false);
     
     if (paymentUrl) {
       window.location.href = paymentUrl;
     } else {
-      alert("حدث خطأ أثناء إنشاء رابط الدفع، يرجى المحاولة مرة أخرى أو التأكد من إعدادات المفتاح.");
+      alert("حدث خطأ أثناء إنشاء فاتورة الدفع، يرجى المحاولة مرة أخرى.");
     }
   };
 
@@ -137,39 +136,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* قسم الترقية والمدفوعات الإلكترونية بـ NOWPayments */}
-      <section className="container mx-auto px-4 py-8">
-        <div className="rounded-3xl border-2 border-gold/60 bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-gold/20 p-6 md:p-8 text-center shadow-gold">
-          <div className="inline-flex items-center gap-1 rounded-full bg-gold px-3.5 py-1 text-xs font-black text-gold-foreground mb-3">
-            <CreditCard className="h-4 w-4" /> مدفوعات فورية آمنة (NOWPayments)
-          </div>
-          <h2 className="text-2xl md:text-3xl font-black text-gradient-gold">ترقية حسابك وباقات Pro بالدولار / فيزا</h2>
-          <p className="mt-2 text-sm text-muted-foreground max-w-xl mx-auto">
-            احصل على مميزات غير محدودة، رفع فيديوهات لمدة 30 دقيقة، وصلاحيات متقدمة عبر الدفع الإلكتروني الفوري.
-          </p>
-
-          <div className="mt-6 flex flex-wrap justify-center gap-4">
-            <button
-              onClick={() => handleCheckout(10, "باقتك الشهرية Pro")}
-              disabled={loading}
-              className="rounded-2xl bg-gradient-gold px-6 py-3.5 text-sm font-black text-gold-foreground shadow-gold hover:scale-105 transition disabled:opacity-50 flex items-center gap-2"
-            >
-              <CreditCard className="h-4 w-4" />
-              {loading ? "جاري تجهيز الفاتورة..." : "ترقية باقة Pro بسعر 10$"}
-            </button>
-            <button
-              onClick={() => handleCheckout(25, "الباقة الشاملة VIP")}
-              disabled={loading}
-              className="rounded-2xl border-2 border-gold bg-background px-6 py-3.5 text-sm font-black text-gold hover:bg-gold/10 transition disabled:opacity-50 flex items-center gap-2"
-            >
-              <Sparkles className="h-4 w-4" />
-              {loading ? "جاري تجهيز الفاتورة..." : "الباقة الشاملة VIP بسعر 25$"}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* قسم التحويل المباشر تحت رقم فودافون كاش 01080390782 مع إضافة الدفع بـ NOWPayments تحت الرقم */}
+      {/* قسم الترقية والدفع المباشر تحت رقم فودافون كاش */}
       <section className="container mx-auto px-4 py-4">
         <div className="rounded-2xl border-2 border-amber-500/40 bg-card p-6 shadow-md max-w-2xl mx-auto">
           <h3 className="text-lg font-black text-center mb-2">الدفع المحلي والعالمي</h3>
@@ -186,30 +153,20 @@ function Landing() {
           {/* الفاصل الخياري */}
           <div className="relative my-6 text-center">
             <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
-            <span className="relative bg-card px-3 text-xs font-bold text-muted-foreground">أو ادفع بالدولار / الفيزا فورياً</span>
+            <span className="relative bg-card px-3 text-xs font-bold text-muted-foreground">أو ترقية Pro فورية بالفيزا / الدولار</span>
           </div>
 
-          {/* زر دفع فاتورة بـ NOWPayments تحت رقم الهاتف مباشرة */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <div className="flex items-center gap-2 border border-border rounded-xl px-3 py-2 bg-background w-full sm:w-auto">
-              <span className="text-xs font-bold text-muted-foreground">المبلغ ($):</span>
-              <input 
-                type="number" 
-                min="1" 
-                value={customAmount} 
-                onChange={(e) => setCustomAmount(Number(e.target.value))} 
-                className="w-16 bg-transparent text-center font-bold outline-none text-gold"
-              />
-            </div>
-            
+          {/* زر الترقية لـ Pro بسعر 1 دولار مباشرة */}
+          <div className="flex flex-col items-center justify-center gap-3">
             <button
-              onClick={() => handleCheckout(customAmount || 5, "دفع فاتورة عامة")}
+              onClick={handleProUpgrade}
               disabled={loading}
-              className="w-full sm:w-auto rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-2.5 text-sm font-black text-white shadow-lg hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full rounded-xl bg-gradient-to-r from-amber-500 via-gold to-yellow-500 px-6 py-3.5 text-base font-black text-black shadow-lg hover:brightness-110 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              <Globe className="h-4 w-4" />
-              {loading ? "جاري إنشاء الفاتورة..." : `ادفع فيزا / دولار ($${customAmount}) عبر NOWPayments`}
+              <Crown className="h-5 w-5 fill-black" />
+              {loading ? "جاري تحضير رابط الدفع..." : "ترقية حسابك إلى Pro بسعر $1 دولار فقط (تفعيل فورى)"}
             </button>
+            <p className="text-xs text-muted-foreground">الدفع يتم عبر بوابة NOWPayments المشفرة بالفيزا أو العملات الرقمية.</p>
           </div>
         </div>
       </section>

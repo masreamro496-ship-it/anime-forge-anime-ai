@@ -22,30 +22,23 @@ function Dashboard() {
   const qc = useQueryClient();
   const { data, isLoading } = useProfile();
 
-  // --- تفعيل تلقائي لباقة Pro بعد إتمام الدفع بالفيزا / الدولار عبر NOWPayments ---
+  // --- تفعيل تلقائي لباقة Pro بعد إتمام الدفع عبر NOWPayments ---
   useEffect(() => {
     const handlePaymentSuccess = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const isSuccess = urlParams.get("payment") === "success";
-      const orderId = urlParams.get("orderId");
 
       if (isSuccess && user) {
         try {
-          // تحديث ملف المستخدم في Supabase إلى Pro
           const { error } = await supabase
             .from("profiles")
             .update({ is_pro: true })
             .eq("id", user.id);
 
           if (!error) {
-            toast.success("🎉 تم تفعيل باقة PRO لحسابك بنجاح!");
-            // إعادة تنشيط استعلامات البيانات لتحديث الواجهة فوراً
+            toast.success("🎉 تم تفعيل عمليتك وباقة PRO بنجاح!");
             qc.invalidateQueries({ queryKey: ["profile", user.id] });
-            
-            // إزالة معلمات الدفع من رابط الصفحة
             window.history.replaceState({}, document.title, window.location.pathname);
-          } else {
-            console.error("خطأ تحديث قاعدة البيانات:", error);
           }
         } catch (err) {
           console.error("خطأ أثناء تفعيل Pro:", err);
@@ -128,8 +121,8 @@ function Dashboard() {
             <div className={`mt-3 text-2xl font-black ${isPro ? "text-gradient-gold" : ""}`}>{isPro ? "PRO" : "مجاني"}</div>
             <p className="mt-1 text-[11px] text-muted-foreground">{isPro ? "2 مشاريع · حتى 30 د · 360p" : "مشروع واحد · 1-10 د · 360p"}</p>
             {!isPro && (
-              <Link to="/" className="mt-3 inline-block rounded-lg bg-gradient-gold px-3 py-1 text-[11px] font-black text-gold-foreground shadow-gold">
-                ترقية بـ 1$
+              <Link to="/pro-upgrade" className="mt-3 inline-block rounded-lg bg-gradient-gold px-3 py-1 text-[11px] font-black text-gold-foreground shadow-gold">
+                ترقية والاشتراكات
               </Link>
             )}
           </div>

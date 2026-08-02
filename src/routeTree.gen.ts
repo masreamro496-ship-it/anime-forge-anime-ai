@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WatermarkRouteImport } from './routes/watermark'
+import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as SocialRouteImport } from './routes/social'
 import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -34,6 +35,11 @@ import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/
 const WatermarkRoute = WatermarkRouteImport.update({
   id: '/watermark',
   path: '/watermark',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SocialRoute = SocialRouteImport.update({
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/social': typeof SocialRoute
+  '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/social': typeof SocialRoute
+  '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/social': typeof SocialRoute
+  '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/social'
+    | '/tasks'
     | '/watermark'
     | '/anime-market/$id'
     | '/generate/goku'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/social'
+    | '/tasks'
     | '/watermark'
     | '/anime-market/$id'
     | '/generate/goku'
@@ -268,6 +279,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/social'
+    | '/tasks'
     | '/watermark'
     | '/anime-market/$id'
     | '/generate/goku'
@@ -292,6 +304,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ShortsRoute: typeof ShortsRouteWithChildren
   SocialRoute: typeof SocialRoute
+  TasksRoute: typeof TasksRoute
   WatermarkRoute: typeof WatermarkRoute
   GenerateGokuRoute: typeof GenerateGokuRoute
   GenerateVideoRoute: typeof GenerateVideoRoute
@@ -307,6 +320,13 @@ declare module '@tanstack/react-router' {
       path: '/watermark'
       fullPath: '/watermark'
       preLoaderRoute: typeof WatermarkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/social': {
@@ -490,6 +510,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ShortsRoute: ShortsRouteWithChildren,
   SocialRoute: SocialRoute,
+  TasksRoute: TasksRoute,
   WatermarkRoute: WatermarkRoute,
   GenerateGokuRoute: GenerateGokuRoute,
   GenerateVideoRoute: GenerateVideoRoute,
@@ -500,3 +521,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

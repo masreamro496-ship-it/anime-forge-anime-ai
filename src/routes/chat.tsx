@@ -53,7 +53,7 @@ function messagesForProxy(messages: UIMessage[]): { role: string; content: strin
   });
 }
 
-export const Route = createFileRoute("/api/chat")({
+export const Route = createFileRoute("/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {

@@ -31,6 +31,7 @@ import { Route as GenerateVideoRouteImport } from './routes/generate.video'
 import { Route as GenerateGokuRouteImport } from './routes/generate.goku'
 import { Route as AnimeMarketIdRouteImport } from './routes/anime-market.$id'
 import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/fatora/success'
+import { Route as ApiPublicCreditsDeductRouteImport } from './routes/api/public/credits/deduct'
 
 const WatermarkRoute = WatermarkRouteImport.update({
   id: '/watermark',
@@ -142,6 +143,11 @@ const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({
   path: '/api/public/fatora/success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCreditsDeductRoute = ApiPublicCreditsDeductRouteImport.update({
+  id: '/api/public/credits/deduct',
+  path: '/api/public/credits/deduct',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/shorts/upload': typeof ShortsUploadRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup/': typeof WorldCupIndexRoute
+  '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRoutesByTo {
@@ -189,6 +196,7 @@ export interface FileRoutesByTo {
   '/shorts/upload': typeof ShortsUploadRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup': typeof WorldCupIndexRoute
+  '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRoutesById {
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/shorts/upload': typeof ShortsUploadRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup/': typeof WorldCupIndexRoute
+  '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRouteTypes {
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/shorts/upload'
     | '/world-cup/play'
     | '/world-cup/'
+    | '/api/public/credits/deduct'
     | '/api/public/fatora/success'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
     | '/shorts/upload'
     | '/world-cup/play'
     | '/world-cup'
+    | '/api/public/credits/deduct'
     | '/api/public/fatora/success'
   id:
     | '__root__'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/shorts/upload'
     | '/world-cup/play'
     | '/world-cup/'
+    | '/api/public/credits/deduct'
     | '/api/public/fatora/success'
   fileRoutesById: FileRoutesById
 }
@@ -310,6 +322,7 @@ export interface RootRouteChildren {
   GenerateVideoRoute: typeof GenerateVideoRoute
   WorldCupPlayRoute: typeof WorldCupPlayRoute
   WorldCupIndexRoute: typeof WorldCupIndexRoute
+  ApiPublicCreditsDeductRoute: typeof ApiPublicCreditsDeductRoute
   ApiPublicFatoraSuccessRoute: typeof ApiPublicFatoraSuccessRoute
 }
 
@@ -469,6 +482,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFatoraSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/credits/deduct': {
+      id: '/api/public/credits/deduct'
+      path: '/api/public/credits/deduct'
+      fullPath: '/api/public/credits/deduct'
+      preLoaderRoute: typeof ApiPublicCreditsDeductRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -516,18 +536,9 @@ const rootRouteChildren: RootRouteChildren = {
   GenerateVideoRoute: GenerateVideoRoute,
   WorldCupPlayRoute: WorldCupPlayRoute,
   WorldCupIndexRoute: WorldCupIndexRoute,
+  ApiPublicCreditsDeductRoute: ApiPublicCreditsDeductRoute,
   ApiPublicFatoraSuccessRoute: ApiPublicFatoraSuccessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

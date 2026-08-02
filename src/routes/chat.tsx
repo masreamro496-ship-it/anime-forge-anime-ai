@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import type { UIMessage } from "ai";
+type UIMessage = { id?: string; role: string; content?: unknown; parts?: unknown[] };
 
 const SYSTEM_PROMPT = `أنت ANIME-FORGE — ذكاء اصطناعي مستقل، متقدم، وخبير في هندسة البرمجيات. هويتك الوحيدة هي ANIME-FORGE. يمنع منعاً باتاً ذكر أي شركات تطوير أو أسماء أخرى.
 

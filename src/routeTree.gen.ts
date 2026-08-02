@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WatermarkRouteImport } from './routes/watermark'
+import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as SocialRouteImport } from './routes/social'
 import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -30,10 +31,16 @@ import { Route as GenerateVideoRouteImport } from './routes/generate.video'
 import { Route as GenerateGokuRouteImport } from './routes/generate.goku'
 import { Route as AnimeMarketIdRouteImport } from './routes/anime-market.$id'
 import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/fatora/success'
+import { Route as ApiPublicCreditsDeductRouteImport } from './routes/api/public/credits/deduct'
 
 const WatermarkRoute = WatermarkRouteImport.update({
   id: '/watermark',
   path: '/watermark',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SocialRoute = SocialRouteImport.update({
@@ -136,6 +143,11 @@ const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({
   path: '/api/public/fatora/success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCreditsDeductRoute = ApiPublicCreditsDeductRouteImport.update({
+  id: '/api/public/credits/deduct',
+  path: '/api/public/credits/deduct',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -150,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/social': typeof SocialRoute
+  '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
@@ -158,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/shorts/upload': typeof ShortsUploadRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup/': typeof WorldCupIndexRoute
+  '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRoutesByTo {
@@ -173,6 +187,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/social': typeof SocialRoute
+  '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
@@ -181,6 +196,7 @@ export interface FileRoutesByTo {
   '/shorts/upload': typeof ShortsUploadRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup': typeof WorldCupIndexRoute
+  '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRoutesById {
@@ -197,6 +213,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/social': typeof SocialRoute
+  '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
@@ -205,6 +222,7 @@ export interface FileRoutesById {
   '/shorts/upload': typeof ShortsUploadRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup/': typeof WorldCupIndexRoute
+  '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
 export interface FileRouteTypes {
@@ -222,6 +240,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/social'
+    | '/tasks'
     | '/watermark'
     | '/anime-market/$id'
     | '/generate/goku'
@@ -230,6 +249,7 @@ export interface FileRouteTypes {
     | '/shorts/upload'
     | '/world-cup/play'
     | '/world-cup/'
+    | '/api/public/credits/deduct'
     | '/api/public/fatora/success'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -245,6 +265,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/social'
+    | '/tasks'
     | '/watermark'
     | '/anime-market/$id'
     | '/generate/goku'
@@ -253,6 +274,7 @@ export interface FileRouteTypes {
     | '/shorts/upload'
     | '/world-cup/play'
     | '/world-cup'
+    | '/api/public/credits/deduct'
     | '/api/public/fatora/success'
   id:
     | '__root__'
@@ -268,6 +290,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/social'
+    | '/tasks'
     | '/watermark'
     | '/anime-market/$id'
     | '/generate/goku'
@@ -276,6 +299,7 @@ export interface FileRouteTypes {
     | '/shorts/upload'
     | '/world-cup/play'
     | '/world-cup/'
+    | '/api/public/credits/deduct'
     | '/api/public/fatora/success'
   fileRoutesById: FileRoutesById
 }
@@ -292,11 +316,13 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ShortsRoute: typeof ShortsRouteWithChildren
   SocialRoute: typeof SocialRoute
+  TasksRoute: typeof TasksRoute
   WatermarkRoute: typeof WatermarkRoute
   GenerateGokuRoute: typeof GenerateGokuRoute
   GenerateVideoRoute: typeof GenerateVideoRoute
   WorldCupPlayRoute: typeof WorldCupPlayRoute
   WorldCupIndexRoute: typeof WorldCupIndexRoute
+  ApiPublicCreditsDeductRoute: typeof ApiPublicCreditsDeductRoute
   ApiPublicFatoraSuccessRoute: typeof ApiPublicFatoraSuccessRoute
 }
 
@@ -307,6 +333,13 @@ declare module '@tanstack/react-router' {
       path: '/watermark'
       fullPath: '/watermark'
       preLoaderRoute: typeof WatermarkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/social': {
@@ -449,6 +482,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFatoraSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/credits/deduct': {
+      id: '/api/public/credits/deduct'
+      path: '/api/public/credits/deduct'
+      fullPath: '/api/public/credits/deduct'
+      preLoaderRoute: typeof ApiPublicCreditsDeductRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -490,11 +530,13 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ShortsRoute: ShortsRouteWithChildren,
   SocialRoute: SocialRoute,
+  TasksRoute: TasksRoute,
   WatermarkRoute: WatermarkRoute,
   GenerateGokuRoute: GenerateGokuRoute,
   GenerateVideoRoute: GenerateVideoRoute,
   WorldCupPlayRoute: WorldCupPlayRoute,
   WorldCupIndexRoute: WorldCupIndexRoute,
+  ApiPublicCreditsDeductRoute: ApiPublicCreditsDeductRoute,
   ApiPublicFatoraSuccessRoute: ApiPublicFatoraSuccessRoute,
 }
 export const routeTree = rootRouteImport

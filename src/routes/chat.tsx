@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import type { UIMessage } from "ai";
+type UIMessage = { id?: string; role: string; content?: any; parts?: any[] };
 
 const SYSTEM_PROMPT = `أنت ANIME-FORGE — ذكاء اصطناعي مستقل، متقدم، وخبير في هندسة البرمجيات. هويتك الوحيدة هي ANIME-FORGE. يمنع منعاً باتاً ذكر أي شركات تطوير أو أسماء أخرى.
 
@@ -53,7 +53,7 @@ function messagesForProxy(messages: UIMessage[]): { role: string; content: strin
   });
 }
 
-export const Route = createFileRoute("/api/chat")({
+export const Route = createFileRoute("/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {

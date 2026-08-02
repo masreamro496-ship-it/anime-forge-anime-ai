@@ -79,7 +79,7 @@ function DonationsAdminView() {
 
   const fetchDonations = async () => {
     setLoading(true);
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('donations')
       .select('*')
       .order('created_at', { ascending: false });
@@ -92,7 +92,7 @@ function DonationsAdminView() {
   }, []);
 
   const handleStatus = async (id: string, status: 'approved' | 'rejected') => {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('donations')
       .update({ status })
       .eq('id', id);

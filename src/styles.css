@@ -96,8 +96,17 @@
   .bg-gradient-gold {
     background: var(--gradient-gold);
   }
+  .bg-gradient-purple {
+    background: var(--gradient-purple);
+  }
   .text-gradient-gold {
     background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-gradient-purple {
+    background: var(--gradient-purple);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -105,11 +114,34 @@
   .shadow-gold {
     box-shadow: var(--shadow-gold);
   }
+  .shadow-purple {
+    box-shadow: var(--shadow-purple);
+  }
   .shadow-card {
     box-shadow: var(--shadow-card);
   }
   .ring-gold {
     box-shadow: 0 0 0 1px var(--gold), 0 0 30px -5px var(--gold);
+  }
+}
+
+/* وضوح الأزرار والفصل بينها */
+@layer base {
+  button,
+  a[role="button"] {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  }
+  button:hover:not(:disabled),
+  a[role="button"]:hover {
+    filter: brightness(1.12);
+  }
+  button:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  button:focus-visible,
+  a:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
 

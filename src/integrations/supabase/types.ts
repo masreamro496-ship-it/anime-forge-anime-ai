@@ -121,6 +121,42 @@ export type Database = {
           },
         ]
       }
+      api_credit_logs: {
+        Row: {
+          amount: number
+          created_at: string
+          email: string | null
+          error: string | null
+          id: string
+          reason: string | null
+          source: string
+          success: boolean
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          email?: string | null
+          error?: string | null
+          id?: string
+          reason?: string | null
+          source: string
+          success?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          email?: string | null
+          error?: string | null
+          id?: string
+          reason?: string | null
+          source?: string
+          success?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audio_clips: {
         Row: {
           audio_url: string
@@ -759,6 +795,51 @@ export type Database = {
         }
         Relationships: []
       }
+      task_submissions: {
+        Row: {
+          admin_note: string | null
+          created_at: string
+          credits_awarded: number
+          id: string
+          proof_link: string | null
+          proof_path: string | null
+          status: string
+          task_id: string
+          task_title: string
+          updated_at: string
+          user_email: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          created_at?: string
+          credits_awarded?: number
+          id?: string
+          proof_link?: string | null
+          proof_path?: string | null
+          status?: string
+          task_id: string
+          task_title: string
+          updated_at?: string
+          user_email?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          created_at?: string
+          credits_awarded?: number
+          id?: string
+          proof_link?: string | null
+          proof_path?: string | null
+          status?: string
+          task_id?: string
+          task_title?: string
+          updated_at?: string
+          user_email?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -975,13 +1056,27 @@ export type Database = {
       }
     }
     Functions: {
-      admin_grant_credits: {
-        Args: { _amount: number; _note?: string; _target_user: string }
-        Returns: undefined
-      }
+      admin_grant_credits:
+        | {
+            Args: { _amount: number; _email: string; _note?: string }
+            Returns: Json
+          }
+        | {
+            Args: { _amount: number; _note?: string; _target_user: string }
+            Returns: undefined
+          }
       admin_set_wc_result: {
         Args: { _match_id: string; _result_a: number; _result_b: number }
         Returns: number
+      }
+      api_deduct_credits: {
+        Args: {
+          _amount: number
+          _email: string
+          _reason?: string
+          _source: string
+        }
+        Returns: Json
       }
       approve_purchase: { Args: { _purchase_id: string }; Returns: undefined }
       can_view_project_video: {
@@ -1025,6 +1120,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      post_bot_greeting: { Args: never; Returns: boolean }
       promote_scheduled_shorts: { Args: never; Returns: undefined }
       promote_to_moderator: { Args: { _email: string }; Returns: string }
       purchase_anime_media: { Args: { _media_id: string }; Returns: string }

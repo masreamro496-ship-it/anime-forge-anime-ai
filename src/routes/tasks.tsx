@@ -31,9 +31,9 @@ function TasksPage() {
     }
   };
 
-    const handleSubmit = async (taskId: string, taskTitle: string) => {
+  const handleSubmit = async (taskId: string, taskTitle: string) => {
     const selectedFile = files[taskId];
-    const textProof = proofs[taskId];
+    const textProof = (proofs[taskId] || "").trim();
 
     if (!selectedFile && !textProof) {
       alert("يرجى إرفاق صورة الإثبات أو وضع رابط المنشور أولاً.");
@@ -43,45 +43,44 @@ function TasksPage() {
     setLoading({ ...loading, [taskId]: true });
 
     try {
-      let finalProofUrl = textProof || '';
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData.session?.user;
+      if (!user) {
+        alert("سجّل دخولك أولاً حتى نتمكن من إضافة الكريدت لحسابك.");
+        return;
+      }
 
-      // 1. رفع الصورة في حال اختيار ملف
+      let proofPath: string | null = null;
+      let finalProofUrl: string = textProof;
+
       if (selectedFile) {
-        const fileExt = selectedFile.name.split('.').pop();
-        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `task-proofs/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("public")
-          .upload(filePath, selectedFile);
-
-        if (!uploadError) {
-          const { data } = supabase.storage
-            .from("public")
-            .getPublicUrl(filePath);
-
-          finalProofUrl = data.publicUrl;
-        } else {
+        if (selectedFile.size > 10 * 1024 * 1024) {
+          alert("حجم الصورة كبير جداً (الحد الأقصى 10 ميجا).");
+          return;
+        }
+        try {
+          proofPath = await uploadUserFile("task-proofs", user.id, selectedFile, `${taskId}-`);
+          if (!finalProofUrl) finalProofUrl = `[صورة مرفقة] ${selectedFile.name}`;
+        } catch (uploadError) {
           console.error("Storage upload error:", uploadError);
+          alert("تعذّر رفع صورة الإثبات. جرّب صورة أصغر أو ضع رابط الإثبات بدلاً منها.");
+          return;
         }
       }
 
-      // 2. جلب بيانات المستخدم
-      const { data: userData } = await supabase.auth.getUser();
-
-      // 3. إدخال الإثبات في قاعدة البيانات
-      const { error: dbError } = await supabase.from("task_submissions").insert({
-        user_id: userData?.user?.id || null,
-        user_email: userData?.user?.email || "زائر / غير معروف",
+      const { error: dbError } = await (supabase as any).from("task_submissions").insert({
+        user_id: user.id,
+        user_email: user.email ?? null,
         task_id: taskId,
         task_title: taskTitle,
         proof_link: finalProofUrl,
+        proof_path: proofPath,
         status: "pending",
       });
 
       if (dbError) {
         console.error("Database insert error:", dbError);
-        alert("حدث خطأ أثناء حفظ الإثبات. حاول مرة أخرى.");
+        alert(`تعذّر حفظ الإثبات: ${dbError.message}`);
       } else {
         setSubmitted({ ...submitted, [taskId]: true });
       }

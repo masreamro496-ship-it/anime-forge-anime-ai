@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Trophy, Video, Share2, MessageSquare, Bug, Star, Calendar, HelpCircle, FileText, Send, ArrowRight, CheckCircle2, Image as ImageIcon, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { uploadUserFile } from "@/lib/storage";
 
 export const Route = createFileRoute("/tasks")({
   component: TasksPage,

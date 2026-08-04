@@ -21,7 +21,17 @@ export const createAnimeMedia = createServerFn({ method: "POST" })
     if (data.price_credits < 1) throw new Error("السعر يجب أن يكون كريدت واحد على الأقل");
     if (data.price_credits > maxPrice) throw new Error(`الحد الأقصى ${maxPrice} كريدت`);
 
+    const [{ data: prof }, { data: rolesRows }] = await Promise.all([
+      supabase.from("profiles").select("is_pro,display_name").eq("id", userId).maybeSingle(),
+      supabase.from("user_roles").select("role").eq("user_id", userId),
+    ]);
+    const roles = ((rolesRows ?? []) as { role: string }[]).map((r) => r.role);
+    const p = prof as { is_pro?: boolean; display_name?: string | null } | null;
+
     const { data: row, error } = await supabase.from("anime_media").insert({
+      author_is_pro: !!p?.is_pro || roles.includes("pro"),
+      author_is_moderator: roles.includes("admin") || roles.includes("moderator"),
+      author_name: p?.display_name ?? null,
       user_id: userId,
       kind: data.kind,
       title: data.title.trim().slice(0, 120),

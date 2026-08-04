@@ -8,6 +8,7 @@ import { AnimeVideoPlayer } from "@/components/AnimeVideoPlayer";
 import { purchaseAnimeMedia, getAnimeMediaVideoUrl } from "@/lib/anime-media.functions";
 import { toast } from "sonner";
 import { ArrowRight, Coins, Film, Loader2, Lock, ShoppingCart } from "lucide-react";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 
 export const Route = createFileRoute("/anime-market/$id")({
   head: () => ({
@@ -36,6 +37,8 @@ type MediaDetail = {
   duration_seconds: number;
   price_credits: number;
   purchases_count: number;
+  author_is_pro?: boolean;
+  author_is_moderator?: boolean;
 };
 
 function DetailPage() {
@@ -125,7 +128,10 @@ function DetailPage() {
             <div className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-card">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-2xl font-black">{m.title}</h1>
+                  <h1 className="flex items-center gap-2 text-2xl font-black">
+                    {m.title}
+                    {m.author_is_moderator ? <VerifiedBadge variant="gold" size={20} withLabel /> : m.author_is_pro ? <VerifiedBadge variant="blue" size={20} withLabel /> : null}
+                  </h1>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {m.kind === "anime_movie" ? "فيلم أنمي" : "فيديو أنمي"} · {m.purchases_count} مبيعة
                   </p>

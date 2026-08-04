@@ -40,6 +40,9 @@ export type Database = {
       }
       anime_media: {
         Row: {
+          author_is_moderator: boolean
+          author_is_pro: boolean
+          author_name: string | null
           created_at: string
           description: string | null
           duration_seconds: number
@@ -54,6 +57,9 @@ export type Database = {
           video_path: string
         }
         Insert: {
+          author_is_moderator?: boolean
+          author_is_pro?: boolean
+          author_name?: string | null
           created_at?: string
           description?: string | null
           duration_seconds?: number
@@ -68,6 +74,9 @@ export type Database = {
           video_path: string
         }
         Update: {
+          author_is_moderator?: boolean
+          author_is_pro?: boolean
+          author_name?: string | null
           created_at?: string
           description?: string | null
           duration_seconds?: number
@@ -259,6 +268,7 @@ export type Database = {
           id: string
           is_admin: boolean
           is_moderator: boolean
+          is_pro: boolean
           media_path: string | null
           media_type: string | null
           user_id: string
@@ -272,6 +282,7 @@ export type Database = {
           id?: string
           is_admin?: boolean
           is_moderator?: boolean
+          is_pro?: boolean
           media_path?: string | null
           media_type?: string | null
           user_id: string
@@ -285,6 +296,7 @@ export type Database = {
           id?: string
           is_admin?: boolean
           is_moderator?: boolean
+          is_pro?: boolean
           media_path?: string | null
           media_type?: string | null
           user_id?: string
@@ -792,6 +804,48 @@ export type Database = {
           message?: string | null
           slug?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      staff_applications: {
+        Row: {
+          age: number | null
+          created_at: string
+          full_name: string
+          id: string
+          info: string
+          kind: string
+          phone: string | null
+          requested_credits: number | null
+          skills: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          age?: number | null
+          created_at?: string
+          full_name: string
+          id?: string
+          info: string
+          kind: string
+          phone?: string | null
+          requested_credits?: number | null
+          skills?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          age?: number | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          info?: string
+          kind?: string
+          phone?: string | null
+          requested_credits?: number | null
+          skills?: string | null
+          status?: string
+          user_id?: string
         }
         Relationships: []
       }

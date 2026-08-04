@@ -204,6 +204,22 @@ function Landing() {
             >
               📖 قراءة القران الكريم
             </a>
+
+            {/* تقديم إدارة */}
+            <Link
+              to="/apply-admin"
+              className="w-full max-w-sm py-3.5 px-6 rounded-2xl font-black text-black bg-gradient-to-r from-yellow-400 to-amber-500 hover:opacity-90 hover:scale-[1.02] transition-all duration-300 text-center shadow-lg border border-yellow-300/60 text-lg"
+            >
+              🛡️ تقديم إدارة — 500 كريدت شهرياً
+            </Link>
+
+            {/* تقديم مطوّر */}
+            <Link
+              to="/apply-developer"
+              className="w-full max-w-sm py-3.5 px-6 rounded-2xl font-black text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:opacity-90 hover:scale-[1.02] transition-all duration-300 text-center shadow-lg border border-sky-400/50 text-lg"
+            >
+              💻 تقديم مطوّر — نسبة 25% من الأرباح
+            </Link>
           </div>
         </div>
 

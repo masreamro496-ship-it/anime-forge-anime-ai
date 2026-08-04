@@ -7,7 +7,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { signCloudinaryUpload } from "@/lib/cloudinary.functions";
 import { createAnimeMedia } from "@/lib/anime-media.functions";
 import { toast } from "sonner";
-import { ArrowRight, Upload, Film, Video as VideoIcon, ImageIcon, Coins, Play } from "lucide-react";
+import { ArrowRight, Upload, Film, Video as VideoIcon, ImageIcon, Coins, Play, ShoppingCart, Loader2 } from "lucide-react";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { purchaseAnimeMedia } from "@/lib/anime-media.functions";
 
 export const Route = createFileRoute("/anime-market")({
   head: () => ({
@@ -34,6 +36,8 @@ type MediaRow = {
   price_credits: number;
   purchases_count: number;
   created_at: string;
+  author_is_pro?: boolean;
+  author_is_moderator?: boolean;
 };
 
 function probeVideo(file: File): Promise<{ duration: number }> {
@@ -86,7 +90,7 @@ function AnimeMarketPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("anime_media")
-        .select("id,user_id,kind,title,description,thumbnail_path,duration_seconds,price_credits,purchases_count,created_at")
+        .select("id,user_id,kind,title,description,thumbnail_path,duration_seconds,price_credits,purchases_count,created_at,author_is_pro,author_is_moderator")
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
@@ -131,35 +135,44 @@ function AnimeMarketPage() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {data!.map((m) => (
-                <Link key={m.id} to="/anime-market/$id" params={{ id: m.id }} className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition hover:border-gold hover:shadow-gold">
-                  <div className="relative aspect-video overflow-hidden bg-muted">
-                    {m.thumbnail_path ? (
-                      <img src={m.thumbnail_path} alt={m.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center"><Film className="h-10 w-10 text-muted-foreground" /></div>
-                    )}
-                    <span className="absolute right-2 top-2 rounded-full bg-black/80 px-2 py-0.5 text-[10px] font-bold text-white">
-                      {m.kind === "anime_movie" ? "فيلم" : "فيديو"}
-                    </span>
-                    <span className="absolute bottom-2 right-2 rounded-md bg-black/80 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                      {fmtDur(m.duration_seconds)}
-                    </span>
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gold/90 text-gold-foreground shadow-2xl">
-                        <Play className="h-5 w-5 fill-current" />
+                <div key={m.id} className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition hover:border-gold hover:shadow-gold">
+                  <Link to="/anime-market/$id" params={{ id: m.id }} className="block">
+                    <div className="relative aspect-video overflow-hidden bg-muted">
+                      {m.thumbnail_path ? (
+                        <img src={m.thumbnail_path} alt={m.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center"><Film className="h-10 w-10 text-muted-foreground" /></div>
+                      )}
+                      <span className="absolute right-2 top-2 rounded-full bg-black/80 px-2 py-0.5 text-[10px] font-bold text-white">
+                        {m.kind === "anime_movie" ? "فيلم" : "فيديو"}
                       </span>
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <h3 className="line-clamp-1 text-sm font-black">{m.title}</h3>
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="flex items-center gap-1 rounded-full bg-gold/15 px-2 py-0.5 text-[11px] font-black text-gold">
-                        <Coins className="h-3 w-3" /> {m.price_credits} كريدت
+                      <span className="absolute bottom-2 right-2 rounded-md bg-black/80 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                        {fmtDur(m.duration_seconds)}
                       </span>
-                      <span className="text-[10px] text-muted-foreground">{m.purchases_count} مبيعة</span>
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gold/90 text-gold-foreground shadow-2xl">
+                          <Play className="h-5 w-5 fill-current" />
+                        </span>
+                      </div>
                     </div>
+                    <div className="p-3 pb-2">
+                      <h3 className="line-clamp-1 flex items-center gap-1 text-sm font-black">
+                        {m.title}
+                        {m.author_is_moderator && <VerifiedBadge variant="gold" size={15} />}
+                        {!m.author_is_moderator && m.author_is_pro && <VerifiedBadge variant="blue" size={15} />}
+                      </h3>
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="flex items-center gap-1 rounded-full bg-gold/15 px-2 py-0.5 text-[11px] font-black text-gold">
+                          <Coins className="h-3 w-3" /> {m.price_credits} كريدت
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">{m.purchases_count} مبيعة</span>
+                      </div>
+                    </div>
+                  </Link>
+                  <div className="px-3 pb-3">
+                    <BuyButton id={m.id} price={m.price_credits} isOwner={user?.id === m.user_id} onBought={() => refetch()} />
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           )}
@@ -179,6 +192,49 @@ function AnimeMarketPage() {
         </section>
       )}
     </div>
+  );
+}
+
+function BuyButton({ id, price, isOwner, onBought }: { id: string; price: number; isOwner: boolean; onBought: () => void }) {
+  const navigate = useNavigate();
+  const buyFn = useServerFn(purchaseAnimeMedia);
+  const [busy, setBusy] = useState(false);
+
+  if (isOwner) {
+    return (
+      <button
+        onClick={() => navigate({ to: "/anime-market/$id", params: { id } })}
+        className="w-full rounded-xl border border-border bg-card py-2.5 text-xs font-black text-foreground"
+      >
+        مشاهدة (محتواك)
+      </button>
+    );
+  }
+
+  const buy = async () => {
+    setBusy(true);
+    try {
+      await buyFn({ data: { media_id: id } });
+      toast.success("تم الشراء! جاري فتح المشغل...");
+      onBought();
+      await navigate({ to: "/anime-market/$id", params: { id } });
+    } catch (e) {
+      const msg = (e as Error).message;
+      if (/auth|401|unauthor/i.test(msg)) { toast.error("سجّل دخولك أولاً"); void navigate({ to: "/login" }); }
+      else if (/already|مشترى|purchased/i.test(msg)) { await navigate({ to: "/anime-market/$id", params: { id } }); }
+      else toast.error(msg);
+    } finally { setBusy(false); }
+  };
+
+  return (
+    <button
+      onClick={buy}
+      disabled={busy}
+      className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-3 text-sm font-black text-white shadow-[0_8px_24px_-10px_rgba(34,197,94,0.8)] transition hover:scale-[1.01] disabled:opacity-60"
+    >
+      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
+      {busy ? "جاري الشراء..." : `شراء بـ ${price} كريدت ومشاهدة`}
+    </button>
   );
 }
 

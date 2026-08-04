@@ -20,6 +20,8 @@ import { Route as FreeShortsRouteImport } from './routes/free-shorts'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AudioRouteImport } from './routes/audio'
+import { Route as ApplyDeveloperRouteImport } from './routes/apply-developer'
+import { Route as ApplyAdminRouteImport } from './routes/apply-admin'
 import { Route as AnimeMarketRouteImport } from './routes/anime-market'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -88,6 +90,16 @@ const AudioRoute = AudioRouteImport.update({
   path: '/audio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApplyDeveloperRoute = ApplyDeveloperRouteImport.update({
+  id: '/apply-developer',
+  path: '/apply-developer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApplyAdminRoute = ApplyAdminRouteImport.update({
+  id: '/apply-admin',
+  path: '/apply-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnimeMarketRoute = AnimeMarketRouteImport.update({
   id: '/anime-market',
   path: '/anime-market',
@@ -153,6 +165,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/anime-market': typeof AnimeMarketRouteWithChildren
+  '/apply-admin': typeof ApplyAdminRoute
+  '/apply-developer': typeof ApplyDeveloperRoute
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
@@ -178,6 +192,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/anime-market': typeof AnimeMarketRouteWithChildren
+  '/apply-admin': typeof ApplyAdminRoute
+  '/apply-developer': typeof ApplyDeveloperRoute
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
@@ -204,6 +220,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/anime-market': typeof AnimeMarketRouteWithChildren
+  '/apply-admin': typeof ApplyAdminRoute
+  '/apply-developer': typeof ApplyDeveloperRoute
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
@@ -231,6 +249,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/anime-market'
+    | '/apply-admin'
+    | '/apply-developer'
     | '/audio'
     | '/chat'
     | '/dashboard'
@@ -256,6 +276,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/anime-market'
+    | '/apply-admin'
+    | '/apply-developer'
     | '/audio'
     | '/chat'
     | '/dashboard'
@@ -281,6 +303,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/anime-market'
+    | '/apply-admin'
+    | '/apply-developer'
     | '/audio'
     | '/chat'
     | '/dashboard'
@@ -307,6 +331,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AnimeMarketRoute: typeof AnimeMarketRouteWithChildren
+  ApplyAdminRoute: typeof ApplyAdminRoute
+  ApplyDeveloperRoute: typeof ApplyDeveloperRoute
   AudioRoute: typeof AudioRoute
   ChatRoute: typeof ChatRoute
   DashboardRoute: typeof DashboardRoute
@@ -403,6 +429,20 @@ declare module '@tanstack/react-router' {
       path: '/audio'
       fullPath: '/audio'
       preLoaderRoute: typeof AudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apply-developer': {
+      id: '/apply-developer'
+      path: '/apply-developer'
+      fullPath: '/apply-developer'
+      preLoaderRoute: typeof ApplyDeveloperRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apply-admin': {
+      id: '/apply-admin'
+      path: '/apply-admin'
+      fullPath: '/apply-admin'
+      preLoaderRoute: typeof ApplyAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/anime-market': {
@@ -521,6 +561,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AnimeMarketRoute: AnimeMarketRouteWithChildren,
+  ApplyAdminRoute: ApplyAdminRoute,
+  ApplyDeveloperRoute: ApplyDeveloperRoute,
   AudioRoute: AudioRoute,
   ChatRoute: ChatRoute,
   DashboardRoute: DashboardRoute,

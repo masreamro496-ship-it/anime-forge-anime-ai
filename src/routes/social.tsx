@@ -7,6 +7,7 @@ import { uploadUserFile, signedUrl } from "@/lib/storage";
 import botAvatar from "@/assets/bot-admin-avatar.jpg";
 import { ArrowRight, Send, Image as ImageIcon, Mic, Paperclip, Trash2, MessageCircle, Crown, ShieldAlert, Bot } from "lucide-react";
 import { toast } from "sonner";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 
 export const Route = createFileRoute("/social")({
   head: () => ({
@@ -28,6 +29,7 @@ type ChatRow = {
   media_type: "image" | "audio" | "file" | null;
   is_admin: boolean;
   is_moderator: boolean;
+  is_pro?: boolean;
   created_at: string;
 };
 
@@ -153,6 +155,7 @@ function SocialPage() {
         media_type: opts.mediaType ?? null,
         is_admin: isAdmin,
         is_moderator: isModerator,
+        is_pro: !!profile?.isPro,
       });
       if (error) throw error;
       setText("");
@@ -281,6 +284,8 @@ function SocialPage() {
                       <Bot className="h-2.5 w-2.5" /> بوت
                     </span>
                   )}
+                  {!isBot && (m.is_admin || m.is_moderator) && <VerifiedBadge variant="gold" size={15} />}
+                  {!isBot && !m.is_admin && !m.is_moderator && m.is_pro && <VerifiedBadge variant="blue" size={15} />}
                   {!isBot && (m.is_admin || m.is_moderator) && (
                     <span className="inline-flex items-center gap-0.5 rounded-full bg-gradient-to-r from-yellow-500 to-amber-600 px-1.5 py-0.5 text-[9px] font-black text-black shadow">
                       <Crown className="h-2.5 w-2.5" /> VIP {m.is_moderator ? "مشرف" : "أدمن"}

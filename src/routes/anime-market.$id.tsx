@@ -77,14 +77,14 @@ function DetailPage() {
     setBuying(true);
     try {
       await buyFn({ data: { media_id: id } });
-      toast.success("تم الشراء! يمكنك المشاهدة الآن");
-      await videoUrl.refetch();
-      await media.refetch();
+      toast.success("تم الشراء! جاري فتح غرفة المشاهدة");
       router.invalidate();
+      await navigate({ to: "/watch/$id", params: { id } });
     } catch (e) {
       toast.error((e as Error).message);
     } finally { setBuying(false); }
   };
+
 
   return (
     <div className="min-h-screen">

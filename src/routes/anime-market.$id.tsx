@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -45,6 +45,7 @@ function DetailPage() {
   const { id } = Route.useParams();
   const { user } = useAuth();
   const router = useRouter();
+  const navigate = useNavigate();
   const buyFn = useServerFn(purchaseAnimeMedia);
   const getUrlFn = useServerFn(getAnimeMediaVideoUrl);
   const [buying, setBuying] = useState(false);

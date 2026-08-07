@@ -271,9 +271,43 @@ function Landing() {
         </div>
       </section>
 
+      {/* نبذة + سياسة الاستخدام + بنود الخدمة */}
+      <section className="container mx-auto px-4 pb-10">
+        <div className="grid gap-4 md:grid-cols-3">
+          <article className="rounded-2xl border border-border bg-card p-5 shadow-card">
+            <h2 className="text-lg font-black text-gradient-gold">نبذة عن الموقع</h2>
+            <p className="mt-2 text-sm leading-7 text-foreground/85">
+              منصة متخصصة في إنتاج وتوليد حلقات أنمي أصلية بالكامل بجهودنا الخاصة، بدءاً من الفكرة والتحريك وحتى الإخراج
+              النهائي. نهدف لتقديم تجربة بصرية سينمائية فريدة للمشاهدين بجودة عالية تصل إلى 4K Ultra HD.
+            </p>
+          </article>
+
+          <article className="rounded-2xl border border-border bg-card p-5 shadow-card">
+            <h2 className="text-lg font-black text-gradient-gold">سياسة الاستخدام</h2>
+            <ul className="mt-2 space-y-2 text-sm leading-7 text-foreground/85">
+              <li><b>الملكية الفكرية:</b> جميع حلقات الأنمي والتصاميم والمحتوى المولد داخل المنصة إنتاج حصري ومملوك للموقع، وتُتاح للمشاهدة والاستخدام الشخصي فقط.</li>
+              <li><b>جودة العرض:</b> نضمن توفير المحتوى بأعلى دقة ممكنة (4K)، مع الاعتماد على اتصال المستخدم بالإنترنت لضمان سلاسة البث.</li>
+              <li><b>الاستخدام المقبول:</b> يُمنع منعاً باتاً تنزيل أو إعادة رفع أو استخدام أي جزء من الحلقات لأغراض تجارية أو إعادة توزيعها دون إذن كتابي مسبق.</li>
+              <li><b>حدود المسؤولية:</b> المحتوى المعروض مخصص لأغراض الترفيه والاستعراض الفني، والموقع غير مسؤول عن أي استخدام غير مصرح به للمحتوى خارج المنصة الرسمية.</li>
+            </ul>
+          </article>
+
+          <article className="rounded-2xl border border-border bg-card p-5 shadow-card">
+            <h2 className="text-lg font-black text-gradient-gold">بنود الخدمة</h2>
+            <ul className="mt-2 space-y-2 text-sm leading-7 text-foreground/85">
+              <li><b>قبول الشروط:</b> باستخدامك لموقعنا أو الوصول إلى محتوانا، فإنك تقر بموافقتك على كافة الشروط والبنود الواردة هنا.</li>
+              <li><b>حساب المستخدم:</b> في حال توفر ميزة إنشاء حساب، يقع على عاتق المستخدم مسؤولية الحفاظ على سرية بيانات دخوله، ولا نتحمل أي مسؤولية عن أي نشاط يتم عبر حسابه.</li>
+              <li><b>تعديل الخدمات والشروط:</b> نحتفظ بالحق الكامل في تعديل أو تعليق أو إيقاف أي جزء من الخدمة أو تحديث هذه البنود في أي وقت دون إشعار مسبق.</li>
+              <li><b>إنهاء الخدمة:</b> يحق لإدارة الموقع إيقاف أو حظر وصول أي مستخدم ينتهك سياسات الاستخدام أو يمارس سلوكاً يضر بالمنصة أو حقوقها.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
       <footer className="border-t border-border/50 py-8 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} منصة انمي فورج — جميع الحقوق محفوظة
       </footer>
+
     </div>
   );
 }

@@ -217,11 +217,11 @@ function BuyButton({ id, price, isOwner, onBought }: { id: string; price: number
       await buyFn({ data: { media_id: id } });
       toast.success("تم الشراء! جاري فتح المشغل...");
       onBought();
-      await navigate({ to: "/anime-market/$id", params: { id } });
+      await navigate({ to: "/watch/$id", params: { id } });
     } catch (e) {
       const msg = (e as Error).message;
       if (/auth|401|unauthor/i.test(msg)) { toast.error("سجّل دخولك أولاً"); void navigate({ to: "/login" }); }
-      else if (/already|مشترى|purchased/i.test(msg)) { await navigate({ to: "/anime-market/$id", params: { id } }); }
+      else if (/already|مشترى|purchased/i.test(msg)) { await navigate({ to: "/watch/$id", params: { id } }); }
       else toast.error(msg);
     } finally { setBusy(false); }
   };

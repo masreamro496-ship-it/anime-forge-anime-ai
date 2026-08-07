@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { submitStaffApplication } from "@/lib/staff.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { ArrowRight, Code2, Send, Percent } from "lucide-react";
+
 
 export const Route = createFileRoute("/apply-developer")({
   head: () => ({
@@ -29,30 +31,29 @@ function ApplyDeveloperPage() {
   const [info, setInfo] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const submitFn = useServerFn(submitStaffApplication);
+
   const submit = async () => {
     if (!user) { toast.error("سجّل دخولك أولاً"); void navigate({ to: "/login" }); return; }
     if (fullName.trim().length < 2) return toast.error("اكتب اسمك");
     if (info.trim().length < 10) return toast.error("اكتب كل معلوماتك وخبراتك");
     setSaving(true);
     try {
-      const { error } = await (supabase as unknown as {
-        from: (t: string) => { insert: (v: Record<string, unknown>) => Promise<{ error: { message: string } | null }> };
-      }).from("staff_applications").insert({
-        user_id: user.id,
+      await submitFn({ data: {
         kind: "developer",
         full_name: fullName.trim(),
         age: age ? Number(age) : null,
         phone: phone.trim() || null,
         skills: skills.trim() || null,
         info: info.trim(),
-      });
-      if (error) throw new Error(error.message);
-      toast.success("تم إرسال طلبك ✅ سيتم مراجعته قريباً");
+      } });
+      toast.success("تم إرسال طلبك ✅ وصلت رسالة للأدمن");
       setFullName(""); setAge(""); setPhone(""); setSkills(""); setInfo("");
     } catch (e) {
       toast.error((e as Error).message);
     } finally { setSaving(false); }
   };
+
 
   return (
     <div className="min-h-screen">

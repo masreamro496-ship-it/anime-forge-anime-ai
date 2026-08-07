@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { submitStaffApplication } from "@/lib/staff.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { ArrowRight, Code2, Send, Percent } from "lucide-react";
+
 
 export const Route = createFileRoute("/apply-developer")({
   head: () => ({

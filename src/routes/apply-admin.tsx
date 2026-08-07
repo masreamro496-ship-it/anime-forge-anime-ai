@@ -30,16 +30,15 @@ function ApplyAdminPage() {
   const [credits, setCredits] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const submitFn = useServerFn(submitStaffApplication);
+
   const submit = async () => {
     if (!user) { toast.error("سجّل دخولك أولاً"); void navigate({ to: "/login" }); return; }
     if (fullName.trim().length < 2) return toast.error("اكتب اسمك");
     if (info.trim().length < 10) return toast.error("اكتب المعلومات والمواصفات التي تقدمها");
     setSaving(true);
     try {
-      const { error } = await (supabase as unknown as {
-        from: (t: string) => { insert: (v: Record<string, unknown>) => Promise<{ error: { message: string } | null }> };
-      }).from("staff_applications").insert({
-        user_id: user.id,
+      await submitFn({ data: {
         kind: "admin",
         full_name: fullName.trim(),
         age: age ? Number(age) : null,
@@ -47,14 +46,14 @@ function ApplyAdminPage() {
         skills: skills.trim() || null,
         info: info.trim(),
         requested_credits: credits ? Number(credits) : null,
-      });
-      if (error) throw new Error(error.message);
-      toast.success("تم إرسال طلبك للإدارة ✅ سيتم مراجعته قريباً");
+      } });
+      toast.success("تم إرسال طلبك للإدارة ✅ وصلت رسالة للأدمن");
       setFullName(""); setAge(""); setPhone(""); setSkills(""); setInfo(""); setCredits("");
     } catch (e) {
       toast.error((e as Error).message);
     } finally { setSaving(false); }
   };
+
 
   return (
     <div className="min-h-screen">

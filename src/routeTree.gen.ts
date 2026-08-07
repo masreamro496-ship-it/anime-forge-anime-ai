@@ -27,6 +27,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorldCupIndexRouteImport } from './routes/world-cup.index'
 import { Route as WorldCupPlayRouteImport } from './routes/world-cup.play'
+import { Route as WatchIdRouteImport } from './routes/watch.$id'
 import { Route as ShortsUploadRouteImport } from './routes/shorts.upload'
 import { Route as ShortsIdRouteImport } from './routes/shorts.$id'
 import { Route as GenerateVideoRouteImport } from './routes/generate.video'
@@ -125,6 +126,11 @@ const WorldCupPlayRoute = WorldCupPlayRouteImport.update({
   path: '/world-cup/play',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WatchIdRoute = WatchIdRouteImport.update({
+  id: '/watch/$id',
+  path: '/watch/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShortsUploadRoute = ShortsUploadRouteImport.update({
   id: '/upload',
   path: '/upload',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
   '/shorts/upload': typeof ShortsUploadRoute
+  '/watch/$id': typeof WatchIdRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup/': typeof WorldCupIndexRoute
   '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
@@ -210,6 +217,7 @@ export interface FileRoutesByTo {
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
   '/shorts/upload': typeof ShortsUploadRoute
+  '/watch/$id': typeof WatchIdRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup': typeof WorldCupIndexRoute
   '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
   '/shorts/upload': typeof ShortsUploadRoute
+  '/watch/$id': typeof WatchIdRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup/': typeof WorldCupIndexRoute
   '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
@@ -267,6 +276,7 @@ export interface FileRouteTypes {
     | '/generate/video'
     | '/shorts/$id'
     | '/shorts/upload'
+    | '/watch/$id'
     | '/world-cup/play'
     | '/world-cup/'
     | '/api/public/credits/deduct'
@@ -294,6 +304,7 @@ export interface FileRouteTypes {
     | '/generate/video'
     | '/shorts/$id'
     | '/shorts/upload'
+    | '/watch/$id'
     | '/world-cup/play'
     | '/world-cup'
     | '/api/public/credits/deduct'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/generate/video'
     | '/shorts/$id'
     | '/shorts/upload'
+    | '/watch/$id'
     | '/world-cup/play'
     | '/world-cup/'
     | '/api/public/credits/deduct'
@@ -346,6 +358,7 @@ export interface RootRouteChildren {
   WatermarkRoute: typeof WatermarkRoute
   GenerateGokuRoute: typeof GenerateGokuRoute
   GenerateVideoRoute: typeof GenerateVideoRoute
+  WatchIdRoute: typeof WatchIdRoute
   WorldCupPlayRoute: typeof WorldCupPlayRoute
   WorldCupIndexRoute: typeof WorldCupIndexRoute
   ApiPublicCreditsDeductRoute: typeof ApiPublicCreditsDeductRoute
@@ -480,6 +493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorldCupPlayRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/watch/$id': {
+      id: '/watch/$id'
+      path: '/watch/$id'
+      fullPath: '/watch/$id'
+      preLoaderRoute: typeof WatchIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shorts/upload': {
       id: '/shorts/upload'
       path: '/upload'
@@ -576,6 +596,7 @@ const rootRouteChildren: RootRouteChildren = {
   WatermarkRoute: WatermarkRoute,
   GenerateGokuRoute: GenerateGokuRoute,
   GenerateVideoRoute: GenerateVideoRoute,
+  WatchIdRoute: WatchIdRoute,
   WorldCupPlayRoute: WorldCupPlayRoute,
   WorldCupIndexRoute: WorldCupIndexRoute,
   ApiPublicCreditsDeductRoute: ApiPublicCreditsDeductRoute,
@@ -584,13 +605,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

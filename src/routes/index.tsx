@@ -332,6 +332,14 @@ function Landing() {
       </section>
 
       <footer className="border-t border-border/50 py-8 text-center text-sm text-muted-foreground">
+        <div className="mb-3 flex items-center justify-center gap-2">
+          <Link to="/legal" hash="policy" className="rounded-full border border-border px-3 py-1 text-[11px] font-bold hover:text-foreground">
+            سياسة الاستخدام
+          </Link>
+          <Link to="/legal" hash="terms" className="rounded-full border border-border px-3 py-1 text-[11px] font-bold hover:text-foreground">
+            بنود الخدمة
+          </Link>
+        </div>
         © {new Date().getFullYear()} منصة انمي فورج — جميع الحقوق محفوظة
       </footer>
 

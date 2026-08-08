@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WheelRouteImport } from './routes/wheel'
 import { Route as WatermarkRouteImport } from './routes/watermark'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as SocialRouteImport } from './routes/social'
@@ -36,6 +37,11 @@ import { Route as AnimeMarketIdRouteImport } from './routes/anime-market.$id'
 import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/fatora/success'
 import { Route as ApiPublicCreditsDeductRouteImport } from './routes/api/public/credits/deduct'
 
+const WheelRoute = WheelRouteImport.update({
+  id: '/wheel',
+  path: '/wheel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WatermarkRoute = WatermarkRouteImport.update({
   id: '/watermark',
   path: '/watermark',
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
+  '/wheel': typeof WheelRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
+  '/wheel': typeof WheelRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
+  '/wheel': typeof WheelRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
     | '/social'
     | '/tasks'
     | '/watermark'
+    | '/wheel'
     | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
@@ -299,6 +309,7 @@ export interface FileRouteTypes {
     | '/social'
     | '/tasks'
     | '/watermark'
+    | '/wheel'
     | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/social'
     | '/tasks'
     | '/watermark'
+    | '/wheel'
     | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
@@ -356,6 +368,7 @@ export interface RootRouteChildren {
   SocialRoute: typeof SocialRoute
   TasksRoute: typeof TasksRoute
   WatermarkRoute: typeof WatermarkRoute
+  WheelRoute: typeof WheelRoute
   GenerateGokuRoute: typeof GenerateGokuRoute
   GenerateVideoRoute: typeof GenerateVideoRoute
   WatchIdRoute: typeof WatchIdRoute
@@ -367,6 +380,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wheel': {
+      id: '/wheel'
+      path: '/wheel'
+      fullPath: '/wheel'
+      preLoaderRoute: typeof WheelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/watermark': {
       id: '/watermark'
       path: '/watermark'
@@ -594,6 +614,7 @@ const rootRouteChildren: RootRouteChildren = {
   SocialRoute: SocialRoute,
   TasksRoute: TasksRoute,
   WatermarkRoute: WatermarkRoute,
+  WheelRoute: WheelRoute,
   GenerateGokuRoute: GenerateGokuRoute,
   GenerateVideoRoute: GenerateVideoRoute,
   WatchIdRoute: WatchIdRoute,

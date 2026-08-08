@@ -171,6 +171,33 @@ function Landing() {
             </p>
           </Link>
 
+          {/* رسم وأنميشن 2D */}
+          <a
+            href="https://speed-ink-dream.lovable.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative overflow-hidden rounded-2xl border-2 border-pink-500/70 bg-gradient-to-br from-pink-500/20 to-rose-500/10 p-5 transition-transform hover:scale-[1.01]"
+          >
+            <span className="text-3xl">🎨</span>
+            <h3 className="mt-3 text-lg font-black text-pink-400">ارسم بسهولة وأنميشن 2D</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              ارسم بسهولة وأنميشن 2D مع أنمي فورج · وخلفيات أنمي رهيبة
+            </p>
+          </a>
+
+          {/* عجلة الحظ */}
+          <Link
+            to="/wheel"
+            className="group relative overflow-hidden rounded-2xl border-2 border-amber-400/80 bg-gradient-to-br from-amber-400/20 to-yellow-500/10 p-5 transition-transform hover:scale-[1.01]"
+          >
+            <span className="absolute right-3 top-3 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-black text-black">أسبوعي</span>
+            <span className="text-3xl">🎡</span>
+            <h3 className="mt-3 text-lg font-black text-amber-400">عجلة الحظ</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              لفّة واحدة كل أسبوع · اربح 25 / 50 / 100 كريدت أو كرت فكة بـ 5 جنيه
+            </p>
+          </Link>
+
           {/* 🔥 زر الترقية والاشتراكات الجديد باللونين الأحمر والذهبي 🔥 */}
           <div className="md:col-span-2">
             <Link
@@ -305,6 +332,14 @@ function Landing() {
       </section>
 
       <footer className="border-t border-border/50 py-8 text-center text-sm text-muted-foreground">
+        <div className="mb-3 flex items-center justify-center gap-2">
+          <Link to="/legal" hash="policy" className="rounded-full border border-border px-3 py-1 text-[11px] font-bold hover:text-foreground">
+            سياسة الاستخدام
+          </Link>
+          <Link to="/legal" hash="terms" className="rounded-full border border-border px-3 py-1 text-[11px] font-bold hover:text-foreground">
+            بنود الخدمة
+          </Link>
+        </div>
         © {new Date().getFullYear()} منصة انمي فورج — جميع الحقوق محفوظة
       </footer>
 

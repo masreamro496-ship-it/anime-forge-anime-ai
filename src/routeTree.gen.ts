@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WheelRouteImport } from './routes/wheel'
 import { Route as WatermarkRouteImport } from './routes/watermark'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as SocialRouteImport } from './routes/social'
@@ -16,6 +17,7 @@ import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LegalRouteImport } from './routes/legal'
 import { Route as FreeShortsRouteImport } from './routes/free-shorts'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ChatRouteImport } from './routes/chat'
@@ -36,6 +38,11 @@ import { Route as AnimeMarketIdRouteImport } from './routes/anime-market.$id'
 import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/fatora/success'
 import { Route as ApiPublicCreditsDeductRouteImport } from './routes/api/public/credits/deduct'
 
+const WheelRoute = WheelRouteImport.update({
+  id: '/wheel',
+  path: '/wheel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WatermarkRoute = WatermarkRouteImport.update({
   id: '/watermark',
   path: '/watermark',
@@ -69,6 +76,11 @@ const ProUpgradeRoute = ProUpgradeRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FreeShortsRoute = FreeShortsRouteImport.update({
@@ -177,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/free-shorts': typeof FreeShortsRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
@@ -184,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
+  '/wheel': typeof WheelRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
@@ -205,6 +219,7 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/free-shorts': typeof FreeShortsRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
@@ -212,6 +227,7 @@ export interface FileRoutesByTo {
   '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
+  '/wheel': typeof WheelRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
@@ -234,6 +250,7 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/free-shorts': typeof FreeShortsRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
@@ -241,6 +258,7 @@ export interface FileRoutesById {
   '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
   '/watermark': typeof WatermarkRoute
+  '/wheel': typeof WheelRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
@@ -264,6 +282,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/dashboard'
     | '/free-shorts'
+    | '/legal'
     | '/login'
     | '/pro-upgrade'
     | '/profile'
@@ -271,6 +290,7 @@ export interface FileRouteTypes {
     | '/social'
     | '/tasks'
     | '/watermark'
+    | '/wheel'
     | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
@@ -292,6 +312,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/dashboard'
     | '/free-shorts'
+    | '/legal'
     | '/login'
     | '/pro-upgrade'
     | '/profile'
@@ -299,6 +320,7 @@ export interface FileRouteTypes {
     | '/social'
     | '/tasks'
     | '/watermark'
+    | '/wheel'
     | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
@@ -320,6 +342,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/dashboard'
     | '/free-shorts'
+    | '/legal'
     | '/login'
     | '/pro-upgrade'
     | '/profile'
@@ -327,6 +350,7 @@ export interface FileRouteTypes {
     | '/social'
     | '/tasks'
     | '/watermark'
+    | '/wheel'
     | '/anime-market/$id'
     | '/generate/goku'
     | '/generate/video'
@@ -349,6 +373,7 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   DashboardRoute: typeof DashboardRoute
   FreeShortsRoute: typeof FreeShortsRoute
+  LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
   ProUpgradeRoute: typeof ProUpgradeRoute
   ProfileRoute: typeof ProfileRoute
@@ -356,6 +381,7 @@ export interface RootRouteChildren {
   SocialRoute: typeof SocialRoute
   TasksRoute: typeof TasksRoute
   WatermarkRoute: typeof WatermarkRoute
+  WheelRoute: typeof WheelRoute
   GenerateGokuRoute: typeof GenerateGokuRoute
   GenerateVideoRoute: typeof GenerateVideoRoute
   WatchIdRoute: typeof WatchIdRoute
@@ -367,6 +393,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wheel': {
+      id: '/wheel'
+      path: '/wheel'
+      fullPath: '/wheel'
+      preLoaderRoute: typeof WheelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/watermark': {
       id: '/watermark'
       path: '/watermark'
@@ -414,6 +447,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/free-shorts': {
@@ -587,6 +627,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   DashboardRoute: DashboardRoute,
   FreeShortsRoute: FreeShortsRoute,
+  LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
   ProUpgradeRoute: ProUpgradeRoute,
   ProfileRoute: ProfileRoute,
@@ -594,6 +635,7 @@ const rootRouteChildren: RootRouteChildren = {
   SocialRoute: SocialRoute,
   TasksRoute: TasksRoute,
   WatermarkRoute: WatermarkRoute,
+  WheelRoute: WheelRoute,
   GenerateGokuRoute: GenerateGokuRoute,
   GenerateVideoRoute: GenerateVideoRoute,
   WatchIdRoute: WatchIdRoute,

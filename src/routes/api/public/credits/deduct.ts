@@ -19,7 +19,7 @@ const BodySchema = z
     email: z.string().email().optional(),
     userId: z.string().uuid().optional(),
     amount: z.number().positive().max(100000),
-    source: z.string().min(1).max(60),
+    source: z.string().min(1).max(60).optional(),
     action: z.string().max(60).optional(),
     sourceSite: z.string().max(60).optional(),
     reason: z.string().max(200).optional(),

@@ -429,6 +429,41 @@ export type Database = {
         }
         Relationships: []
       }
+      media_servers: {
+        Row: {
+          created_at: string
+          embed_url: string
+          id: string
+          media_id: string
+          quality: number
+          server_no: number
+        }
+        Insert: {
+          created_at?: string
+          embed_url: string
+          id?: string
+          media_id: string
+          quality: number
+          server_no: number
+        }
+        Update: {
+          created_at?: string
+          embed_url?: string
+          id?: string
+          media_id?: string
+          quality?: number
+          server_no?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_servers_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "anime_media"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string
@@ -1058,6 +1093,65 @@ export type Database = {
         }
         Relationships: []
       }
+      wheel_claims: {
+        Row: {
+          created_at: string
+          id: string
+          phone: string
+          spin_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          phone: string
+          spin_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          phone?: string
+          spin_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wheel_claims_spin_id_fkey"
+            columns: ["spin_id"]
+            isOneToOne: false
+            referencedRelation: "wheel_spins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wheel_spins: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          prize_kind: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          prize_kind: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          prize_kind?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       shorts_public: {
@@ -1132,12 +1226,22 @@ export type Database = {
         }
         Returns: Json
       }
+      api_deduct_credits_by_user: {
+        Args: {
+          _amount: number
+          _reason?: string
+          _source: string
+          _user_id: string
+        }
+        Returns: Json
+      }
       approve_purchase: { Args: { _purchase_id: string }; Returns: undefined }
       can_view_project_video: {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
       claim_daily_gift: { Args: never; Returns: number }
+      convert_cash_card: { Args: { _spin_id: string }; Returns: number }
       create_free_short: {
         Args: {
           _description: string
@@ -1190,6 +1294,7 @@ export type Database = {
         }
         Returns: string
       }
+      spin_wheel: { Args: never; Returns: Json }
       submit_novita_video: {
         Args: {
           _admin_notes: string

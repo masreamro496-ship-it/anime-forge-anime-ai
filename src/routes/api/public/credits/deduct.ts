@@ -14,12 +14,17 @@ import { z } from "zod";
  *  404 { ok: false, error: "user_not_found" }
  */
 
-const BodySchema = z.object({
-  email: z.string().email(),
-  amount: z.number().positive().max(100000),
-  source: z.string().min(1).max(60),
-  reason: z.string().max(200).optional(),
-});
+const BodySchema = z
+  .object({
+    email: z.string().email().optional(),
+    userId: z.string().uuid().optional(),
+    amount: z.number().positive().max(100000),
+    source: z.string().min(1).max(60),
+    action: z.string().max(60).optional(),
+    sourceSite: z.string().max(60).optional(),
+    reason: z.string().max(200).optional(),
+  })
+  .refine((v) => !!(v.email || v.userId), { message: "email_or_userId_required" });
 
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), {

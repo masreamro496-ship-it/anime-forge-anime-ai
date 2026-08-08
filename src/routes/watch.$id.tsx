@@ -92,6 +92,21 @@ function WatchPage() {
     },
   });
 
+  // روابط السيرفرات الخارجية (Embed) من قاعدة البيانات
+  const servers = useQuery({
+    queryKey: ["media_servers", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("media_servers")
+        .select("server_no, quality, embed_url")
+        .eq("media_id", id);
+      if (error) throw error;
+      return (data ?? []) as { server_no: number; quality: number; embed_url: string }[];
+    },
+  });
+
+  const embed = servers.data?.find((s) => s.server_no === server && s.quality === quality)?.embed_url;
+
   const m = media.data;
   const src = videoUrl.data;
 

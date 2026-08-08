@@ -129,7 +129,19 @@ function WatchPage() {
           <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-gold" /></div>
         ) : (
           <>
-            {videoUrl.isFetching && !src ? (
+            {embed && src ? (
+              <div className="aspect-video w-full overflow-hidden rounded-2xl bg-black shadow-2xl ring-1 ring-white/10">
+                <iframe
+                  key={`${server}-${quality}`}
+                  src={embed}
+                  title={`${m.title} — سيرفر ${server} · ${quality}p`}
+                  className="h-full w-full"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+            ) : videoUrl.isFetching && !src ? (
               <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-black">
                 <Loader2 className="h-8 w-8 animate-spin text-gold" />
               </div>

@@ -17,6 +17,7 @@ import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LegalRouteImport } from './routes/legal'
 import { Route as FreeShortsRouteImport } from './routes/free-shorts'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ChatRouteImport } from './routes/chat'
@@ -75,6 +76,11 @@ const ProUpgradeRoute = ProUpgradeRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FreeShortsRoute = FreeShortsRouteImport.update({
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/free-shorts': typeof FreeShortsRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/free-shorts': typeof FreeShortsRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
@@ -242,6 +250,7 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/free-shorts': typeof FreeShortsRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/dashboard'
     | '/free-shorts'
+    | '/legal'
     | '/login'
     | '/pro-upgrade'
     | '/profile'
@@ -302,6 +312,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/dashboard'
     | '/free-shorts'
+    | '/legal'
     | '/login'
     | '/pro-upgrade'
     | '/profile'
@@ -331,6 +342,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/dashboard'
     | '/free-shorts'
+    | '/legal'
     | '/login'
     | '/pro-upgrade'
     | '/profile'
@@ -361,6 +373,7 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   DashboardRoute: typeof DashboardRoute
   FreeShortsRoute: typeof FreeShortsRoute
+  LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
   ProUpgradeRoute: typeof ProUpgradeRoute
   ProfileRoute: typeof ProfileRoute
@@ -434,6 +447,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/free-shorts': {
@@ -607,6 +627,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   DashboardRoute: DashboardRoute,
   FreeShortsRoute: FreeShortsRoute,
+  LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
   ProUpgradeRoute: ProUpgradeRoute,
   ProfileRoute: ProfileRoute,

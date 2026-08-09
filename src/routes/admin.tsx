@@ -77,6 +77,94 @@ function AdminPanel() {
   );
 }
 
+type WheelPurchaseRow = {
+  id: string;
+  user_id: string;
+  op_number: string;
+  receipt_path: string | null;
+  amount_egp: number;
+  spins: number;
+  status: string;
+  created_at: string;
+};
+
+function WheelPurchasesPanel() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "wheel_purchases"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as unknown as {
+        from: (t: string) => {
+          select: (c: string) => { order: (k: string, o: { ascending: boolean }) => Promise<{ data: WheelPurchaseRow[] | null; error: { message: string } | null }> };
+        };
+      })
+        .from("wheel_purchases")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
+
+  const review = async (id: string, approve: boolean) => {
+    const { error } = await supabase.rpc("approve_wheel_purchase" as never, { _id: id, _approve: approve } as never);
+    if (error) return toast.error(error.message);
+    toast.success(approve ? "تمت الموافقة وإضافة اللفّات ✅" : "تم الرفض");
+    qc.invalidateQueries({ queryKey: ["admin", "wheel_purchases"] });
+  };
+
+  const openReceipt = async (path: string) => {
+    try {
+      const url = await signedUrl("receipts", path, 3600);
+      window.open(url, "_blank", "noopener");
+    } catch {
+      toast.error("تعذّر فتح الإيصال");
+    }
+  };
+
+  if (isLoading) return <p className="text-muted-foreground">جاري التحميل...</p>;
+  if (!data?.length) return <p className="text-muted-foreground">لا توجد طلبات شراء لفّات حالياً.</p>;
+
+  return (
+    <div className="grid gap-3">
+      {data.map((p) => (
+        <div key={p.id} className="rounded-xl border border-border bg-card p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+            <div>
+              <p className="font-black">رقم العملية: {p.op_number}</p>
+              <p className="text-xs text-muted-foreground">
+                المستخدم: {p.user_id} · {p.amount_egp} جنيه · {p.spins} لفّة · {new Date(p.created_at).toLocaleString("ar-EG")}
+              </p>
+            </div>
+            <span className={`rounded-full px-2 py-0.5 text-[11px] font-black ${p.status === "approved" ? "bg-emerald-500/20 text-emerald-400" : p.status === "rejected" ? "bg-red-500/20 text-red-400" : "bg-yellow-500/20 text-yellow-400"}`}>
+              {p.status === "approved" ? "مقبول" : p.status === "rejected" ? "مرفوض" : "قيد المراجعة"}
+            </span>
+          </div>
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            {p.receipt_path && (
+              <button onClick={() => void openReceipt(p.receipt_path!)} className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-bold">
+                <ExternalLink className="h-3.5 w-3.5" /> عرض الإيصال
+              </button>
+            )}
+            {p.status === "pending" && (
+              <>
+                <button onClick={() => void review(p.id, true)} className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-black text-white">
+                  <Check className="h-3.5 w-3.5" /> موافقة (+{p.spins} لفّة)
+                </button>
+                <button onClick={() => void review(p.id, false)} className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-black text-white">
+                  <X className="h-3.5 w-3.5" /> رفض
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
 function DonationsAdminView() {
   const [donations, setDonations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

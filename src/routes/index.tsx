@@ -263,21 +263,25 @@ function Landing() {
             صنع شخصيات وأنميشن — مجاني بالكامل
           </a>
 
-          <div className="rounded-2xl border-2 border-sky-500/60 bg-gradient-to-br from-sky-500/15 to-indigo-500/10 p-4">
+          <a
+            href="https://anime-forge-boxes-leguce.lovable.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block rounded-2xl border-2 border-sky-500/60 bg-gradient-to-br from-sky-500/15 to-indigo-500/10 p-4 transition-transform hover:scale-[1.01]"
+          >
             <div className="flex items-center gap-2 text-sky-300 font-black text-base mb-3">
               <Smartphone className="h-5 w-5" />
-              اللعبة ستنزل على تلفونك قريباً
+              نزلت لعبة انمي فورج وتحقيقات انمية وكأس العالم
             </div>
             <img
               src={gameComingSoon}
-              alt="معاينة محرّر اللعبة — قطع وتصميمات"
+              alt="لعبة انمي فورج — تحقيقات أنمية وكأس العالم"
               className="w-full rounded-xl border border-sky-500/30"
               loading="lazy"
             />
-            <p className="mt-2 text-xs text-muted-foreground">
-              محرّر ثلاثي الأبعاد كامل · قطع وتصميمات جاهزة · نسخة تلفون قريباً
-            </p>
-          </div>
+            <p className="mt-2 text-xs text-muted-foreground">تعب لمدة شهرين</p>
+          </a>
+
         </div>
       </section>
 

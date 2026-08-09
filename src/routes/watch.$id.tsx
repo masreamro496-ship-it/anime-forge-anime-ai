@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { AnimeVideoPlayer } from "@/components/AnimeVideoPlayer";
@@ -105,7 +105,20 @@ function WatchPage() {
     },
   });
 
+  // اختيار سيرفر عشوائي متاح تلقائياً عند فتح الصفحة
+  const [autoPicked, setAutoPicked] = useState(false);
+  useEffect(() => {
+    if (autoPicked || !servers.data?.length) return;
+    const pool = servers.data.filter((s) => s.quality === quality);
+    const list = pool.length ? pool : servers.data;
+    const pick = list[Math.floor(Math.random() * list.length)]!;
+    setServer(pick.server_no);
+    setQuality(pick.quality);
+    setAutoPicked(true);
+  }, [servers.data, autoPicked, quality]);
+
   const embed = servers.data?.find((s) => s.server_no === server && s.quality === quality)?.embed_url;
+
 
   const m = media.data;
   const src = videoUrl.data;

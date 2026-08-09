@@ -1128,6 +1128,69 @@ export type Database = {
           },
         ]
       }
+      wheel_extra_spins: {
+        Row: {
+          created_at: string
+          spins: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          spins?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          spins?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wheel_purchases: {
+        Row: {
+          amount_egp: number
+          created_at: string
+          id: string
+          op_number: string
+          receipt_path: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          spins: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_egp?: number
+          created_at?: string
+          id?: string
+          op_number: string
+          receipt_path?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          spins?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_egp?: number
+          created_at?: string
+          id?: string
+          op_number?: string
+          receipt_path?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          spins?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       wheel_spins: {
         Row: {
           amount: number
@@ -1236,6 +1299,10 @@ export type Database = {
         Returns: Json
       }
       approve_purchase: { Args: { _purchase_id: string }; Returns: undefined }
+      approve_wheel_purchase: {
+        Args: { _approve?: boolean; _id: string }
+        Returns: undefined
+      }
       can_view_project_video: {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean

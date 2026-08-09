@@ -129,12 +129,15 @@ function WorldCupPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             لاعب ضد لاعب Real-time — تسديد وتصدي بشخصيات مختلفة. جماهير، هدف "GOOOOL"، ومؤقت 20 دقيقة.
           </p>
-          <Link
-            to="/world-cup/play"
+          <a
+            href="https://anime-forge-boxes-leguce.lovable.app/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-4 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-3 text-sm font-black text-white shadow-lg hover:scale-105 transition-transform"
           >
             <Users className="h-4 w-4" /> ابدأ اللعب الآن
-          </Link>
+          </a>
+
         </div>
 
         <Link

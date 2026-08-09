@@ -6,8 +6,47 @@ import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
 import gameComingSoon from "@/assets/game-coming-soon.jpg";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "انمي فورج | Anime Forge — أنمي، شورتس، ألعاب وأدوات AI" },
+      {
+        name: "description",
+        content:
+          "انمي فورج (Anime Forge): منصة أنمي عربية لتوليد وصناعة الأنمي بالذكاء الاصطناعي، نشر ومشاهدة حلقات وأفلام أنمي، شورتس، دبلجة، ألعاب كأس العالم، ودردشة مباشرة.",
+      },
+      { name: "keywords", content: "انمي فورج, Anime Forge, انمي, أنمي بالذكاء الاصطناعي, مشاهدة انمي, شورتس, دبلجة انمي, كأس العالم" },
+      { property: "og:site_name", content: "انمي فورج — Anime Forge" },
+      { property: "og:title", content: "انمي فورج | Anime Forge — منصة الأنمي والذكاء الاصطناعي" },
+      { property: "og:description", content: "أنمي، شورتس، دبلجة، ألعاب وأدوات ذكاء اصطناعي في مكان واحد على انمي فورج." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://anime-forge-anime-ai.lovable.app" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "انمي فورج | Anime Forge" },
+      { name: "twitter:description", content: "منصة الأنمي العربية: توليد أنمي بالـ AI، حلقات، أفلام، شورتس وألعاب." },
+    ],
+    links: [{ rel: "canonical", href: "https://anime-forge-anime-ai.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "انمي فورج — Anime Forge",
+          alternateName: ["Anime Forge", "انمي فورج"],
+          url: "https://anime-forge-anime-ai.lovable.app/",
+          inLanguage: "ar",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://anime-forge-anime-ai.lovable.app/anime-market?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }),
+      },
+    ],
+  }),
   component: Landing,
 });
+
 
 function Landing() {
   const { user } = useAuth();
@@ -263,21 +302,25 @@ function Landing() {
             صنع شخصيات وأنميشن — مجاني بالكامل
           </a>
 
-          <div className="rounded-2xl border-2 border-sky-500/60 bg-gradient-to-br from-sky-500/15 to-indigo-500/10 p-4">
+          <a
+            href="https://anime-forge-boxes-leguce.lovable.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block rounded-2xl border-2 border-sky-500/60 bg-gradient-to-br from-sky-500/15 to-indigo-500/10 p-4 transition-transform hover:scale-[1.01]"
+          >
             <div className="flex items-center gap-2 text-sky-300 font-black text-base mb-3">
               <Smartphone className="h-5 w-5" />
-              اللعبة ستنزل على تلفونك قريباً
+              نزلت لعبة انمي فورج وتحقيقات انمية وكأس العالم
             </div>
             <img
               src={gameComingSoon}
-              alt="معاينة محرّر اللعبة — قطع وتصميمات"
+              alt="لعبة انمي فورج — تحقيقات أنمية وكأس العالم"
               className="w-full rounded-xl border border-sky-500/30"
               loading="lazy"
             />
-            <p className="mt-2 text-xs text-muted-foreground">
-              محرّر ثلاثي الأبعاد كامل · قطع وتصميمات جاهزة · نسخة تلفون قريباً
-            </p>
-          </div>
+            <p className="mt-2 text-xs text-muted-foreground">تعب لمدة شهرين</p>
+          </a>
+
         </div>
       </section>
 

@@ -46,6 +46,8 @@ function AdminPanel() {
             { k: "mods", label: "المشرفون" },
             { k: "tasks", label: "🎯 طلبات المهمات" },
             { k: "donations", label: "التبرعات ❤️" },
+            { k: "wheel", label: "🎡 شاري عجلات الحظ" },
+
           ].map((t) => (
             <button
               key={t.k}

@@ -6,8 +6,47 @@ import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
 import gameComingSoon from "@/assets/game-coming-soon.jpg";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "انمي فورج | Anime Forge — أنمي، شورتس، ألعاب وأدوات AI" },
+      {
+        name: "description",
+        content:
+          "انمي فورج (Anime Forge): منصة أنمي عربية لتوليد وصناعة الأنمي بالذكاء الاصطناعي، نشر ومشاهدة حلقات وأفلام أنمي، شورتس، دبلجة، ألعاب كأس العالم، ودردشة مباشرة.",
+      },
+      { name: "keywords", content: "انمي فورج, Anime Forge, انمي, أنمي بالذكاء الاصطناعي, مشاهدة انمي, شورتس, دبلجة انمي, كأس العالم" },
+      { property: "og:site_name", content: "انمي فورج — Anime Forge" },
+      { property: "og:title", content: "انمي فورج | Anime Forge — منصة الأنمي والذكاء الاصطناعي" },
+      { property: "og:description", content: "أنمي، شورتس، دبلجة، ألعاب وأدوات ذكاء اصطناعي في مكان واحد على انمي فورج." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://anime-forge-anime-ai.lovable.app" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "انمي فورج | Anime Forge" },
+      { name: "twitter:description", content: "منصة الأنمي العربية: توليد أنمي بالـ AI، حلقات، أفلام، شورتس وألعاب." },
+    ],
+    links: [{ rel: "canonical", href: "https://anime-forge-anime-ai.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "انمي فورج — Anime Forge",
+          alternateName: ["Anime Forge", "انمي فورج"],
+          url: "https://anime-forge-anime-ai.lovable.app/",
+          inLanguage: "ar",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://anime-forge-anime-ai.lovable.app/anime-market?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }),
+      },
+    ],
+  }),
   component: Landing,
 });
+
 
 function Landing() {
   const { user } = useAuth();

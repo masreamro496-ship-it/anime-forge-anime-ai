@@ -70,6 +70,8 @@ function AdminPanel() {
         {tab === "mods" && <ModeratorsPanel />}
         {tab === "tasks" && <TaskSubmissionsAdminView />}
         {tab === "donations" && <DonationsAdminView />}
+        {tab === "wheel" && <WheelPurchasesPanel />}
+
       </main>
     </div>
   );

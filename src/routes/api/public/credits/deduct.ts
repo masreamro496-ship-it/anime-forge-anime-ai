@@ -42,17 +42,28 @@ export const Route = createFileRoute("/api/public/credits/deduct")({
     handlers: {
       OPTIONS: async () => json({ ok: true }),
       POST: async ({ request }) => {
-        const keys = [process.env["CREDITS_API_KEY"], process.env["EXTERNAL_CREDITS_KEY"]].filter(
-          (k): k is string => !!k,
-        );
-        const provided =
+        const url = new URL(request.url);
+        const keys = [
+          process.env["CREDITS_API_KEY"],
+          process.env["EXTERNAL_CREDITS_KEY"],
+          process.env["ANIME_FORGE_API_KEY"],
+        ]
+          .filter((k): k is string => !!k)
+          .map((k) => k.trim());
+
+        const provided = (
           request.headers.get("x-api-key") ??
+          request.headers.get("apikey") ??
+          request.headers.get("x-credits-key") ??
           request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
-          "";
+          url.searchParams.get("key") ??
+          ""
+        ).trim();
 
         if (keys.length === 0 || !keys.includes(provided)) {
-          return json({ ok: false, error: "unauthorized" }, 401);
+          return json({ ok: false, success: false, error: "unauthorized", message: "مفتاح API غير صحيح" }, 401);
         }
+
 
         let raw: unknown;
         try {

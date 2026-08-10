@@ -141,33 +141,34 @@ function Landing() {
             <p className="mt-1 text-sm text-muted-foreground">معالجة متقدمة عبر Cloudinary · 15 كريديت · النتيجة خاصة بك فقط</p>
           </Link>
 
-          <a href="https://anime-forge-ai-coder.lovable.app/login" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#3b82f6", background: "linear-gradient(135deg, rgba(59,130,246,0.25), transparent)" }}>
+          <PaidFeatureGate featureKey="ai_chat" href="https://anime-forge-ai-coder.lovable.app/login" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#3b82f6", background: "linear-gradient(135deg, rgba(59,130,246,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-black text-white">New</span>
             <Rocket className="h-10 w-10" style={{ color: "#3b82f6" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#3b82f6" }}>شات برمجي</h3>
-            <p className="mt-1 text-sm text-muted-foreground">منصّة برمجة كاملة · افتح المحرّر في تبويب جديد</p>
-          </a>
+            <p className="mt-1 text-sm text-muted-foreground">ادفع 25 كريدت للدخول والتجربة لمدة ساعتين فقط</p>
+          </PaidFeatureGate>
 
-          <a href="https://anime-key-forge.lovable.app/" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#a855f7", background: "linear-gradient(135deg, rgba(168,85,247,0.25), transparent)" }}>
+          <PaidFeatureGate featureKey="keys" href="https://anime-key-forge.lovable.app/" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#a855f7", background: "linear-gradient(135deg, rgba(168,85,247,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#a855f7" }}>جديد</span>
             <Sparkles className="h-10 w-10" style={{ color: "#a855f7" }} />
-            <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>إنشاء مفتاح</h3>
-            <p className="mt-1 text-sm text-muted-foreground">منصّة Anime Key Forge لتوليد المفاتيح</p>
-          </a>
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>إنشاء مفاتيح</h3>
+            <p className="mt-1 text-sm text-muted-foreground">ادفع 5 كريدت كل يوم لتجربته · وبعد انتهاء اليوم ادفع مرة أخرى</p>
+          </PaidFeatureGate>
 
-          <a href="https://anime-forge-4k-art.lovable.app/" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#f97316", background: "linear-gradient(135deg, rgba(249,115,22,0.25), transparent)" }}>
+          <PaidFeatureGate featureKey="art4k" href="https://anime-forge-4k-art.lovable.app/" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#f97316", background: "linear-gradient(135deg, rgba(249,115,22,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#f97316" }}>جديد</span>
             <Wand2 className="h-10 w-10" style={{ color: "#f97316" }} />
-            <h3 className="mt-3 text-lg font-black" style={{ color: "#f97316" }}>توليد جودة أنمي صورية خيالية</h3>
-            <p className="mt-1 text-sm text-muted-foreground">صور أنمي بجودة 4K · افتح المولّد في تبويب جديد</p>
-          </a>
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#f97316" }}>توليد جودة أنمي صورية خيالية 4K</h3>
+            <p className="mt-1 text-sm text-muted-foreground">ادفع 50 كريدت كل 5 ساعات لتجربته</p>
+          </PaidFeatureGate>
 
-          <a href="https://anime-forge-dummling.lovable.app/" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#22c55e", background: "linear-gradient(135deg, rgba(34,197,94,0.25), transparent)" }}>
+          <PaidFeatureGate featureKey="dubbing" href="https://anime-forge-dummling.lovable.app/" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#22c55e", background: "linear-gradient(135deg, rgba(34,197,94,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#22c55e" }}>جديد</span>
             <Film className="h-10 w-10" style={{ color: "#22c55e" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#22c55e" }}>دبلجة فيديوهات</h3>
-            <p className="mt-1 text-sm text-muted-foreground">دبلجة فيديو من لغة انجليزية للغة العربية أو دبلجة من لغة صينية أو يبانية للعربية</p>
-          </a>
+            <p className="mt-1 text-sm text-muted-foreground">دبلجة من الإنجليزية أو الصينية أو اليابانية للعربية · ادفع 25 كريدت للدخول لمدة 3 ساعات فقط</p>
+          </PaidFeatureGate>
+
 
           <Link to="/anime-market" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#ec4899", background: "linear-gradient(135deg, rgba(236,72,153,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#ec4899" }}>جديد</span>

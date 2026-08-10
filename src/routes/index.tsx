@@ -241,7 +241,7 @@ function Landing() {
           </Link>
 
           {/* 🔥 زر الترقية والاشتراكات الجديد باللونين الأحمر والذهبي 🔥 */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 space-y-3">
             <Link
               to="/pro-upgrade"
               className="flex items-center justify-center gap-3 w-full rounded-2xl bg-gradient-to-r from-red-600 via-amber-500 to-yellow-500 p-5 text-xl font-black text-white shadow-xl hover:brightness-110 hover:scale-[1.01] transition-all duration-300 border border-yellow-400/50"
@@ -250,7 +250,15 @@ function Landing() {
               <span>ترقية والاشتراكات 👑</span>
               <Sparkles className="h-6 w-6 text-yellow-200" />
             </Link>
+
+            <Link
+              to="/domains"
+              className="flex items-center justify-center gap-3 w-full rounded-2xl border-2 border-sky-400/60 bg-gradient-to-r from-sky-600 to-indigo-600 p-4 text-lg font-black text-white shadow-lg hover:brightness-110 hover:scale-[1.01] transition-all"
+            >
+              🌐 <span>دومينات مستقلة — 1000 كريدت للسنة الأولى</span>
+            </Link>
           </div>
+
 
           {/* أزرار التبرع ودعم المنصة */}
           <div className="text-center my-8 md:col-span-2 flex flex-col items-center gap-4">

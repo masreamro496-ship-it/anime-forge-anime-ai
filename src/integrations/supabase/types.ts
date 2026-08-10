@@ -369,6 +369,63 @@ export type Database = {
         }
         Relationships: []
       }
+      domain_requests: {
+        Row: {
+          created_at: string
+          credits_paid: number
+          domain_name: string
+          id: string
+          status: string
+          target_url: string
+          user_id: string
+          year_no: number
+        }
+        Insert: {
+          created_at?: string
+          credits_paid: number
+          domain_name: string
+          id?: string
+          status?: string
+          target_url: string
+          user_id: string
+          year_no: number
+        }
+        Update: {
+          created_at?: string
+          credits_paid?: number
+          domain_name?: string
+          id?: string
+          status?: string
+          target_url?: string
+          user_id?: string
+          year_no?: number
+        }
+        Relationships: []
+      }
+      feature_passes: {
+        Row: {
+          created_at: string
+          expires_at: string
+          feature_key: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          feature_key: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          feature_key?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       generation_requests: {
         Row: {
           admin_notes: string | null
@@ -1351,6 +1408,10 @@ export type Database = {
       purchase_anime_media: { Args: { _media_id: string }; Returns: string }
       purchase_audio_download: { Args: { _clip_id: string }; Returns: string }
       purge_expired_chat: { Args: never; Returns: undefined }
+      request_domain: {
+        Args: { _domain: string; _url: string; _year: number }
+        Returns: Json
+      }
       request_purchase: { Args: { _project_id: string }; Returns: string }
       spend_chat_credits: { Args: never; Returns: undefined }
       spend_watermark_credits: {
@@ -1374,6 +1435,7 @@ export type Database = {
         }
         Returns: string
       }
+      unlock_feature: { Args: { _key: string }; Returns: Json }
       wc_finish_match: {
         Args: {
           _players: Json

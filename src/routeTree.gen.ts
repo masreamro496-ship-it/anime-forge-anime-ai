@@ -19,6 +19,7 @@ import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LegalRouteImport } from './routes/legal'
 import { Route as FreeShortsRouteImport } from './routes/free-shorts'
+import { Route as DomainsRouteImport } from './routes/domains'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AudioRouteImport } from './routes/audio'
@@ -86,6 +87,11 @@ const LegalRoute = LegalRouteImport.update({
 const FreeShortsRoute = FreeShortsRouteImport.update({
   id: '/free-shorts',
   path: '/free-shorts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DomainsRoute = DomainsRouteImport.update({
+  id: '/domains',
+  path: '/domains',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
+  '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
+  '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
@@ -249,6 +257,7 @@ export interface FileRoutesById {
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
+  '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/audio'
     | '/chat'
     | '/dashboard'
+    | '/domains'
     | '/free-shorts'
     | '/legal'
     | '/login'
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/audio'
     | '/chat'
     | '/dashboard'
+    | '/domains'
     | '/free-shorts'
     | '/legal'
     | '/login'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/audio'
     | '/chat'
     | '/dashboard'
+    | '/domains'
     | '/free-shorts'
     | '/legal'
     | '/login'
@@ -372,6 +384,7 @@ export interface RootRouteChildren {
   AudioRoute: typeof AudioRoute
   ChatRoute: typeof ChatRoute
   DashboardRoute: typeof DashboardRoute
+  DomainsRoute: typeof DomainsRoute
   FreeShortsRoute: typeof FreeShortsRoute
   LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
@@ -461,6 +474,13 @@ declare module '@tanstack/react-router' {
       path: '/free-shorts'
       fullPath: '/free-shorts'
       preLoaderRoute: typeof FreeShortsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/domains': {
+      id: '/domains'
+      path: '/domains'
+      fullPath: '/domains'
+      preLoaderRoute: typeof DomainsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -626,6 +646,7 @@ const rootRouteChildren: RootRouteChildren = {
   AudioRoute: AudioRoute,
   ChatRoute: ChatRoute,
   DashboardRoute: DashboardRoute,
+  DomainsRoute: DomainsRoute,
   FreeShortsRoute: FreeShortsRoute,
   LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,

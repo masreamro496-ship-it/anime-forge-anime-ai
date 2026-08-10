@@ -3,7 +3,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone, Heart, Crown } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
-import gameComingSoon from "@/assets/game-coming-soon.jpg";
+import gameComingSoon from "@/assets/world-cup-game.jpg";
+import { PaidFeatureGate } from "@/components/PaidFeatureGate";
 
 export const Route = createFileRoute("/")({
   head: () => ({

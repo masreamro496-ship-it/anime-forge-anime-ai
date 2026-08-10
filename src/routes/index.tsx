@@ -185,12 +185,13 @@ function Landing() {
             <p className="mt-1 text-sm text-muted-foreground">ارفع فيلم أنمي حتى ساعتين بسعر يصل إلى 200 كريدت — عرض بجودة 480p ومشغّل احترافي مريح</p>
           </Link>
 
-          <Link to="/world-cup" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#10b981", background: "linear-gradient(135deg, rgba(16,185,129,0.30), transparent)" }}>
+          <PaidFeatureGate featureKey="world_cup" to="/world-cup" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#10b981", background: "linear-gradient(135deg, rgba(16,185,129,0.30), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-black text-white">HOT</span>
             <span className="text-4xl">⚽</span>
             <h3 className="mt-3 text-lg font-black" style={{ color: "#10b981" }}>كأس العالم</h3>
-            <p className="mt-1 text-sm text-muted-foreground">خمّن نتيجة الماتش واربح كريدت · العب ماتشات مباشرة ضد لاعبين آخرين</p>
-          </Link>
+            <p className="mt-1 text-sm text-muted-foreground">ادفع 10 كريدت كل شهر للدخول واللعب · خمّن نتيجة الماتش واربح كريدت</p>
+          </PaidFeatureGate>
+
 
           <Link to="/social" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#06b6d4", background: "linear-gradient(135deg, rgba(6,182,212,0.30), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-black text-white">LIVE</span>
@@ -213,18 +214,18 @@ function Landing() {
           </Link>
 
           {/* رسم وأنميشن 2D */}
-          <a
+          <PaidFeatureGate
+            featureKey="draw2d"
             href="https://speed-ink-dream.lovable.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative overflow-hidden rounded-2xl border-2 border-pink-500/70 bg-gradient-to-br from-pink-500/20 to-rose-500/10 p-5 transition-transform hover:scale-[1.01]"
+            className="group relative block w-full overflow-hidden rounded-2xl border-2 border-pink-500/70 bg-gradient-to-br from-pink-500/20 to-rose-500/10 p-5 text-right transition-transform hover:scale-[1.01]"
           >
             <span className="text-3xl">🎨</span>
             <h3 className="mt-3 text-lg font-black text-pink-400">ارسم بسهولة وأنميشن 2D</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              ارسم بسهولة وأنميشن 2D مع أنمي فورج · وخلفيات أنمي رهيبة
+              ادفع 250 كريدت للتجربة لمدة شهر كامل · وخلفيات أنمي رهيبة
             </p>
-          </a>
+          </PaidFeatureGate>
+
 
           {/* عجلة الحظ */}
           <Link

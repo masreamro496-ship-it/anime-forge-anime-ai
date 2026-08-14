@@ -226,6 +226,21 @@ function Landing() {
             </p>
           </PaidFeatureGate>
 
+          {/* زر المانجا الجديد */}
+          <button
+            onClick={() => alert("قريباً سنطورها")}
+            className="group relative block w-full overflow-hidden rounded-2xl border-2 border-amber-900/50 bg-amber-950 p-5 text-right transition-transform hover:scale-[1.01] text-white"
+          >
+            <span className="absolute right-3 top-3 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-black text-white">
+              قريباً
+            </span>
+            <span className="text-3xl">📖</span>
+            <h3 className="mt-3 text-lg font-black text-amber-100">مانجا انمي</h3>
+            <p className="mt-1 text-sm text-amber-200/70">
+              أداة صنع المانجا القادمة · قصص مصورة احترافية بلمستك الخاصة
+            </p>
+          </button>
+
 
           {/* عجلة الحظ */}
           <Link

@@ -1,6 +1,18 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { createClient } from "@supabase/supabase-js";
+
+// إعداد الاتصال المباشر بقاعدة البيانات المستقلة
+const SUPABASE_URL = "https://ximllvsgpfeqmhharjin.supabase.co";
+const SUPABASE_KEY = "sb_publishable_gjpclJMqOF6g74NMKVEM9Q_ndgM4rqX";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    storage: typeof window !== 'undefined' ? localStorage : undefined,
+    persistSession: true,
+    autoRefreshToken: true,
+  }
+});
 
 type AuthContextValue = {
   session: Session | null;

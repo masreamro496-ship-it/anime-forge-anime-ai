@@ -3,13 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 function createSupabaseClient() {
-  const SUPABASE_URL = 
-    import.meta.env.VITE_SUPABASE_URL || 
-    "https://ximllvsgpfeqmhharjin.supabase.co";
-
-  const SUPABASE_PUBLISHABLE_KEY = 
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 
-    "sb_publishable_gjpclJMqOF6g74NMKVEM9Q_ndgM4rqX";
+  // تم إجبار الرابط والمفتاح الجديدين مباشرة لتجاوز أي قيم قديمة في المنصة
+  const SUPABASE_URL = "https://ximllvsgpfeqmhharjin.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_gjpclJMqOF6g74NMKVEM9Q_ndgM4rqX";
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     const missing = [

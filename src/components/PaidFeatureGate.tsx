@@ -1,8 +1,14 @@
 import { useState, type ReactNode, type CSSProperties } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { createClient } from "@supabase/supabase-js";
 import { useAuth } from "@/hooks/use-auth";
+
+// إعداد الاتصال المباشر بقاعدة البيانات المستقلة
+const SUPABASE_URL = "https://ximllvsgpfeqmhharjin.supabase.co";
+const SUPABASE_KEY = "sb_publishable_gjpclJMqOF6g74NMKVEM9Q_ndgM4rqX";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export type FeatureKey = "ai_chat" | "keys" | "art4k" | "dubbing" | "draw2d" | "world_cup";
 

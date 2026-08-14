@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
 
@@ -22,17 +21,8 @@ function LoginPage() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // دالة مخصصة لإنشاء رابط إعادة التوجيه بأسلوب آمن
-  const getRedirectUrl = () => {
-    const targetPath = redirectTo && redirectTo.startsWith("/") ? redirectTo : "/dashboard";
-    return `${window.location.origin}${targetPath}`;
-  };
-
   useEffect(() => {
-    if (user) {
-      const targetPath = redirectTo && redirectTo.startsWith("/") ? redirectTo : "/dashboard";
-      navigate({ to: targetPath as "/dashboard" });
-    }
+    if (user) navigate({ to: (redirectTo ?? "/dashboard") as "/dashboard" });
   }, [user, navigate, redirectTo]);
 
   function checkLoginCooldown(): string | null {
@@ -47,14 +37,13 @@ function LoginPage() {
       return;
     }
     setLoading(true);
-
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: getRedirectUrl(),
+            emailRedirectTo: window.location.origin + (redirectTo ?? "/dashboard"),
             data: { full_name: name },
           },
         });
@@ -66,7 +55,7 @@ function LoginPage() {
         toast.success("تم تسجيل الدخول بنجاح");
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "حدث خطأ غير متوقع";
+      const msg = err instanceof Error ? err.message : "حدث خطأ";
       toast.error(msg.includes("Invalid") ? "البريد أو كلمة المرور غير صحيحة" : msg);
     } finally {
       setLoading(false);
@@ -80,24 +69,14 @@ function LoginPage() {
       return;
     }
     setLoading(true);
-
-    try {
-      const redirectUri = getRedirectUrl();
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: redirectUri,
-      });
-
-      if (result?.error) {
-        const errorMsg =
-          typeof result.error === "object" && result.error !== null && "message" in result.error
-            ? (result.error as { message: string }).message
-            : String(result.error);
-        toast.error("فشل تسجيل الدخول بـ Google: " + errorMsg);
-        setLoading(false);
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "فشل تسجيل الدخول بـ Google";
-      toast.error(msg);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + (redirectTo ?? "/dashboard"),
+      },
+    });
+    if (error) {
+      toast.error("فشل تسجيل الدخول بـ Google: " + error.message);
       setLoading(false);
     }
   };
@@ -109,16 +88,14 @@ function LoginPage() {
       return;
     }
     setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "github",
-        options: { redirectTo: getRedirectUrl() },
-      });
-      if (error) throw error;
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "فشل تسجيل الدخول بـ GitHub";
-      toast.error(msg);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: window.location.origin + (redirectTo ?? "/dashboard"),
+      },
+    });
+    if (error) {
+      toast.error("فشل تسجيل الدخول بـ GitHub: " + error.message);
       setLoading(false);
     }
   };
@@ -135,7 +112,6 @@ function LoginPage() {
         </h1>
 
         <button
-          type="button"
           onClick={handleGoogle}
           disabled={loading}
           className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 font-bold transition-colors hover:bg-accent disabled:opacity-50"
@@ -162,7 +138,6 @@ function LoginPage() {
         </button>
 
         <button
-          type="button"
           onClick={handleGithub}
           disabled={loading}
           className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 font-bold transition-colors hover:bg-accent disabled:opacity-50"
@@ -210,7 +185,7 @@ function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold disabled:opacity-60 transition-opacity"
+            className="w-full rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold disabled:opacity-60"
           >
             {loading ? "جاري المعالجة..." : mode === "signin" ? "تسجيل الدخول" : "إنشاء الحساب"}
           </button>
@@ -230,3 +205,4 @@ function LoginPage() {
     </div>
   );
 }
+

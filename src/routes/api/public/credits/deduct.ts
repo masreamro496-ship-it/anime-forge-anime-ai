@@ -1,19 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import { createClient } from "@supabase/supabase-js";
 
 /**
- * نقطة استقبال طلبات خصم الكريدت من المواقع الخارجية (مثل: شات برمجي).
- *
- * POST /api/public/credits/deduct
- * Headers: x-api-key: <CREDITS_API_KEY>
- * Body: { "email": "user@example.com", "amount": 5, "source": "ai-coder", "reason": "توليد كود" }
- *
- * الرد:
- *  200 { ok: true, balance, deducted }
- *  402 { ok: false, error: "insufficient_credits", balance }
- *  404 { ok: false, error: "user_not_found" }
+ * تهيئة Supabase بشكل مباشر (بدون الاعتماد على Lovable)
  */
+const SUPABASE_URL = "https://ximllvsgpfeqmhharjin.supabase.co";
+const SUPABASE_KEY = "sb_publishable_gjpclJMqOF6g74NMKVEM9Q_ndgM4rqX";
 
+// إنشاء العميل
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: false, // لا نحتاج لحفظ الجلسة في API endpoint
+  },
+});
+
+/**
+ * نقطة استقبال طلبات خصم الكريدت
+ */
 const BodySchema = z
   .object({
     email: z.string().email().optional(),
@@ -43,6 +47,8 @@ export const Route = createFileRoute("/api/public/credits/deduct")({
       OPTIONS: async () => json({ ok: true }),
       POST: async ({ request }) => {
         const url = new URL(request.url);
+        
+        // التحقق من مفاتيح API الخاصة بك
         const keys = [
           process.env["CREDITS_API_KEY"],
           process.env["EXTERNAL_CREDITS_KEY"],
@@ -64,7 +70,6 @@ export const Route = createFileRoute("/api/public/credits/deduct")({
           return json({ ok: false, success: false, error: "unauthorized", message: "مفتاح API غير صحيح" }, 401);
         }
 
-
         let raw: unknown;
         try {
           raw = await request.json();
@@ -81,19 +86,15 @@ export const Route = createFileRoute("/api/public/credits/deduct")({
         const src = source ?? sourceSite ?? "external";
         const why = reason ?? action ?? null;
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const rpcClient = supabaseAdmin as unknown as {
-          rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
-        };
-
+        // تنفيذ الـ RPC باستخدام عميل Supabase المستقل
         const { data, error } = userId
-          ? await rpcClient.rpc("api_deduct_credits_by_user", {
+          ? await supabase.rpc("api_deduct_credits_by_user", {
               _user_id: userId,
               _amount: amount,
               _source: src,
               _reason: why,
             })
-          : await rpcClient.rpc("api_deduct_credits", {
+          : await supabase.rpc("api_deduct_credits", {
               _email: email,
               _amount: amount,
               _source: src,

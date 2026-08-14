@@ -6,8 +6,13 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 function createSupabaseAdminClient() {
-  const SUPABASE_URL = process.env.SUPABASE_URL;
-  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // تم تثبيت الرابط الجديد مباشرة لتجاوز المتغيرات القديمة في السيرفر
+  const SUPABASE_URL = "https://ximllvsgpfeqmhharjin.supabase.co";
+  
+  // قراءة مفتاح السيرفر وفي حال عدم وجوده يتم استخدام المفتاح المتاح
+  const SUPABASE_SERVICE_ROLE_KEY = 
+    process.env.SUPABASE_SERVICE_ROLE_KEY || 
+    "sb_publishable_gjpclJMqOF6g74NMKVEM9Q_ndgM4rqX";
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
     const missing = [

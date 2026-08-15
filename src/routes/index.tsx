@@ -48,7 +48,6 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-
 function Landing() {
   const { user } = useAuth();
 
@@ -170,7 +169,6 @@ function Landing() {
             <p className="mt-1 text-sm text-muted-foreground">دبلجة من الإنجليزية أو الصينية أو اليابانية للعربية · ادفع 25 كريدت للدخول لمدة 3 ساعات فقط</p>
           </PaidFeatureGate>
 
-
           <Link to="/anime-market" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#ec4899", background: "linear-gradient(135deg, rgba(236,72,153,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#ec4899" }}>جديد</span>
             <Upload className="h-10 w-10" style={{ color: "#ec4899" }} />
@@ -191,7 +189,6 @@ function Landing() {
             <h3 className="mt-3 text-lg font-black" style={{ color: "#10b981" }}>كأس العالم</h3>
             <p className="mt-1 text-sm text-muted-foreground">ادفع 10 كريدت كل شهر للدخول واللعب · خمّن نتيجة الماتش واربح كريدت</p>
           </PaidFeatureGate>
-
 
           <Link to="/social" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#06b6d4", background: "linear-gradient(135deg, rgba(6,182,212,0.30), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-black text-white">LIVE</span>
@@ -241,7 +238,6 @@ function Landing() {
             </p>
           </button>
 
-
           {/* عجلة الحظ */}
           <Link
             to="/wheel"
@@ -255,7 +251,7 @@ function Landing() {
             </p>
           </Link>
 
-          {/* 🔥 زر الترقية والاشتراكات الجديد باللونين الأحمر والذهبي 🔥 */}
+          {/* زر الترقية والاشتراكات الجديد */}
           <div className="md:col-span-2 space-y-3">
             <Link
               to="/pro-upgrade"
@@ -274,7 +270,6 @@ function Landing() {
             </Link>
           </div>
 
-
           {/* أزرار التبرع ودعم المنصة */}
           <div className="text-center my-8 md:col-span-2 flex flex-col items-center gap-4">
             <a 
@@ -287,7 +282,6 @@ function Landing() {
               <span>دعم المنصة والتبرع ❤️</span>
             </a>
 
-            {/* زر قراءة القرآن الكريم */}
             <a
               href="https://anime-forge-quran.lovable.app/"
               target="_blank"
@@ -297,7 +291,6 @@ function Landing() {
               📖 قراءة القران الكريم
             </a>
 
-            {/* تقديم إدارة */}
             <Link
               to="/apply-admin"
               className="w-full max-w-sm py-3.5 px-6 rounded-2xl font-black text-black bg-gradient-to-r from-yellow-400 to-amber-500 hover:opacity-90 hover:scale-[1.02] transition-all duration-300 text-center shadow-lg border border-yellow-300/60 text-lg"
@@ -305,7 +298,6 @@ function Landing() {
               🛡️ تقديم إدارة — 500 كريدت شهرياً
             </Link>
 
-            {/* تقديم مطوّر */}
             <Link
               to="/apply-developer"
               className="w-full max-w-sm py-3.5 px-6 rounded-2xl font-black text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:opacity-90 hover:scale-[1.02] transition-all duration-300 text-center shadow-lg border border-sky-400/50 text-lg"
@@ -346,7 +338,6 @@ function Landing() {
             />
             <p className="mt-2 text-xs text-muted-foreground">تعب لمدة شهرين</p>
           </a>
-
         </div>
       </section>
 
@@ -411,7 +402,7 @@ function Landing() {
         </div>
         © {new Date().getFullYear()} منصة انمي فورج — جميع الحقوق محفوظة
       </footer>
-
     </div>
   );
 }
+

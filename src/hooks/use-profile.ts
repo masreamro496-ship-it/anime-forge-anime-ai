@@ -9,7 +9,7 @@ const SUPABASE_KEY = "sb_publishable_gjpclJMqOF6g74NMKVEM9Q_ndgM4rqX";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export type ProfileData = {
-  profile: { id: string; display_name: string | null; avatar_url: string | null; is_pro: boolean; pro_expires_at: string | null; earnings_usd: number } | null;
+  profile: { id: string; display_name: string | null; avatar_url: string | null; is_pro: boolean; pro_expires_at: string | null; earnings_usd: number; credits: number } | null;
   credits: number;
   earningsUsd: number;
   roles: string[];
@@ -26,20 +26,18 @@ export function useProfile() {
     queryFn: async () => {
       if (!user) throw new Error("no user");
       
-      const [profileRes, creditsRes, rolesRes] = await Promise.all([
+      const [profileRes, rolesRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-        supabase.from("credits").select("balance").eq("user_id", user.id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", user.id),
       ]);
       
       const profile = profileRes.data as ProfileData["profile"];
-      const credits = creditsRes.data as { balance: number } | null;
       const rolesArr = (rolesRes.data ?? []) as { role: string }[];
       const roleList = rolesArr.map((r) => r.role);
       
       return {
         profile,
-        credits: Number(credits?.balance ?? 0),
+        credits: Number(profile?.credits ?? 0), // قراءة الكريديت مباشرة من جدول profiles
         earningsUsd: Number(profile?.earnings_usd ?? 0),
         roles: roleList,
         isAdmin: roleList.includes("admin"),

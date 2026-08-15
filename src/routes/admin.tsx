@@ -47,7 +47,6 @@ function AdminPanel() {
             { k: "tasks", label: "🎯 طلبات المهمات" },
             { k: "donations", label: "التبرعات ❤️" },
             { k: "wheel", label: "🎡 شاري عجلات الحظ" },
-
           ].map((t) => (
             <button
               key={t.k}
@@ -71,7 +70,6 @@ function AdminPanel() {
         {tab === "tasks" && <TaskSubmissionsAdminView />}
         {tab === "donations" && <DonationsAdminView />}
         {tab === "wheel" && <WheelPurchasesPanel />}
-
       </main>
     </div>
   );
@@ -93,21 +91,17 @@ function WheelPurchasesPanel() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "wheel_purchases"],
     queryFn: async () => {
-      const { data, error } = await (supabase as unknown as {
-        from: (t: string) => {
-          select: (c: string) => { order: (k: string, o: { ascending: boolean }) => Promise<{ data: WheelPurchaseRow[] | null; error: { message: string } | null }> };
-        };
-      })
+      const { data, error } = await supabase
         .from("wheel_purchases")
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
-      return data ?? [];
+      return (data ?? []) as WheelPurchaseRow[];
     },
   });
 
   const review = async (id: string, approve: boolean) => {
-    const { error } = await supabase.rpc("approve_wheel_purchase" as never, { _id: id, _approve: approve } as never);
+    const { error } = await supabase.rpc("approve_wheel_purchase" as any, { _id: id, _approve: approve } as any);
     if (error) return toast.error(error.message);
     toast.success(approve ? "تمت الموافقة وإضافة اللفّات ✅" : "تم الرفض");
     qc.invalidateQueries({ queryKey: ["admin", "wheel_purchases"] });
@@ -164,14 +158,13 @@ function WheelPurchasesPanel() {
   );
 }
 
-
 function DonationsAdminView() {
   const [donations, setDonations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchDonations = async () => {
     setLoading(true);
-    const { data } = await (supabase as any)
+    const { data } = await supabase
       .from('donations')
       .select('*')
       .order('created_at', { ascending: false });
@@ -184,7 +177,7 @@ function DonationsAdminView() {
   }, []);
 
   const handleStatus = async (id: string, status: 'approved' | 'rejected') => {
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('donations')
       .update({ status })
       .eq('id', id);
@@ -254,7 +247,7 @@ function ModeratorsPanel() {
     if (!email.trim()) return;
     setBusy(true);
     try {
-      const { error } = await (supabase as any).rpc(fn, { _email: email.trim() });
+      const { error } = await supabase.rpc(fn, { _email: email.trim() } as any);
       if (error) throw error;
       toast.success(fn === "promote_to_moderator" ? "تمت الترقية إلى مشرف" : "تم عزل المشرف");
       setEmail("");
@@ -518,7 +511,7 @@ function RequestRow({ row, expanded, onToggle, onChange }: { row: any; expanded:
           )}
 
           {row.status === "completed" && row.result_url && (
-            <a href={row.result_url} target="_blank" className="inline-flex items-center gap-1 text-sm text-gold underline">
+            <a href={row.result_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm text-gold underline">
               <ExternalLink className="h-3 w-3" /> النتيجة المسلّمة
             </a>
           )}
@@ -715,18 +708,17 @@ function ShortsTable() {
 
 function PurchasesTable() {
   const qc = useQueryClient();
-  const sb = supabase as unknown as { from: (t: string) => { select: (c: string) => { order: (col: string, opts: { ascending: boolean }) => Promise<{ data: unknown; error: { message: string } | null }> } }; rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }> };
   const { data: rows } = useQuery({
     queryKey: ["admin-purchases"],
     queryFn: async () => {
-      const res = await sb.from("project_purchases").select("id,project_id,buyer_id,seller_id,price_usd,status,created_at").order("created_at", { ascending: false });
+      const res = await supabase.from("project_purchases").select("id,project_id,buyer_id,seller_id,price_usd,status,created_at").order("created_at", { ascending: false });
       if (res.error) throw new Error(res.error.message);
       return (res.data ?? []) as { id: string; project_id: string; buyer_id: string; seller_id: string; price_usd: number; status: string; created_at: string }[];
     },
   });
 
   const approve = async (id: string) => {
-    const res = await sb.rpc("approve_purchase", { _purchase_id: id });
+    const res = await supabase.rpc("approve_purchase" as any, { _purchase_id: id } as any);
     if (res.error) return toast.error(res.error.message);
     toast.success("تم التفعيل");
     qc.invalidateQueries({ queryKey: ["admin-purchases"] });
@@ -760,7 +752,6 @@ function GrantCreditsPanel() {
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
-  const sb = supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }> };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -768,8 +759,7 @@ function GrantCreditsPanel() {
     if (!email.trim() || !amt) return toast.error("ادخل الإيميل وقيمة الكريديت");
     setBusy(true);
     
-    // تم تغيير تمرير المتغير إلى _email، تأكد من تحديث دالة الـ RPC في قاعدة البيانات إذا كانت تقبل _target_user
-    const res = await sb.rpc("admin_grant_credits", { _email: email.trim(), _amount: amt, _note: note || null });
+    const res = await supabase.rpc("admin_grant_credits" as any, { _email: email.trim(), _amount: amt, _note: note || null } as any);
     
     setBusy(false);
     if (res.error) return toast.error(res.error.message);
@@ -929,11 +919,11 @@ function MatchAdminRow({ match, onChanged }: { match: { id: string; team_a: stri
   const setResult = async () => {
     if (a === "" || b === "") return toast.error("ادخل النتيجتين");
     setBusy(true);
-    const { data, error } = await supabase.rpc("admin_set_wc_result", {
+    const { data, error } = await supabase.rpc("admin_set_wc_result" as any, {
       _match_id: match.id,
       _result_a: Number(a),
       _result_b: Number(b),
-    });
+    } as any);
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(`تم حفظ النتيجة — ${data ?? 0} فائز`);
@@ -962,13 +952,14 @@ function MatchAdminRow({ match, onChanged }: { match: { id: string; team_a: stri
       {match.status === "finished" ? (
         <p className="mt-2 text-sm">النتيجة النهائية: <span className="font-black text-emerald-400">{match.result_a} - {match.result_b}</span></p>
       ) : (
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <input value={a} onChange={(e) => setA(e.target.value)} type="number" min={0} placeholder="نتيجة 1" className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-sm" />
-          <input value={b} onChange={(e) => setB(e.target.value)} type="number" min={0} placeholder="نتيجة 2" className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-sm" />
-          <button disabled={busy} onClick={setResult} className="rounded-lg bg-gradient-gold px-4 py-2 text-xs font-black text-gold-foreground">حفظ النتيجة وتوزيع الكريدت</button>
-          <button onClick={del} className="rounded-lg border border-destructive bg-destructive/10 px-3 py-2 text-xs font-bold text-destructive">حذف</button>
-        </div>
+        <p className="mt-3 text-xs text-muted-foreground">أدخل النتيجة النهائية لحفظها وتوزيع الجوائز تلقائياً.</p>
       )}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <input value={a} onChange={(e) => setA(e.target.value)} type="number" min={0} placeholder="نتيجة 1" className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+        <input value={b} onChange={(e) => setB(e.target.value)} type="number" min={0} placeholder="نتيجة 2" className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+        <button disabled={busy} onClick={setResult} className="rounded-lg bg-gradient-gold px-4 py-2 text-xs font-black text-gold-foreground">حفظ النتيجة وتوزيع الكريديت</button>
+        <button onClick={del} className="rounded-lg border border-destructive bg-destructive/10 px-3 py-2 text-xs font-bold text-destructive">حذف</button>
+      </div>
     </div>
   );
 }

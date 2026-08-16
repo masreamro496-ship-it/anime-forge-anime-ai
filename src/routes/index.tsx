@@ -30,21 +30,45 @@ import { PaidFeatureGate } from "@/components/PaidFeatureGate";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "انمي فورج | Anime Forge — أنمي، شورتس، ألعاب وأدوات AI" },
+      {
+        title:
+          "انمي فورج | Anime Forge — مشاهدة انمي مترجم اونلاين، توليد أنمي بالذكاء الاصطناعي، شورتس، دبلجة، ألعاب",
+      },
       {
         name: "description",
         content:
-          "انمي فورج (Anime Forge): منصة أنمي عربية لتوليد وصناعة الأنمي بالذكاء الاصطناعي، نشر ومشاهدة حلقات وأفلام أنمي، شورتس، دبلجة، ألعاب كأس العالم، ودردشة مباشرة.",
+          "انمي فورج (Anime Forge): أفضل منصة عربية لمشاهدة انمي مترجم اونلاين بجودة 4K، توليد وصناعة حلقات وأفلام أنمي بالذكاء الاصطناعي، شورتس أنمي، دبلجة عربية، بيع وشراء مشاريع أنمي، ألعاب كأس العالم، ودردشة مباشرة. ابدأ الآن مجاناً على anime-forge-anime-ai.lovable.app",
       },
-      { name: "keywords", content: "انمي فورج, Anime Forge, انمي, أنمي بالذكاء الاصطناعي, مشاهدة انمي, شورتس, دبلجة انمي, كأس العالم" },
+      {
+        name: "keywords",
+        content:
+          "انمي فورج, Anime Forge, انمي, مشاهدة انمي, مشاهدة انمي مترجم, انمي مترجم اونلاين, انمي اون لاين, تحميل انمي, انمي بالذكاء الاصطناعي, توليد انمي AI, صناعة انمي, حلقات انمي, افلام انمي, افلام انمي مترجمة, شورتس انمي, دبلجة انمي, دبلجة انمي عربي, بيع مشاريع انمي, شراء مشاريع انمي, كأس العالم انمي, العاب انمي, دردشة انمي, مانجا انمي, صور انمي بالذكاء الاصطناعي, انمي 4K, انمي فورج تسجيل دخول, anime forge site, anime ai generator arabic, مواقع مشاهدة انمي عربي",
+      },
+      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
+      { name: "author", content: "انمي فورج - Anime Forge" },
+      { name: "language", content: "Arabic" },
+      { name: "revisit-after", content: "1 days" },
+
       { property: "og:site_name", content: "انمي فورج — Anime Forge" },
-      { property: "og:title", content: "انمي فورج | Anime Forge — منصة الأنمي والذكاء الاصطناعي" },
-      { property: "og:description", content: "أنمي، شورتس، دبلجة، ألعاب وأدوات ذكاء اصطناعي في مكان واحد على انمي فورج." },
+      {
+        property: "og:title",
+        content: "انمي فورج | Anime Forge — مشاهدة وصناعة الأنمي بالذكاء الاصطناعي",
+      },
+      {
+        property: "og:description",
+        content:
+          "شاهد وصنع وبيع أنمي بالذكاء الاصطناعي: حلقات، أفلام، شورتس، دبلجة عربية، وألعاب — كل شيء في مكان واحد على انمي فورج.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://anime-forge-anime-ai.lovable.app" },
+      { property: "og:locale", content: "ar_AR" },
+
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "انمي فورج | Anime Forge" },
-      { name: "twitter:description", content: "منصة الأنمي العربية: توليد أنمي بالـ AI، حلقات، أفلام، شورتس وألعاب." },
+      { name: "twitter:title", content: "انمي فورج | Anime Forge — مشاهدة وصناعة الأنمي بالذكاء الاصطناعي" },
+      {
+        name: "twitter:description",
+        content: "منصة الأنمي العربية الأولى: توليد أنمي بالـ AI، مشاهدة حلقات وأفلام، شورتس، دبلجة وألعاب.",
+      },
     ],
     links: [{ rel: "canonical", href: "https://anime-forge-anime-ai.lovable.app/" }],
     scripts: [
@@ -54,14 +78,51 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "انمي فورج — Anime Forge",
-          alternateName: ["Anime Forge", "انمي فورج"],
+          alternateName: [
+            "Anime Forge",
+            "انمي فورج",
+            "موقع انمي فورج",
+            "منصة انمي فورج",
+            "Anime Forge AI",
+          ],
           url: "https://anime-forge-anime-ai.lovable.app/",
           inLanguage: "ar",
+          description:
+            "منصة انمي فورج لمشاهدة وصناعة وبيع الأنمي بالذكاء الاصطناعي: حلقات، أفلام، شورتس، دبلجة، وألعاب.",
           potentialAction: {
             "@type": "SearchAction",
             target: "https://anime-forge-anime-ai.lovable.app/anime-market?q={search_term_string}",
             "query-input": "required name=search_term_string",
           },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "انمي فورج - Anime Forge",
+          alternateName: "Anime Forge",
+          url: "https://anime-forge-anime-ai.lovable.app/",
+          logo: "https://anime-forge-anime-ai.lovable.app/favicon.ico",
+          sameAs: [],
+          description:
+            "انمي فورج منصة عربية لتوليد ومشاهدة وبيع محتوى الأنمي بالذكاء الاصطناعي.",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "انمي فورج",
+              item: "https://anime-forge-anime-ai.lovable.app/",
+            },
+          ],
         }),
       },
     ],
@@ -107,6 +168,11 @@ function Landing() {
         </div>
       </header>
 
+      {/* SEO: h1 مخفي بصرياً لتعزيز الكلمات المفتاحية دون التأثير على التصميم */}
+      <h1 className="sr-only">
+        انمي فورج Anime Forge — مشاهدة انمي مترجم اونلاين وتوليد أنمي بالذكاء الاصطناعي
+      </h1>
+
       {/* 🔥 هيرو رئيسي: سجّل دخولك / إنشاء مشروع أنمي — أول حاجة يشوفها الزائر */}
       <section className="container mx-auto px-4 pt-8">
         <div className="relative overflow-hidden rounded-3xl border-2 border-gold bg-gradient-to-br from-gold/25 via-primary/15 to-transparent p-6 text-center shadow-gold sm:p-10">
@@ -115,7 +181,7 @@ function Landing() {
 
           <Sparkles className="mx-auto h-10 w-10 text-gold animate-pulse" />
 
-          <h1 className="mt-3 text-2xl font-black leading-snug sm:text-4xl">
+          <h2 className="mt-3 text-2xl font-black leading-snug sm:text-4xl">
             {user ? (
               <>
                 جاهز تبدأ؟ <span className="text-gradient-gold">أنشئ مشروع أنمي الآن</span>
@@ -125,7 +191,7 @@ function Landing() {
                 سجّل دخولك أولاً <span className="text-gradient-gold">وابدأ رحلتك في عالم الأنمي</span>
               </>
             )}
-          </h1>
+          </h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground sm:text-base">
             ولّد، انشر، وابيع مشاريع أنمي بالذكاء الاصطناعي — كل الأدوات في مكان واحد
           </p>
@@ -178,9 +244,9 @@ function Landing() {
 
       {/* Hero — بيع المشاريع */}
       <section className="container mx-auto px-4 py-12 text-center">
-        <h1 className="text-3xl font-black leading-tight md:text-5xl">
+        <h2 className="text-3xl font-black leading-tight md:text-5xl">
           بيع مشاريعك مباشرة بـ <span className="text-gradient-gold">فودافون كاش</span>
-        </h1>
+        </h2>
         <p className="mt-4 text-sm text-muted-foreground md:text-base">
           ارفع فيديو مشروعك، ضع سعراً بالدولار، والمشتري يحوّل لك مباشرة. أنت توافق على التفعيل.
         </p>
@@ -471,10 +537,11 @@ function Landing() {
       <section className="container mx-auto px-4 pb-10">
         <div className="grid gap-4 md:grid-cols-3">
           <article className="rounded-2xl border border-border bg-card p-5 shadow-card">
-            <h2 className="text-lg font-black text-gradient-gold">نبذة عن الموقع</h2>
+            <h2 className="text-lg font-black text-gradient-gold">نبذة عن انمي فورج Anime Forge</h2>
             <p className="mt-2 text-sm leading-7 text-foreground/85">
-              منصة متخصصة في إنتاج وتوليد حلقات أنمي أصلية بالكامل بجهودنا الخاصة، بدءاً من الفكرة والتحريك وحتى الإخراج
-              النهائي. نهدف لتقديم تجربة بصرية سينمائية فريدة للمشاهدين بجودة عالية تصل إلى 4K Ultra HD.
+              انمي فورج (Anime Forge) منصة عربية متخصصة في مشاهدة انمي مترجم اونلاين وإنتاج وتوليد حلقات أنمي أصلية بالكامل
+              بالذكاء الاصطناعي، بدءاً من الفكرة والتحريك وحتى الإخراج النهائي. نهدف لتقديم تجربة بصرية سينمائية فريدة
+              لعشاق الأنمي بجودة عالية تصل إلى 4K Ultra HD، مع دبلجة عربية وشورتس أنمي وأفلام أنمي حصرية.
             </p>
           </article>
 
@@ -514,3 +581,4 @@ function Landing() {
     </div>
   );
 }
+

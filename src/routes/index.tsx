@@ -1,6 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Sparkles, Play, Music, Wand2, User, DollarSign, Upload, Rocket, Film, MessageCircle, Palette, Smartphone, Heart, Crown } from "lucide-react";
+import { useState } from "react";
+import {
+  Sparkles,
+  Play,
+  Music,
+  Wand2,
+  User,
+  DollarSign,
+  Upload,
+  Rocket,
+  Film,
+  MessageCircle,
+  Palette,
+  Smartphone,
+  Heart,
+  Crown,
+  LogIn,
+  ImagePlus,
+  ChevronDown,
+  Code2,
+  Shield,
+} from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
 import gameComingSoon from "@/assets/world-cup-game.jpg";
@@ -50,6 +71,7 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   const { user } = useAuth();
+  const [showMore, setShowMore] = useState(false);
 
   return (
     <div className="min-h-screen">
@@ -85,6 +107,59 @@ function Landing() {
         </div>
       </header>
 
+      {/* 🔥 هيرو رئيسي: سجّل دخولك / إنشاء مشروع أنمي — أول حاجة يشوفها الزائر */}
+      <section className="container mx-auto px-4 pt-8">
+        <div className="relative overflow-hidden rounded-3xl border-2 border-gold bg-gradient-to-br from-gold/25 via-primary/15 to-transparent p-6 text-center shadow-gold sm:p-10">
+          <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-gold/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
+
+          <Sparkles className="mx-auto h-10 w-10 text-gold animate-pulse" />
+
+          <h1 className="mt-3 text-2xl font-black leading-snug sm:text-4xl">
+            {user ? (
+              <>
+                جاهز تبدأ؟ <span className="text-gradient-gold">أنشئ مشروع أنمي الآن</span>
+              </>
+            ) : (
+              <>
+                سجّل دخولك أولاً <span className="text-gradient-gold">وابدأ رحلتك في عالم الأنمي</span>
+              </>
+            )}
+          </h1>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground sm:text-base">
+            ولّد، انشر، وابيع مشاريع أنمي بالذكاء الاصطناعي — كل الأدوات في مكان واحد
+          </p>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            {!user && (
+              <Link
+                to="/login"
+                className="flex items-center gap-2 rounded-2xl bg-gradient-gold px-8 py-4 text-base font-black text-gold-foreground shadow-gold transition-transform hover:scale-[1.03]"
+              >
+                <LogIn className="h-5 w-5" /> سجّل دخولك الآن
+              </Link>
+            )}
+
+            {user ? (
+              <Link
+                to="/anime-market"
+                className="flex items-center gap-2 rounded-2xl bg-gradient-gold px-8 py-4 text-base font-black text-gold-foreground shadow-gold transition-transform hover:scale-[1.03]"
+              >
+                <Wand2 className="h-5 w-5" /> إنشاء مشروع أنمي
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                search={{ redirect: "/anime-market" }}
+                className="flex items-center gap-2 rounded-2xl border-2 border-gold bg-gold/10 px-8 py-4 text-base font-black text-gold transition-transform hover:scale-[1.03]"
+              >
+                <Wand2 className="h-5 w-5" /> إنشاء مشروع أنمي
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* Big Gold CTA — Free Shorts */}
       <section className="container mx-auto px-4 pt-6">
         <Link to="/free-shorts" className="block rounded-3xl border-2 border-gold bg-gradient-to-br from-gold/30 via-gold/10 to-transparent p-6 shadow-gold transition-transform hover:scale-[1.01] sm:p-8">
@@ -101,7 +176,7 @@ function Landing() {
         </Link>
       </section>
 
-      {/* Hero */}
+      {/* Hero — بيع المشاريع */}
       <section className="container mx-auto px-4 py-12 text-center">
         <h1 className="text-3xl font-black leading-tight md:text-5xl">
           بيع مشاريعك مباشرة بـ <span className="text-gradient-gold">فودافون كاش</span>
@@ -141,6 +216,7 @@ function Landing() {
             <p className="mt-1 text-sm text-muted-foreground">معالجة متقدمة عبر Cloudinary · 15 كريديت · النتيجة خاصة بك فقط</p>
           </Link>
 
+          {/* شات برمجي — مدفوع بالكريدت */}
           <PaidFeatureGate featureKey="ai_chat" href="https://anime-forge-ai-coder.lovable.app/login" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#3b82f6", background: "linear-gradient(135deg, rgba(59,130,246,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-black text-white">New</span>
             <Rocket className="h-10 w-10" style={{ color: "#3b82f6" }} />
@@ -160,6 +236,19 @@ function Landing() {
             <Wand2 className="h-10 w-10" style={{ color: "#f97316" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#f97316" }}>توليد جودة أنمي صورية خيالية 4K</h3>
             <p className="mt-1 text-sm text-muted-foreground">ادفع 50 كريدت كل 5 ساعات لتجربته</p>
+          </PaidFeatureGate>
+
+          {/* إنشاء صورة بالذكاء الاصطناعي — مدفوع بالكريدت (جديد) */}
+          <PaidFeatureGate
+            featureKey="image_gen"
+            href="https://your-image-generator-app.lovable.app/"
+            className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]"
+            style={{ borderColor: "#8b5cf6", background: "linear-gradient(135deg, rgba(139,92,246,0.25), transparent)" }}
+          >
+            <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#8b5cf6" }}>جديد</span>
+            <ImagePlus className="h-10 w-10" style={{ color: "#8b5cf6" }} />
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#8b5cf6" }}>إنشاء صورة بالذكاء الاصطناعي</h3>
+            <p className="mt-1 text-sm text-muted-foreground">ولّد صور أنمي فريدة من وصف نصي · ادفع 20 كريدت لكل صورة</p>
           </PaidFeatureGate>
 
           <PaidFeatureGate featureKey="dubbing" href="https://anime-forge-dummling.lovable.app/" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#22c55e", background: "linear-gradient(135deg, rgba(34,197,94,0.25), transparent)" }}>
@@ -223,7 +312,7 @@ function Landing() {
             </p>
           </PaidFeatureGate>
 
-          {/* زر المانجا الجديد */}
+          {/* زر المانجا */}
           <button
             onClick={() => alert("قريباً سنطورها")}
             className="group relative block w-full overflow-hidden rounded-2xl border-2 border-amber-900/50 bg-amber-950 p-5 text-right transition-transform hover:scale-[1.01] text-white"
@@ -251,7 +340,7 @@ function Landing() {
             </p>
           </Link>
 
-          {/* زر الترقية والاشتراكات الجديد */}
+          {/* الترقية والاشتراكات + الدومينات */}
           <div className="md:col-span-2 space-y-3">
             <Link
               to="/pro-upgrade"
@@ -270,40 +359,60 @@ function Landing() {
             </Link>
           </div>
 
-          {/* أزرار التبرع ودعم المنصة */}
+          {/* المزيد — قسم قابل للطي يجمع القرآن / تقديم إدارة / تقديم مطور */}
+          <div className="md:col-span-2">
+            <button
+              onClick={() => setShowMore(!showMore)}
+              className="flex w-full items-center justify-between rounded-2xl border-2 border-border bg-card px-5 py-4 text-base font-black transition-colors hover:border-gold"
+            >
+              <span className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-gold" /> المزيد من الخدمات
+              </span>
+              <ChevronDown className={`h-5 w-5 transition-transform ${showMore ? "rotate-180" : ""}`} />
+            </button>
+
+            {showMore && (
+              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                <a
+                  href="https://anime-forge-quran.lovable.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-5 text-center transition-colors hover:border-gold"
+                >
+                  <span className="text-3xl">📖</span>
+                  <span className="font-black">قراءة القرآن الكريم</span>
+                </a>
+
+                <Link
+                  to="/apply-admin"
+                  className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-5 text-center transition-colors hover:border-gold"
+                >
+                  <Shield className="h-7 w-7 text-gold" />
+                  <span className="font-black">تقديم إدارة — 500 كريدت شهرياً</span>
+                </Link>
+
+                <Link
+                  to="/apply-developer"
+                  className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-5 text-center transition-colors hover:border-gold"
+                >
+                  <Code2 className="h-7 w-7 text-gold" />
+                  <span className="font-black">تقديم مطوّر — 25% من الأرباح</span>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* دعم المنصة والتبرع */}
           <div className="text-center my-8 md:col-span-2 flex flex-col items-center gap-4">
-            <a 
-              href="https://wa.me/?text=أرغب%20في%20دعم%20منصة%20أنمي%20فورج" 
-              target="_blank" 
+            <a
+              href="https://wa.me/?text=أرغب%20في%20دعم%20منصة%20أنمي%20فورج"
+              target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-500 rounded-full font-bold text-white shadow-lg transition-all"
             >
               <Heart className="w-5 h-5 fill-white animate-pulse" />
               <span>دعم المنصة والتبرع ❤️</span>
             </a>
-
-            <a
-              href="https://anime-forge-quran.lovable.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full max-w-sm py-3.5 px-6 rounded-2xl font-black text-white bg-gradient-to-r from-yellow-500 via-purple-500 to-amber-400 hover:opacity-90 hover:scale-[1.02] transition-all duration-300 text-center shadow-lg border border-yellow-400/50 text-lg"
-            >
-              📖 قراءة القران الكريم
-            </a>
-
-            <Link
-              to="/apply-admin"
-              className="w-full max-w-sm py-3.5 px-6 rounded-2xl font-black text-black bg-gradient-to-r from-yellow-400 to-amber-500 hover:opacity-90 hover:scale-[1.02] transition-all duration-300 text-center shadow-lg border border-yellow-300/60 text-lg"
-            >
-              🛡️ تقديم إدارة — 500 كريدت شهرياً
-            </Link>
-
-            <Link
-              to="/apply-developer"
-              className="w-full max-w-sm py-3.5 px-6 rounded-2xl font-black text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:opacity-90 hover:scale-[1.02] transition-all duration-300 text-center shadow-lg border border-sky-400/50 text-lg"
-            >
-              💻 تقديم مطوّر — نسبة 25% من الأرباح
-            </Link>
           </div>
         </div>
 
@@ -405,4 +514,3 @@ function Landing() {
     </div>
   );
 }
-

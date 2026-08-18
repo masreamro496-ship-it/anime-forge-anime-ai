@@ -49,12 +49,14 @@
   --secondary: oklch(0.19 0.04 20);
   --secondary-foreground: oklch(0.96 0.01 30);
   --muted: oklch(0.16 0.035 20);
-  --muted-foreground: oklch(0.68 0.06 25);
+  /* تم تفتيح لون النص الوصفي ليصبح رمادي فاتح بدل الأحمر الغامق لتحسين القراءة */
+  --muted-foreground: #D1D5DB;
   --accent: oklch(0.32 0.14 18);
   --accent-foreground: oklch(0.98 0.01 90);
   --destructive: oklch(0.5 0.22 10);
   --destructive-foreground: oklch(0.98 0.01 90);
-  --border: oklch(0.42 0.16 22);
+  /* تم استبدال لون الحدود الأحمر الصاخب برمادي داكن هادئ */
+  --border: #333333;
   --input: oklch(0.19 0.04 20);
   --ring: oklch(0.68 0.24 25);
 

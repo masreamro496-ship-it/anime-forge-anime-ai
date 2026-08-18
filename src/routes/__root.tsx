@@ -9,9 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
-
-
-
+import Navbar from "@/components/Navbar";
 
 import appCss from "../styles.css?url";
 
@@ -123,9 +121,11 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
+        <div className="pb-20">
+          <Outlet />
+        </div>
 
-
+        <Navbar />
 
         <Toaster richColors position="top-center" dir="rtl" />
       </AuthProvider>

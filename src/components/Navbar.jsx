@@ -1,13 +1,15 @@
 import { Link, useLocation } from '@tanstack/react-router';
 import { Home, Film, Sparkles, LayoutDashboard, Gift, MoreHorizontal } from 'lucide-react';
 
+// ملاحظة: الروابط دي لازم تبقى مطابقة لمسارات موجودة فعلاً في src/routes
+// عدّل href هنا لو غيّرت اسم أي صفحة
 const navItems = [
-  { id: 'home', label: 'الرئيسية', icon: Home, href: '/' },
-  { id: 'movies', label: 'أفلام', icon: Film, href: '/movies' },
-  { id: 'anime', label: 'انمي', icon: Sparkles, href: '/anime' },
-  { id: 'dashboard', label: 'لوحتي', icon: LayoutDashboard, href: '/dashboard' },
-  { id: 'earn', label: 'اربح كريدت', icon: Gift, href: '/earn' },
-  { id: 'more', label: 'المزيد', icon: MoreHorizontal, href: '/more' },
+  { id: 'home', label: 'الرئيسية', icon: Home, href: '/' as const },
+  { id: 'movies', label: 'أفلام', icon: Film, href: '/anime-market' as const },
+  { id: 'anime', label: 'انمي', icon: Sparkles, href: '/anime-market' as const },
+  { id: 'dashboard', label: 'لوحتي', icon: LayoutDashboard, href: '/dashboard' as const },
+  { id: 'earn', label: 'اربح كريدت', icon: Gift, href: '/tasks' as const },
+  { id: 'more', label: 'المزيد', icon: MoreHorizontal, href: '/legal' as const },
 ];
 
 export default function Navbar() {

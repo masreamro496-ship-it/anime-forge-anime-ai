@@ -47,191 +47,49 @@ import { Route as GraphicDesignMarketListingIdRouteImport } from './routes/graph
 import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/fatora/success'
 import { Route as ApiPublicCreditsDeductRouteImport } from './routes/api/public/credits/deduct'
 
-const WheelRoute = WheelRouteImport.update({
-  id: '/wheel',
-  path: '/wheel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WatermarkRoute = WatermarkRouteImport.update({
-  id: '/watermark',
-  path: '/watermark',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TasksRoute = TasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SocialRoute = SocialRouteImport.update({
-  id: '/social',
-  path: '/social',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShortsRoute = ShortsRouteImport.update({
-  id: '/shorts',
-  path: '/shorts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProUpgradeRoute = ProUpgradeRouteImport.update({
-  id: '/pro-upgrade',
-  path: '/pro-upgrade',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalRoute = LegalRouteImport.update({
-  id: '/legal',
-  path: '/legal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GraphicDesignRoute = GraphicDesignRouteImport.update({
-  id: '/graphic-design',
-  path: '/graphic-design',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FreeShortsRoute = FreeShortsRouteImport.update({
-  id: '/free-shorts',
-  path: '/free-shorts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DomainsRoute = DomainsRouteImport.update({
-  id: '/domains',
-  path: '/domains',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChatRoute = ChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AudioRoute = AudioRouteImport.update({
-  id: '/audio',
-  path: '/audio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApplyDeveloperRoute = ApplyDeveloperRouteImport.update({
-  id: '/apply-developer',
-  path: '/apply-developer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApplyAdminRoute = ApplyAdminRouteImport.update({
-  id: '/apply-admin',
-  path: '/apply-admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnimeMarketRoute = AnimeMarketRouteImport.update({
-  id: '/anime-market',
-  path: '/anime-market',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WorldCupIndexRoute = WorldCupIndexRouteImport.update({
-  id: '/world-cup/',
-  path: '/world-cup/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WorldCupPlayRoute = WorldCupPlayRouteImport.update({
-  id: '/world-cup/play',
-  path: '/world-cup/play',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WatchIdRoute = WatchIdRouteImport.update({
-  id: '/watch/$id',
-  path: '/watch/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShortsUploadRoute = ShortsUploadRouteImport.update({
-  id: '/upload',
-  path: '/upload',
-  getParentRoute: () => ShortsRoute,
-} as any)
-const ShortsIdRoute = ShortsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ShortsRoute,
-} as any)
-const GraphicDesignUploadRoute = GraphicDesignUploadRouteImport.update({
-  id: '/upload',
-  path: '/upload',
-  getParentRoute: () => GraphicDesignRoute,
-} as any)
-const GraphicDesignMarketRoute = GraphicDesignMarketRouteImport.update({
-  id: '/market',
-  path: '/market',
-  getParentRoute: () => GraphicDesignRoute,
-} as any)
-const GraphicDesignGalleryRoute = GraphicDesignGalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
-  getParentRoute: () => GraphicDesignRoute,
-} as any)
-const GraphicDesignEditorRoute = GraphicDesignEditorRouteImport.update({
-  id: '/editor',
-  path: '/editor',
-  getParentRoute: () => GraphicDesignRoute,
-} as any)
-const GraphicDesignDashboardRoute = GraphicDesignDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => GraphicDesignRoute,
-} as any)
-const GenerateVideoRoute = GenerateVideoRouteImport.update({
-  id: '/generate/video',
-  path: '/generate/video',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GenerateGokuRoute = GenerateGokuRouteImport.update({
-  id: '/generate/goku',
-  path: '/generate/goku',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnimeMarketIdRoute = AnimeMarketIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AnimeMarketRoute,
-} as any)
-const GraphicDesignProfileUserIdRoute = GraphicDesignProfileUserIdRouteImport.update({
-  id: '/profile/$userId',
-  path: '/profile/$userId',
-  getParentRoute: () => GraphicDesignRoute,
-} as any)
-const GraphicDesignMarketListingIdRoute = GraphicDesignMarketListingIdRouteImport.update({
-  id: '/$listingId',
-  path: '/$listingId',
-  getParentRoute: () => GraphicDesignMarketRoute,
-} as any)
-const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({
-  id: '/api/public/fatora/success',
-  path: '/api/public/fatora/success',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicCreditsDeductRoute = ApiPublicCreditsDeductRouteImport.update({
-  id: '/api/public/credits/deduct',
-  path: '/api/public/credits/deduct',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const WheelRoute = WheelRouteImport.update({ id: '/wheel', path: '/wheel', getParentRoute: () => rootRouteImport } as any)
+const WatermarkRoute = WatermarkRouteImport.update({ id: '/watermark', path: '/watermark', getParentRoute: () => rootRouteImport } as any)
+const TasksRoute = TasksRouteImport.update({ id: '/tasks', path: '/tasks', getParentRoute: () => rootRouteImport } as any)
+const SocialRoute = SocialRouteImport.update({ id: '/social', path: '/social', getParentRoute: () => rootRouteImport } as any)
+const ShortsRoute = ShortsRouteImport.update({ id: '/shorts', path: '/shorts', getParentRoute: () => rootRouteImport } as any)
+const ProfileRoute = ProfileRouteImport.update({ id: '/profile', path: '/profile', getParentRoute: () => rootRouteImport } as any)
+const ProUpgradeRoute = ProUpgradeRouteImport.update({ id: '/pro-upgrade', path: '/pro-upgrade', getParentRoute: () => rootRouteImport } as any)
+const LoginRoute = LoginRouteImport.update({ id: '/login', path: '/login', getParentRoute: () => rootRouteImport } as any)
+const LegalRoute = LegalRouteImport.update({ id: '/legal', path: '/legal', getParentRoute: () => rootRouteImport } as any)
+const GraphicDesignRoute = GraphicDesignRouteImport.update({ id: '/graphic-design', path: '/graphic-design', getParentRoute: () => rootRouteImport } as any)
+const FreeShortsRoute = FreeShortsRouteImport.update({ id: '/free-shorts', path: '/free-shorts', getParentRoute: () => rootRouteImport } as any)
+const DomainsRoute = DomainsRouteImport.update({ id: '/domains', path: '/domains', getParentRoute: () => rootRouteImport } as any)
+const DashboardRoute = DashboardRouteImport.update({ id: '/dashboard', path: '/dashboard', getParentRoute: () => rootRouteImport } as any)
+const ChatRoute = ChatRouteImport.update({ id: '/chat', path: '/chat', getParentRoute: () => rootRouteImport } as any)
+const AudioRoute = AudioRouteImport.update({ id: '/audio', path: '/audio', getParentRoute: () => rootRouteImport } as any)
+const ApplyDeveloperRoute = ApplyDeveloperRouteImport.update({ id: '/apply-developer', path: '/apply-developer', getParentRoute: () => rootRouteImport } as any)
+const ApplyAdminRoute = ApplyAdminRouteImport.update({ id: '/apply-admin', path: '/apply-admin', getParentRoute: () => rootRouteImport } as any)
+const AnimeMarketRoute = AnimeMarketRouteImport.update({ id: '/anime-market', path: '/anime-market', getParentRoute: () => rootRouteImport } as any)
+const AdminRoute = AdminRouteImport.update({ id: '/admin', path: '/admin', getParentRoute: () => rootRouteImport } as any)
+const IndexRoute = IndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => rootRouteImport } as any)
+const WorldCupIndexRoute = WorldCupIndexRouteImport.update({ id: '/world-cup/', path: '/world-cup/', getParentRoute: () => rootRouteImport } as any)
+const WorldCupPlayRoute = WorldCupPlayRouteImport.update({ id: '/world-cup/play', path: '/world-cup/play', getParentRoute: () => rootRouteImport } as any)
+const WatchIdRoute = WatchIdRouteImport.update({ id: '/watch/$id', path: '/watch/$id', getParentRoute: () => rootRouteImport } as any)
+
+const ShortsUploadRoute = ShortsUploadRouteImport.update({ id: '/upload', path: '/upload', getParentRoute: () => ShortsRoute } as any)
+const ShortsIdRoute = ShortsIdRouteImport.update({ id: '/$id', path: '/$id', getParentRoute: () => ShortsRoute } as any)
+
+const GraphicDesignUploadRoute = GraphicDesignUploadRouteImport.update({ id: '/upload', path: '/upload', getParentRoute: () => GraphicDesignRoute } as any)
+const GraphicDesignMarketRoute = GraphicDesignMarketRouteImport.update({ id: '/market', path: '/market', getParentRoute: () => GraphicDesignRoute } as any)
+const GraphicDesignGalleryRoute = GraphicDesignGalleryRouteImport.update({ id: '/gallery', path: '/gallery', getParentRoute: () => GraphicDesignRoute } as any)
+const GraphicDesignEditorRoute = GraphicDesignEditorRouteImport.update({ id: '/editor', path: '/editor', getParentRoute: () => GraphicDesignRoute } as any)
+const GraphicDesignDashboardRoute = GraphicDesignDashboardRouteImport.update({ id: '/dashboard', path: '/dashboard', getParentRoute: () => GraphicDesignRoute } as any)
+const GraphicDesignProfileUserIdRoute = GraphicDesignProfileUserIdRouteImport.update({ id: '/profile/$userId', path: '/profile/$userId', getParentRoute: () => GraphicDesignRoute } as any)
+
+const GenerateVideoRoute = GenerateVideoRouteImport.update({ id: '/generate/video', path: '/generate/video', getParentRoute: () => rootRouteImport } as any)
+const GenerateGokuRoute = GenerateGokuRouteImport.update({ id: '/generate/goku', path: '/generate/goku', getParentRoute: () => rootRouteImport } as any)
+
+const AnimeMarketIdRoute = AnimeMarketIdRouteImport.update({ id: '/$id', path: '/$id', getParentRoute: () => AnimeMarketRoute } as any)
+
+const GraphicDesignMarketListingIdRoute = GraphicDesignMarketListingIdRouteImport.update({ id: '/$listingId', path: '/$listingId', getParentRoute: () => GraphicDesignMarketRoute } as any)
+
+const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({ id: '/api/public/fatora/success', path: '/api/public/fatora/success', getParentRoute: () => rootRouteImport } as any)
+const ApiPublicCreditsDeductRoute = ApiPublicCreditsDeductRouteImport.update({ id: '/api/public/credits/deduct', path: '/api/public/credits/deduct', getParentRoute: () => rootRouteImport } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -272,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
+
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
@@ -311,6 +170,7 @@ export interface FileRoutesByTo {
   '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
+
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
@@ -351,6 +211,7 @@ export interface FileRoutesById {
   '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
+
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
@@ -471,6 +332,7 @@ export interface FileRouteTypes {
     | '/api/public/fatora/success'
   fileRoutesById: FileRoutesById
 }
+
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
@@ -787,8 +649,7 @@ const ShortsRouteChildren: ShortsRouteChildren = {
   ShortsUploadRoute: ShortsUploadRoute,
 }
 
-const ShortsRouteWithChildren =
-  ShortsRoute._addFileChildren(ShortsRouteChildren)
+const ShortsRouteWithChildren = ShortsRoute._addFileChildren(ShortsRouteChildren)
 
 interface GraphicDesignMarketRouteChildren {
   GraphicDesignMarketListingIdRoute: typeof GraphicDesignMarketListingIdRoute
@@ -852,6 +713,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCreditsDeductRoute: ApiPublicCreditsDeductRoute,
   ApiPublicFatoraSuccessRoute: ApiPublicFatoraSuccessRoute,
 }
+
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()

@@ -18,6 +18,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LegalRouteImport } from './routes/legal'
+import { Route as GraphicDesignRouteImport } from './routes/graphic-design'
 import { Route as FreeShortsRouteImport } from './routes/free-shorts'
 import { Route as DomainsRouteImport } from './routes/domains'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -33,9 +34,16 @@ import { Route as WorldCupPlayRouteImport } from './routes/world-cup.play'
 import { Route as WatchIdRouteImport } from './routes/watch.$id'
 import { Route as ShortsUploadRouteImport } from './routes/shorts.upload'
 import { Route as ShortsIdRouteImport } from './routes/shorts.$id'
+import { Route as GraphicDesignUploadRouteImport } from './routes/graphic-design.upload'
+import { Route as GraphicDesignMarketRouteImport } from './routes/graphic-design.market'
+import { Route as GraphicDesignGalleryRouteImport } from './routes/graphic-design.gallery'
+import { Route as GraphicDesignEditorRouteImport } from './routes/graphic-design.editor'
+import { Route as GraphicDesignDashboardRouteImport } from './routes/graphic-design.dashboard'
 import { Route as GenerateVideoRouteImport } from './routes/generate.video'
 import { Route as GenerateGokuRouteImport } from './routes/generate.goku'
 import { Route as AnimeMarketIdRouteImport } from './routes/anime-market.$id'
+import { Route as GraphicDesignProfileUserIdRouteImport } from './routes/graphic-design.profile.$userId'
+import { Route as GraphicDesignMarketListingIdRouteImport } from './routes/graphic-design.market.$listingId'
 import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/fatora/success'
 import { Route as ApiPublicCreditsDeductRouteImport } from './routes/api/public/credits/deduct'
 
@@ -82,6 +90,11 @@ const LoginRoute = LoginRouteImport.update({
 const LegalRoute = LegalRouteImport.update({
   id: '/legal',
   path: '/legal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GraphicDesignRoute = GraphicDesignRouteImport.update({
+  id: '/graphic-design',
+  path: '/graphic-design',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FreeShortsRoute = FreeShortsRouteImport.update({
@@ -159,6 +172,31 @@ const ShortsIdRoute = ShortsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ShortsRoute,
 } as any)
+const GraphicDesignUploadRoute = GraphicDesignUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => GraphicDesignRoute,
+} as any)
+const GraphicDesignMarketRoute = GraphicDesignMarketRouteImport.update({
+  id: '/market',
+  path: '/market',
+  getParentRoute: () => GraphicDesignRoute,
+} as any)
+const GraphicDesignGalleryRoute = GraphicDesignGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => GraphicDesignRoute,
+} as any)
+const GraphicDesignEditorRoute = GraphicDesignEditorRouteImport.update({
+  id: '/editor',
+  path: '/editor',
+  getParentRoute: () => GraphicDesignRoute,
+} as any)
+const GraphicDesignDashboardRoute = GraphicDesignDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => GraphicDesignRoute,
+} as any)
 const GenerateVideoRoute = GenerateVideoRouteImport.update({
   id: '/generate/video',
   path: '/generate/video',
@@ -173,6 +211,16 @@ const AnimeMarketIdRoute = AnimeMarketIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => AnimeMarketRoute,
+} as any)
+const GraphicDesignProfileUserIdRoute = GraphicDesignProfileUserIdRouteImport.update({
+  id: '/profile/$userId',
+  path: '/profile/$userId',
+  getParentRoute: () => GraphicDesignRoute,
+} as any)
+const GraphicDesignMarketListingIdRoute = GraphicDesignMarketListingIdRouteImport.update({
+  id: '/$listingId',
+  path: '/$listingId',
+  getParentRoute: () => GraphicDesignMarketRoute,
 } as any)
 const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({
   id: '/api/public/fatora/success',
@@ -196,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
+  '/graphic-design': typeof GraphicDesignRouteWithChildren
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
@@ -206,6 +255,11 @@ export interface FileRoutesByFullPath {
   '/watermark': typeof WatermarkRoute
   '/wheel': typeof WheelRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
+  '/graphic-design/dashboard': typeof GraphicDesignDashboardRoute
+  '/graphic-design/editor': typeof GraphicDesignEditorRoute
+  '/graphic-design/gallery': typeof GraphicDesignGalleryRoute
+  '/graphic-design/market': typeof GraphicDesignMarketRouteWithChildren
+  '/graphic-design/upload': typeof GraphicDesignUploadRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
@@ -213,6 +267,8 @@ export interface FileRoutesByFullPath {
   '/watch/$id': typeof WatchIdRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup/': typeof WorldCupIndexRoute
+  '/graphic-design/market/$listingId': typeof GraphicDesignMarketListingIdRoute
+  '/graphic-design/profile/$userId': typeof GraphicDesignProfileUserIdRoute
   '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
@@ -227,6 +283,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
+  '/graphic-design': typeof GraphicDesignRouteWithChildren
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
@@ -237,6 +294,11 @@ export interface FileRoutesByTo {
   '/watermark': typeof WatermarkRoute
   '/wheel': typeof WheelRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
+  '/graphic-design/dashboard': typeof GraphicDesignDashboardRoute
+  '/graphic-design/editor': typeof GraphicDesignEditorRoute
+  '/graphic-design/gallery': typeof GraphicDesignGalleryRoute
+  '/graphic-design/market': typeof GraphicDesignMarketRouteWithChildren
+  '/graphic-design/upload': typeof GraphicDesignUploadRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
@@ -244,6 +306,8 @@ export interface FileRoutesByTo {
   '/watch/$id': typeof WatchIdRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup': typeof WorldCupIndexRoute
+  '/graphic-design/market/$listingId': typeof GraphicDesignMarketListingIdRoute
+  '/graphic-design/profile/$userId': typeof GraphicDesignProfileUserIdRoute
   '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
@@ -259,6 +323,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
+  '/graphic-design': typeof GraphicDesignRouteWithChildren
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pro-upgrade': typeof ProUpgradeRoute
@@ -269,6 +334,11 @@ export interface FileRoutesById {
   '/watermark': typeof WatermarkRoute
   '/wheel': typeof WheelRoute
   '/anime-market/$id': typeof AnimeMarketIdRoute
+  '/graphic-design/dashboard': typeof GraphicDesignDashboardRoute
+  '/graphic-design/editor': typeof GraphicDesignEditorRoute
+  '/graphic-design/gallery': typeof GraphicDesignGalleryRoute
+  '/graphic-design/market': typeof GraphicDesignMarketRouteWithChildren
+  '/graphic-design/upload': typeof GraphicDesignUploadRoute
   '/generate/goku': typeof GenerateGokuRoute
   '/generate/video': typeof GenerateVideoRoute
   '/shorts/$id': typeof ShortsIdRoute
@@ -276,6 +346,8 @@ export interface FileRoutesById {
   '/watch/$id': typeof WatchIdRoute
   '/world-cup/play': typeof WorldCupPlayRoute
   '/world-cup/': typeof WorldCupIndexRoute
+  '/graphic-design/market/$listingId': typeof GraphicDesignMarketListingIdRoute
+  '/graphic-design/profile/$userId': typeof GraphicDesignProfileUserIdRoute
   '/api/public/credits/deduct': typeof ApiPublicCreditsDeductRoute
   '/api/public/fatora/success': typeof ApiPublicFatoraSuccessRoute
 }
@@ -292,6 +364,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/domains'
     | '/free-shorts'
+    | '/graphic-design'
     | '/legal'
     | '/login'
     | '/pro-upgrade'
@@ -302,6 +375,11 @@ export interface FileRouteTypes {
     | '/watermark'
     | '/wheel'
     | '/anime-market/$id'
+    | '/graphic-design/dashboard'
+    | '/graphic-design/editor'
+    | '/graphic-design/gallery'
+    | '/graphic-design/market'
+    | '/graphic-design/upload'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
@@ -309,6 +387,8 @@ export interface FileRouteTypes {
     | '/watch/$id'
     | '/world-cup/play'
     | '/world-cup/'
+    | '/graphic-design/market/$listingId'
+    | '/graphic-design/profile/$userId'
     | '/api/public/credits/deduct'
     | '/api/public/fatora/success'
   fileRoutesByTo: FileRoutesByTo
@@ -323,6 +403,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/domains'
     | '/free-shorts'
+    | '/graphic-design'
     | '/legal'
     | '/login'
     | '/pro-upgrade'
@@ -333,6 +414,11 @@ export interface FileRouteTypes {
     | '/watermark'
     | '/wheel'
     | '/anime-market/$id'
+    | '/graphic-design/dashboard'
+    | '/graphic-design/editor'
+    | '/graphic-design/gallery'
+    | '/graphic-design/market'
+    | '/graphic-design/upload'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
@@ -340,6 +426,8 @@ export interface FileRouteTypes {
     | '/watch/$id'
     | '/world-cup/play'
     | '/world-cup'
+    | '/graphic-design/market/$listingId'
+    | '/graphic-design/profile/$userId'
     | '/api/public/credits/deduct'
     | '/api/public/fatora/success'
   id:
@@ -354,6 +442,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/domains'
     | '/free-shorts'
+    | '/graphic-design'
     | '/legal'
     | '/login'
     | '/pro-upgrade'
@@ -364,6 +453,11 @@ export interface FileRouteTypes {
     | '/watermark'
     | '/wheel'
     | '/anime-market/$id'
+    | '/graphic-design/dashboard'
+    | '/graphic-design/editor'
+    | '/graphic-design/gallery'
+    | '/graphic-design/market'
+    | '/graphic-design/upload'
     | '/generate/goku'
     | '/generate/video'
     | '/shorts/$id'
@@ -371,6 +465,8 @@ export interface FileRouteTypes {
     | '/watch/$id'
     | '/world-cup/play'
     | '/world-cup/'
+    | '/graphic-design/market/$listingId'
+    | '/graphic-design/profile/$userId'
     | '/api/public/credits/deduct'
     | '/api/public/fatora/success'
   fileRoutesById: FileRoutesById
@@ -386,6 +482,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   DomainsRoute: typeof DomainsRoute
   FreeShortsRoute: typeof FreeShortsRoute
+  GraphicDesignRoute: typeof GraphicDesignRouteWithChildren
   LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
   ProUpgradeRoute: typeof ProUpgradeRoute
@@ -467,6 +564,13 @@ declare module '@tanstack/react-router' {
       path: '/legal'
       fullPath: '/legal'
       preLoaderRoute: typeof LegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/graphic-design': {
+      id: '/graphic-design'
+      path: '/graphic-design'
+      fullPath: '/graphic-design'
+      preLoaderRoute: typeof GraphicDesignRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/free-shorts': {
@@ -574,6 +678,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShortsIdRouteImport
       parentRoute: typeof ShortsRoute
     }
+    '/graphic-design/upload': {
+      id: '/graphic-design/upload'
+      path: '/upload'
+      fullPath: '/graphic-design/upload'
+      preLoaderRoute: typeof GraphicDesignUploadRouteImport
+      parentRoute: typeof GraphicDesignRoute
+    }
+    '/graphic-design/market': {
+      id: '/graphic-design/market'
+      path: '/market'
+      fullPath: '/graphic-design/market'
+      preLoaderRoute: typeof GraphicDesignMarketRouteImport
+      parentRoute: typeof GraphicDesignRoute
+    }
+    '/graphic-design/gallery': {
+      id: '/graphic-design/gallery'
+      path: '/gallery'
+      fullPath: '/graphic-design/gallery'
+      preLoaderRoute: typeof GraphicDesignGalleryRouteImport
+      parentRoute: typeof GraphicDesignRoute
+    }
+    '/graphic-design/editor': {
+      id: '/graphic-design/editor'
+      path: '/editor'
+      fullPath: '/graphic-design/editor'
+      preLoaderRoute: typeof GraphicDesignEditorRouteImport
+      parentRoute: typeof GraphicDesignRoute
+    }
+    '/graphic-design/dashboard': {
+      id: '/graphic-design/dashboard'
+      path: '/dashboard'
+      fullPath: '/graphic-design/dashboard'
+      preLoaderRoute: typeof GraphicDesignDashboardRouteImport
+      parentRoute: typeof GraphicDesignRoute
+    }
     '/generate/video': {
       id: '/generate/video'
       path: '/generate/video'
@@ -594,6 +733,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/anime-market/$id'
       preLoaderRoute: typeof AnimeMarketIdRouteImport
       parentRoute: typeof AnimeMarketRoute
+    }
+    '/graphic-design/profile/$userId': {
+      id: '/graphic-design/profile/$userId'
+      path: '/profile/$userId'
+      fullPath: '/graphic-design/profile/$userId'
+      preLoaderRoute: typeof GraphicDesignProfileUserIdRouteImport
+      parentRoute: typeof GraphicDesignRoute
+    }
+    '/graphic-design/market/$listingId': {
+      id: '/graphic-design/market/$listingId'
+      path: '/$listingId'
+      fullPath: '/graphic-design/market/$listingId'
+      preLoaderRoute: typeof GraphicDesignMarketListingIdRouteImport
+      parentRoute: typeof GraphicDesignMarketRoute
     }
     '/api/public/fatora/success': {
       id: '/api/public/fatora/success'
@@ -637,6 +790,39 @@ const ShortsRouteChildren: ShortsRouteChildren = {
 const ShortsRouteWithChildren =
   ShortsRoute._addFileChildren(ShortsRouteChildren)
 
+interface GraphicDesignMarketRouteChildren {
+  GraphicDesignMarketListingIdRoute: typeof GraphicDesignMarketListingIdRoute
+}
+
+const GraphicDesignMarketRouteChildren: GraphicDesignMarketRouteChildren = {
+  GraphicDesignMarketListingIdRoute: GraphicDesignMarketListingIdRoute,
+}
+
+const GraphicDesignMarketRouteWithChildren =
+  GraphicDesignMarketRoute._addFileChildren(GraphicDesignMarketRouteChildren)
+
+interface GraphicDesignRouteChildren {
+  GraphicDesignDashboardRoute: typeof GraphicDesignDashboardRoute
+  GraphicDesignEditorRoute: typeof GraphicDesignEditorRoute
+  GraphicDesignGalleryRoute: typeof GraphicDesignGalleryRoute
+  GraphicDesignMarketRoute: typeof GraphicDesignMarketRouteWithChildren
+  GraphicDesignProfileUserIdRoute: typeof GraphicDesignProfileUserIdRoute
+  GraphicDesignUploadRoute: typeof GraphicDesignUploadRoute
+}
+
+const GraphicDesignRouteChildren: GraphicDesignRouteChildren = {
+  GraphicDesignDashboardRoute: GraphicDesignDashboardRoute,
+  GraphicDesignEditorRoute: GraphicDesignEditorRoute,
+  GraphicDesignGalleryRoute: GraphicDesignGalleryRoute,
+  GraphicDesignMarketRoute: GraphicDesignMarketRouteWithChildren,
+  GraphicDesignProfileUserIdRoute: GraphicDesignProfileUserIdRoute,
+  GraphicDesignUploadRoute: GraphicDesignUploadRoute,
+}
+
+const GraphicDesignRouteWithChildren = GraphicDesignRoute._addFileChildren(
+  GraphicDesignRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
@@ -648,6 +834,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   DomainsRoute: DomainsRoute,
   FreeShortsRoute: FreeShortsRoute,
+  GraphicDesignRoute: GraphicDesignRouteWithChildren,
   LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
   ProUpgradeRoute: ProUpgradeRoute,
@@ -668,3 +855,4 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+

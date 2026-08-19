@@ -406,6 +406,21 @@ function Landing() {
             </p>
           </Link>
 
+          {/* جرافيك ديزاين */}
+          <Link
+            to="/graphic-design"
+            className="group relative overflow-hidden rounded-2xl border-2 border-red-500/80 bg-gradient-to-br from-red-600/25 to-red-900/10 p-5 transition-transform hover:scale-[1.01]"
+          >
+            <span className="absolute right-3 top-3 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-black text-white animate-pulse">
+              جديد
+            </span>
+            <span className="text-3xl">🖌️</span>
+            <h3 className="mt-3 text-lg font-black text-red-500">جرافيك ديزاين</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              اكسب فلوس من جرافيك ديزاين وبيع للناس، وبيع لوحات أنمي ولوحات وكتابة لوحات وشركات ونصوص
+            </p>
+          </Link>
+
           {/* الترقية والاشتراكات + الدومينات */}
           <div className="md:col-span-2 space-y-3">
             <Link
@@ -581,4 +596,3 @@ function Landing() {
     </div>
   );
 }
-

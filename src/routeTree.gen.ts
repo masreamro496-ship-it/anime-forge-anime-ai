@@ -86,6 +86,8 @@ const GenerateGokuRoute = GenerateGokuRouteImport.update({ id: '/generate/goku',
 
 const AnimeMarketIdRoute = AnimeMarketIdRouteImport.update({ id: '/$id', path: '/$id', getParentRoute: () => AnimeMarketRoute } as any)
 
+// ✅ الإصلاح هنا: كان مكتوب '/market/$listingId' وده بيكرر '/market' لأن الأب أصلاً '/market'
+// المفروض المسار الفرعي بس '/$listingId' عشان الناتج يبقى /graphic-design/market/$listingId
 const GraphicDesignMarketListingIdRoute = GraphicDesignMarketListingIdRouteImport.update({ id: '/$listingId', path: '/$listingId', getParentRoute: () => GraphicDesignMarketRoute } as any)
 
 const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({ id: '/api/public/fatora/success', path: '/api/public/fatora/success', getParentRoute: () => rootRouteImport } as any)

@@ -21,6 +21,7 @@ import {
   ChevronDown,
   Code2,
   Shield,
+  Download,
 } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
@@ -501,6 +502,15 @@ function Landing() {
           <InstallAppButton />
 
           <a
+            href="/app-release.apk"
+            download="AnimeForge.apk"
+            className="w-full rounded-2xl border-2 border-emerald-500/60 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 py-4 text-base font-black text-emerald-300 flex items-center justify-center gap-2 hover:scale-[1.01] transition"
+          >
+            <Download className="h-5 w-5" />
+            تحميل تطبيق انمي فورج (APK) مباشرة على جهازك
+          </a>
+
+          <a
             href="https://anime-forge-glb-1440p.lovable.app/"
             target="_blank"
             rel="noopener noreferrer"
@@ -596,3 +606,4 @@ function Landing() {
     </div>
   );
 }
+

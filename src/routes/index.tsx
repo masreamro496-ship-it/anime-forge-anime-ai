@@ -17,7 +17,6 @@ import {
   Heart,
   Crown,
   LogIn,
-  ImagePlus,
   ChevronDown,
   Code2,
   Shield,
@@ -303,19 +302,6 @@ function Landing() {
             <Wand2 className="h-10 w-10" style={{ color: "#f97316" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#f97316" }}>توليد جودة أنمي صورية خيالية 4K</h3>
             <p className="mt-1 text-sm text-muted-foreground">ادفع 50 كريدت كل 5 ساعات لتجربته</p>
-          </PaidFeatureGate>
-
-          {/* إنشاء صورة بالذكاء الاصطناعي — مدفوع بالكريدت (جديد) */}
-          <PaidFeatureGate
-            featureKey="image_gen"
-            href="https://your-image-generator-app.lovable.app/"
-            className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]"
-            style={{ borderColor: "#8b5cf6", background: "linear-gradient(135deg, rgba(139,92,246,0.25), transparent)" }}
-          >
-            <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#8b5cf6" }}>جديد</span>
-            <ImagePlus className="h-10 w-10" style={{ color: "#8b5cf6" }} />
-            <h3 className="mt-3 text-lg font-black" style={{ color: "#8b5cf6" }}>إنشاء صورة بالذكاء الاصطناعي</h3>
-            <p className="mt-1 text-sm text-muted-foreground">ولّد صور أنمي فريدة من وصف نصي · ادفع 20 كريدت لكل صورة</p>
           </PaidFeatureGate>
 
           <PaidFeatureGate featureKey="dubbing" href="https://anime-forge-dummling.lovable.app/" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#22c55e", background: "linear-gradient(135deg, rgba(34,197,94,0.25), transparent)" }}>
@@ -606,4 +592,3 @@ function Landing() {
     </div>
   );
 }
-

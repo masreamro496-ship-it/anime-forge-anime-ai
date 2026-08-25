@@ -21,6 +21,7 @@ import {
   Code2,
   Shield,
   Download,
+  Cpu,
 } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
@@ -408,6 +409,27 @@ function Landing() {
             </p>
           </Link>
 
+          {/* استوديو النماذج — إنشاء نموذج ذكاء اصطناعي مخصص (جديد) */}
+          <Link
+            to="/model-studio"
+            className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]"
+            style={{ borderColor: "#84cc16", background: "linear-gradient(135deg, rgba(132,204,22,0.25), transparent)" }}
+          >
+            <span
+              className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black"
+              style={{ color: "#84cc16" }}
+            >
+              جديد
+            </span>
+            <Cpu className="h-10 w-10" style={{ color: "#84cc16" }} />
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#84cc16" }}>
+              إنشاء نموذج ذكاء اصطناعي مخصص
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              درّب نموذج شخصية خاص بك على السحابة (مثل Gemini)، وابيعه أو استخدمه في التوليد — 10 صور فقط واسم الشخصية
+            </p>
+          </Link>
+
           {/* الترقية والاشتراكات + الدومينات */}
           <div className="md:col-span-2 space-y-3">
             <Link
@@ -592,3 +614,4 @@ function Landing() {
     </div>
   );
 }
+

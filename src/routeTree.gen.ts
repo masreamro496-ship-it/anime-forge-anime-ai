@@ -16,6 +16,7 @@ import { Route as SocialRouteImport } from './routes/social'
 import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
+import { Route as ModelStudioRouteImport } from './routes/model-studio'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LegalRouteImport } from './routes/legal'
 import { Route as GraphicDesignRouteImport } from './routes/graphic-design'
@@ -85,6 +86,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const ProUpgradeRoute = ProUpgradeRouteImport.update({
   id: '/pro-upgrade',
   path: '/pro-upgrade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelStudioRoute = ModelStudioRouteImport.update({
+  id: '/model-studio',
+  path: '/model-studio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -282,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/graphic-design': typeof GraphicDesignRouteWithChildren
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
+  '/model-studio': typeof ModelStudioRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
@@ -325,6 +332,7 @@ export interface FileRoutesByTo {
   '/free-shorts': typeof FreeShortsRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
+  '/model-studio': typeof ModelStudioRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
@@ -370,6 +378,7 @@ export interface FileRoutesById {
   '/graphic-design': typeof GraphicDesignRouteWithChildren
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
+  '/model-studio': typeof ModelStudioRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRouteWithChildren
@@ -416,6 +425,7 @@ export interface FileRouteTypes {
     | '/graphic-design'
     | '/legal'
     | '/login'
+    | '/model-studio'
     | '/pro-upgrade'
     | '/profile'
     | '/shorts'
@@ -459,6 +469,7 @@ export interface FileRouteTypes {
     | '/free-shorts'
     | '/legal'
     | '/login'
+    | '/model-studio'
     | '/pro-upgrade'
     | '/profile'
     | '/shorts'
@@ -503,6 +514,7 @@ export interface FileRouteTypes {
     | '/graphic-design'
     | '/legal'
     | '/login'
+    | '/model-studio'
     | '/pro-upgrade'
     | '/profile'
     | '/shorts'
@@ -548,6 +560,7 @@ export interface RootRouteChildren {
   GraphicDesignRoute: typeof GraphicDesignRouteWithChildren
   LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
+  ModelStudioRoute: typeof ModelStudioRoute
   ProUpgradeRoute: typeof ProUpgradeRoute
   ProfileRoute: typeof ProfileRoute
   ShortsRoute: typeof ShortsRouteWithChildren
@@ -613,6 +626,13 @@ declare module '@tanstack/react-router' {
       path: '/pro-upgrade'
       fullPath: '/pro-upgrade'
       preLoaderRoute: typeof ProUpgradeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/model-studio': {
+      id: '/model-studio'
+      path: '/model-studio'
+      fullPath: '/model-studio'
+      preLoaderRoute: typeof ModelStudioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -963,6 +983,7 @@ const rootRouteChildren: RootRouteChildren = {
   GraphicDesignRoute: GraphicDesignRouteWithChildren,
   LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
+  ModelStudioRoute: ModelStudioRoute,
   ProUpgradeRoute: ProUpgradeRoute,
   ProfileRoute: ProfileRoute,
   ShortsRoute: ShortsRouteWithChildren,

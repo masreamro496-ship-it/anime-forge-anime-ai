@@ -7,140 +7,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { uploadUserFile, signedUrl } from "@/lib/storage";
 import { copilotChat, getTrainingStatus, startLoraTraining } from "@/lib/model-studio.functions";
 
-export const Route = createFileRoute("/model-studio")({
-  head: () => ({
-    meta: [
-      { title: "استوديو النماذج — درّب نموذج ذكاء اصطناعي مخصص | انمي فورج" },
-      { name: "description", content: "ابنِ نموذج ذكاء اصطناعي مخصص للمانجا والصور والفيديو، برمجه مع كوبايلوت ذكي، ودرّبه بتقنية LoRA على GPU مجاني." },
-      { property: "og:title", content: "استوديو النماذج — انمي فورج" },
-      { property: "og:description", content: "درّب نموذج LoRA خاص بك على المانجا والصور والفيديو بمساعدة كوبايلوت ذكي." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: ModelStudio,
-});
-
-const BASE_MODELS = [
-  { id: "stabilityai/stable-diffusion-xl-base-1.0", label: "SDXL 1.0 — صور عالية الدقة", domain: "image" },
-  { id: "cagliostrolab/animagine-xl-3.1", label: "Animagine XL 3.1 — أنمي", domain: "image" },
-  { id: "Linaqruf/anything-v3.0", label: "Anything V3 — مانجا وأنمي", domain: "manga" },
-  { id: "runwayml/stable-diffusion-v1-5", label: "SD 1.5 — سريع وخفيف", domain: "image" },
-  { id: "guoyww/animatediff-motion-adapter-v1-5-2", label: "AnimateDiff — فيديو/تحريك", domain: "video" },
-];
-
-type ChatMsg = { role: "user" | "assistant"; content: string };
-type Asset = { name: string; url: string };
-
-function ModelStudio() {
-  const { user } = useAuth();
-  const chat = useServerFn(copilotChat);
-  const train = useServerFn(startLoraTraining);
-  const status = useServerFn(getTrainingStatus);
-
-  const [tab, setTab] = useState<"config" | "data" | "train" | "copilot">("config");
-
-  // إعدادات النموذج
-  const [modelName, setModelName] = useState("نموذجي الأول");
-  const [triggerWord, setTriggerWord] = useState("afchar");
-  const [domain, setDomain] = useState<"manga" | "image" | "video">("manga");
-  const [baseModel, setBaseModel] = useState(BASE_MODELS[2]!.id);
-  const [systemPrompt, setSystemPrompt] = useState(
-    "أنت نموذج توليد أنمي/مانجا عالي الجودة. التزم بأسلوب خطوط حادة، تظليل سينمائي، وألوان متباينة.",
-  );
-  const [steps, setSteps] = useState(1200);
-  const [learningRate, setLearningRate] = useState(0.0001);
-  const [rank, setRank] = useState(16);
-  const [resolution, setResolution] = useState(768);
-
-  // الداتاست
-  const [assets, setAssets] = useState<Asset[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  // التدريب
-  const [training, setTraining] = useState(false);
-  const [jobLog, setJobLog] = useState<string[]>([]);
-
-  // الكوبايلوت
-  const [messages, setMessages] = useState<ChatMsg[]>([
-    {
-      role: "assistant",
-      content:
-        "أهلاً 👋 أنا كوبايلوت أنمي فورج. قولي نوع النموذج اللي عايز تبنيه (مانجا / صور / فيديو) وأنا هظبطلك الـ System Prompt والباراميترات وأحسّن جودة ردوده.",
-    },
-  ]);
-  const [input, setInput] = useState("");
-  const [thinking, setThinking] = useState(false);
-
-  const configText = `الاسم: ${modelName} | المجال: ${domain} | النموذج الأساسي: ${baseModel} | كلمة التفعيل: ${triggerWord} | steps: ${steps} | lr: ${learningRate} | rank: ${rank} | resolution: ${resolution} | عدد ملفات الداتاست: ${assets.length}\nSystem Prompt: ${systemPrompt}`;
-
-  const log = (m: string) => setJobLog((p) => [`${new Date().toLocaleTimeString("ar-EG")} — ${m}`, ...p].slice(0, 60));
-
-  async function onUpload(files: FileList | null) {
-    if (!files?.length) return;
-    if (!user) {
-      toast.error("سجّل دخولك الأول عشان ترفع الداتاست");
-      return;
-    }
-    setUploading(true);
-    try {
-      const next: Asset[] = [];
-      for (const file of Array.from(files)) {
-        // تم التعديل هنا لرفع الصور إلى lora-models
-        const path = await uploadUserFile("lora-models", user.id, file, "lora-");
-        const url = await signedUrl("lora-models", path, 60 * 60 * 24 * 7);
-        next.push({ name: file.name, url });
-      }
-      setAssets((p) => [...p, ...next]);
-      toast.success(`تم رفع ${next.length} ملف ✅`);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "فشل الرفع");
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
-    }
-  }
-
-  async function ask(text: string) {
-    const q = text.trim();
-    if (!q || thinking) return;
-    const history: ChatMsg[] = [...messages, { role: "user", content: q }];
-    setMessages(history);
-    setInput("");
-    setThinking(true);
-    try {
-      const res = await chat({ data: { messages: history, context: configText } });
-      setMessages((p) => [...p, { role: "assistant", content: res.text || "..." }]);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "فشل الاتصال بالكوبايلوت");
-    } finally {
-      setThinking(false);
-    }
-  }
-
-  async function autoTune() {
-    setThinking(true);
-    setTab("copilot");
-    try {
-      const res = await chat({
-        data: {
-          messages: [
-            {
-              role: "user",
-              content:
-                "اضبط لي أفضل باراميترات تدريب LoRA لهذه الإعدادات، وأعد في آخر ردك سطر JSON فقط بالشكل: {\"steps\":..,\"learning_rate\":..,\"rank\":تم تعديل مسار التوجيه (Route) إلى `"/lora-models"`، وتحديث النصوص الداخلية والبيانات الوصفية (Meta tags) لتتطابق مع الاسم الصحيح «موقع انمي فورج».
-
-```tsx
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { useRef, useState } from "react";
-import { toast } from "sonner";
-import { ArrowRight, Bot, Cpu, ImagePlus, Loader2, Play, Send, Sparkles, Trash2, Wand2 } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-import { uploadUserFile, signedUrl } from "@/lib/storage";
-import { copilotChat, getTrainingStatus, startLoraTraining } from "@/lib/model-studio.functions";
-
 export const Route = createFileRoute("/lora-models")({
   head: () => ({
     meta: [
@@ -221,8 +87,8 @@ function ModelStudio() {
     try {
       const next: Asset[] = [];
       for (const file of Array.from(files)) {
-        const path = await uploadUserFile("gen-inputs", user.id, file, "lora-");
-        const url = await signedUrl("gen-inputs", path, 60 * 60 * 24 * 7);
+        const path = await uploadUserFile("lora-models", user.id, file, "lora-");
+        const url = await signedUrl("lora-models", path, 60 * 60 * 24 * 7);
         next.push({ name: file.name, url });
       }
       setAssets((p) => [...p, ...next]);

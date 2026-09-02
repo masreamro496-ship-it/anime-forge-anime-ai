@@ -4,7 +4,10 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { ArrowRight, Bot, Cpu, ImagePlus, Loader2, Play, Send, Sparkles, Trash2, Wand2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { uploadUserFile, signedUrl } from "@/lib/storage";
+import { uploadUserFile, signedUrl, publicUrl } from "@/lib/storage";
+import gokuHero from "@/assets/goku-hero.png";
+
+const LORA_BUCKET = "lora-model";
 import { copilotChat, getTrainingStatus, startLoraTraining } from "@/lib/model-studio.functions";
 
 export const Route = createFileRoute("/model-studio")({

@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { uploadUserFile, signedUrl } from "@/lib/storage";
 import { copilotChat, getTrainingStatus, startLoraTraining } from "@/lib/model-studio.functions";
 
-export const Route = createFileRoute("/lora-models")({
+export const Route = createFileRoute("/model-studio")({
   head: () => ({
     meta: [
       { title: "استوديو النماذج — درّب نموذج ذكاء اصطناعي مخصص | موقع انمي فورج" },

@@ -90,14 +90,9 @@ function ModelStudio() {
     try {
       const next: Asset[] = [];
       for (const file of Array.from(files)) {
-        const uploadedPath = await uploadUserFile("lora-models", user.id, file, "lora-");
-
-        // تنظيف المسار لمنع تكرار اسم الحاوية وحل مشكلة Object not found
-        const cleanPath = uploadedPath.startsWith("lora-models/")
-          ? uploadedPath.replace("lora-models/", "")
-          : uploadedPath;
-
-        const url = await signedUrl("lora-models", cleanPath, 60 * 60 * 24 * 7);
+        // يستخدم دلو LoRA الصحيح، والمسار المُرجع يكون داخل الدلو بالفعل.
+        const uploadedPath = await uploadUserFile(LORA_BUCKET, user.id, file, "lora-");
+        const url = await signedUrl(LORA_BUCKET, uploadedPath, 60 * 60 * 24 * 7);
         next.push({ name: file.name, url });
       }
       setAssets((p) => [...p, ...next]);

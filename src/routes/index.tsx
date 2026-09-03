@@ -180,6 +180,9 @@ function Landing() {
           <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-gold/20 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
 
+          <div className="flex justify-center">
+            <GokuMascot size={140} />
+          </div>
           <Sparkles className="mx-auto h-10 w-10 text-gold animate-pulse" />
 
           <h2 className="mt-3 text-2xl font-black leading-snug sm:text-4xl">

@@ -27,6 +27,7 @@ import { InstallAppButton } from "@/components/InstallAppButton";
 import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
 import gameComingSoon from "@/assets/world-cup-game.jpg";
 import { PaidFeatureGate } from "@/components/PaidFeatureGate";
+import GokuMascot from "@/components/GokuMascot";
 
 export const Route = createFileRoute("/")({
   head: () => ({

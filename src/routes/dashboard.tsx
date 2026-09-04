@@ -101,6 +101,11 @@ function Dashboard() {
           <p className="mt-1 text-sm text-muted-foreground">لوحة التحكم الخاصة بك</p>
         </div>
 
+        <div className="mb-6 max-w-md">
+          <AdminCodeBox />
+        </div>
+
+
         {/* Stats */}
         <div className="grid gap-4 md:grid-cols-4">
           <div className="rounded-2xl border border-border bg-card p-6 shadow-card">

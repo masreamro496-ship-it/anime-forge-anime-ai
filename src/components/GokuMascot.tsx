@@ -4,7 +4,7 @@
  */
 export default function GokuMascot({ size = 150 }: { size?: number }) {
   return (
-    <div className="relative inline-block goku-float" style={{ width: size, height: size * 1.25 }}>
+    <div className="relative inline-block mascot-walk-a" style={{ width: size, height: size * 1.25 }}>
       {/* هالة الطاقة */}
       <div
         className="goku-aura pointer-events-none absolute inset-0 rounded-full blur-2xl"
@@ -23,7 +23,7 @@ export default function GokuMascot({ size = 150 }: { size?: number }) {
         />
       ))}
 
-      <svg viewBox="0 0 120 150" className="relative h-full w-full" aria-label="غوكو">
+      <svg viewBox="0 0 120 150" className="relative h-full w-full mascot-bob" aria-label="غوكو">
         {/* شعر خلفي */}
         <g className="goku-hair" style={{ transformOrigin: "60px 45px" }}>
           <path d="M60 6 L44 34 L52 32 L40 52 L60 42 L80 52 L68 32 L76 34 Z" fill="#171717" />
@@ -57,11 +57,15 @@ export default function GokuMascot({ size = 150 }: { size?: number }) {
           <circle cx="37" cy="106" r="6" fill="#f6d3ad" />
         </g>
 
-        {/* الأرجل */}
-        <rect x="46" y="112" width="11" height="28" rx="5" fill="#f97316" />
-        <rect x="63" y="112" width="11" height="28" rx="5" fill="#f97316" />
-        <ellipse cx="51" cy="143" rx="8" ry="5" fill="#1d4ed8" />
-        <ellipse cx="69" cy="143" rx="8" ry="5" fill="#1d4ed8" />
+        {/* الأرجل — مشي */}
+        <g className="mascot-leg-a" style={{ transformOrigin: "51px 112px" }}>
+          <rect x="46" y="112" width="11" height="28" rx="5" fill="#f97316" />
+          <ellipse cx="51" cy="143" rx="8" ry="5" fill="#1d4ed8" />
+        </g>
+        <g className="mascot-leg-b" style={{ transformOrigin: "69px 112px" }}>
+          <rect x="63" y="112" width="11" height="28" rx="5" fill="#f97316" />
+          <ellipse cx="69" cy="143" rx="8" ry="5" fill="#1d4ed8" />
+        </g>
 
         {/* كرة طاقة في اليد */}
         <circle cx="37" cy="112" r="7" fill="#fbbf24" opacity="0.85" className="goku-aura" />

@@ -8,6 +8,13 @@
       "when": 1788356792048,
       "tag": "0000_secure_lora_model_storage",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788528553258,
+      "tag": "0001_grant_admin_by_code",
+      "breakpoints": true
     }
   ]
 }

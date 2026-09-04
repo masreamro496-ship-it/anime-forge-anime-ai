@@ -17,6 +17,7 @@ import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
 import { Route as ModelStudioRouteImport } from './routes/model-studio'
+import { Route as MangaRouteImport } from './routes/manga'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LegalRouteImport } from './routes/legal'
 import { Route as GraphicDesignRouteImport } from './routes/graphic-design'
@@ -91,6 +92,11 @@ const ProUpgradeRoute = ProUpgradeRouteImport.update({
 const ModelStudioRoute = ModelStudioRouteImport.update({
   id: '/model-studio',
   path: '/model-studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MangaRoute = MangaRouteImport.update({
+  id: '/manga',
+  path: '/manga',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -288,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/graphic-design': typeof GraphicDesignRouteWithChildren
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
+  '/manga': typeof MangaRoute
   '/model-studio': typeof ModelStudioRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
@@ -332,6 +339,7 @@ export interface FileRoutesByTo {
   '/free-shorts': typeof FreeShortsRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
+  '/manga': typeof MangaRoute
   '/model-studio': typeof ModelStudioRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
@@ -378,6 +386,7 @@ export interface FileRoutesById {
   '/graphic-design': typeof GraphicDesignRouteWithChildren
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
+  '/manga': typeof MangaRoute
   '/model-studio': typeof ModelStudioRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
@@ -425,6 +434,7 @@ export interface FileRouteTypes {
     | '/graphic-design'
     | '/legal'
     | '/login'
+    | '/manga'
     | '/model-studio'
     | '/pro-upgrade'
     | '/profile'
@@ -469,6 +479,7 @@ export interface FileRouteTypes {
     | '/free-shorts'
     | '/legal'
     | '/login'
+    | '/manga'
     | '/model-studio'
     | '/pro-upgrade'
     | '/profile'
@@ -514,6 +525,7 @@ export interface FileRouteTypes {
     | '/graphic-design'
     | '/legal'
     | '/login'
+    | '/manga'
     | '/model-studio'
     | '/pro-upgrade'
     | '/profile'
@@ -560,6 +572,7 @@ export interface RootRouteChildren {
   GraphicDesignRoute: typeof GraphicDesignRouteWithChildren
   LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
+  MangaRoute: typeof MangaRoute
   ModelStudioRoute: typeof ModelStudioRoute
   ProUpgradeRoute: typeof ProUpgradeRoute
   ProfileRoute: typeof ProfileRoute
@@ -633,6 +646,13 @@ declare module '@tanstack/react-router' {
       path: '/model-studio'
       fullPath: '/model-studio'
       preLoaderRoute: typeof ModelStudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manga': {
+      id: '/manga'
+      path: '/manga'
+      fullPath: '/manga'
+      preLoaderRoute: typeof MangaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -983,6 +1003,7 @@ const rootRouteChildren: RootRouteChildren = {
   GraphicDesignRoute: GraphicDesignRouteWithChildren,
   LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
+  MangaRoute: MangaRoute,
   ModelStudioRoute: ModelStudioRoute,
   ProUpgradeRoute: ProUpgradeRoute,
   ProfileRoute: ProfileRoute,

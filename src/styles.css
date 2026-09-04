@@ -234,3 +234,46 @@ button:has(a[href*="lovable.dev"]),
 .goku-wave { animation: goku-wave-arm 1.4s ease-in-out infinite; }
 .goku-punch { animation: goku-punch-arm 2.6s ease-in-out infinite; }
 .goku-blink { animation: goku-blink 4s ease-in-out infinite; }
+
+/* ===== حركة الشخصيات: مشي يمين وشمال + تلويح ===== */
+@keyframes mascot-walk-a {
+  0%, 100% { transform: translateX(-26px) scaleX(1); }
+  46% { transform: translateX(26px) scaleX(1); }
+  50% { transform: translateX(26px) scaleX(-1); }
+  96% { transform: translateX(-26px) scaleX(-1); }
+}
+@keyframes mascot-walk-b {
+  0%, 100% { transform: translateX(24px) scaleX(-1); }
+  46% { transform: translateX(-24px) scaleX(-1); }
+  50% { transform: translateX(-24px) scaleX(1); }
+  96% { transform: translateX(24px) scaleX(1); }
+}
+@keyframes mascot-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes mascot-leg {
+  0%, 100% { transform: rotate(14deg); }
+  50% { transform: rotate(-14deg); }
+}
+@keyframes conan-wave-arm {
+  0%, 100% { transform: rotate(4deg); }
+  50% { transform: rotate(-50deg); }
+}
+@keyframes conan-lens-arm {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  80% { transform: rotate(-12deg); }
+}
+@keyframes conan-shine {
+  0%, 80%, 100% { opacity: 0; }
+  88% { opacity: 1; }
+}
+.mascot-walk-a { animation: mascot-walk-a 8s ease-in-out infinite; will-change: transform; }
+.mascot-walk-b { animation: mascot-walk-b 8s ease-in-out infinite; will-change: transform; }
+.mascot-bob { animation: mascot-bob 0.9s ease-in-out infinite; }
+.mascot-leg-a { animation: mascot-leg 0.9s ease-in-out infinite; }
+.mascot-leg-b { animation: mascot-leg 0.9s ease-in-out infinite reverse; }
+.conan-hair { animation: goku-hair-wave 2s ease-in-out infinite; }
+.conan-wave { animation: conan-wave-arm 1.2s ease-in-out infinite; }
+.conan-lens { animation: conan-lens-arm 3s ease-in-out infinite; }
+.conan-shine { animation: conan-shine 3.2s linear infinite; }

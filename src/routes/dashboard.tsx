@@ -6,6 +6,7 @@ import { useProfile } from "@/hooks/use-profile";
 import { Crown, Sparkles, LogOut, Coins, ShieldCheck, Video, Mic, Receipt, Clock, CheckCircle2, XCircle, Play, DollarSign, Check, Gift, KeyRound, Copy } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AdminChatBox } from "@/components/AdminChatBox";
+import AdminCodeBox from "@/components/AdminCodeBox";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard")({
@@ -100,6 +101,11 @@ function Dashboard() {
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">لوحة التحكم الخاصة بك</p>
         </div>
+
+        <div className="mb-6 max-w-md">
+          <AdminCodeBox />
+        </div>
+
 
         {/* Stats */}
         <div className="grid gap-4 md:grid-cols-4">

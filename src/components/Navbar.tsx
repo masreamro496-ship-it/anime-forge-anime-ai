@@ -18,6 +18,7 @@ import {
   Users,
   Music,
   Scale,
+  BookOpen,
 } from "lucide-react";
 
 const navItems = [
@@ -36,6 +37,7 @@ const moreItems = [
   { label: "شات برمجي", desc: "مساعد برمجة ذكي", icon: MessageSquare, to: "/chat" as const, tone: "#3b82f6" },
   { label: "استوديو النماذج", desc: "درّب نموذج ذكاء اصطناعي خاص", icon: Bot, to: "/model-studio" as const, tone: "#8b5cf6" },
   { label: "جرافيك ديزاين", desc: "محرر تصميم ومتجر", icon: Palette, to: "/graphic-design" as const, tone: "#06b6d4" },
+  { label: "استوديو المانجا", desc: "ارسم مانجا بالألوان والأنميشن", icon: BookOpen, to: "/manga" as const, tone: "#f59e0b" },
   { label: "عجلة الحظ", desc: "لفة أسبوعية وجوائز", icon: Ticket, to: "/wheel" as const, tone: "#eab308" },
   { label: "الدردشة العامة", desc: "تواصل مع المجتمع", icon: Users, to: "/social" as const, tone: "#14b8a6" },
   { label: "الصوتيات", desc: "مؤثرات وموسيقى أنمي", icon: Music, to: "/audio" as const, tone: "#a855f7" },

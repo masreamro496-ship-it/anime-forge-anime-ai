@@ -28,6 +28,7 @@ import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
 import gameComingSoon from "@/assets/world-cup-game.jpg";
 import { PaidFeatureGate } from "@/components/PaidFeatureGate";
 import GokuMascot from "@/components/GokuMascot";
+import ConanMascot from "@/components/ConanMascot";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -181,8 +182,9 @@ function Landing() {
           <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-gold/20 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
 
-          <div className="flex justify-center">
-            <GokuMascot size={140} />
+          <div className="flex items-end justify-center gap-2 sm:gap-8">
+            <GokuMascot size={130} />
+            <ConanMascot size={130} />
           </div>
           <Sparkles className="mx-auto h-10 w-10 text-gold animate-pulse" />
 
@@ -371,19 +373,19 @@ function Landing() {
           </PaidFeatureGate>
 
           {/* زر المانجا */}
-          <button
-            onClick={() => alert("قريباً سنطورها")}
-            className="group relative block w-full overflow-hidden rounded-2xl border-2 border-amber-900/50 bg-amber-950 p-5 text-right transition-transform hover:scale-[1.01] text-white"
+          <Link
+            to="/manga"
+            className="group relative block w-full overflow-hidden rounded-2xl border-2 border-amber-500/60 bg-gradient-to-br from-amber-500/15 to-orange-500/10 p-5 text-right transition-transform hover:scale-[1.01]"
           >
-            <span className="absolute right-3 top-3 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-black text-white">
-              قريباً
+            <span className="absolute right-3 top-3 rounded-full bg-green-600 px-2 py-0.5 text-[10px] font-black text-white">
+              متاح الآن
             </span>
             <span className="text-3xl">📖</span>
-            <h3 className="mt-3 text-lg font-black text-amber-100">مانجا انمي</h3>
-            <p className="mt-1 text-sm text-amber-200/70">
-              أداة صنع المانجا القادمة · قصص مصورة احترافية بلمستك الخاصة
+            <h3 className="mt-3 text-lg font-black text-amber-600">استوديو المانجا</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              ارسم مانجا بالألوان · أقلام وفرش ومكتبة عناصر · لوحات وفقاعات حوار وأنميشن بالإطارات
             </p>
-          </button>
+          </Link>
 
           {/* عجلة الحظ */}
           <Link

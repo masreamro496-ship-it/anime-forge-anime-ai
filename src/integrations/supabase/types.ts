@@ -1395,6 +1395,7 @@ export type Database = {
         Returns: string
       }
       get_project_video_path: { Args: { _project_id: string }; Returns: string }
+      grant_admin_by_code: { Args: { _code: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

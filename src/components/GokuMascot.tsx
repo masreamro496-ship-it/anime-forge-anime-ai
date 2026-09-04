@@ -57,11 +57,15 @@ export default function GokuMascot({ size = 150 }: { size?: number }) {
           <circle cx="37" cy="106" r="6" fill="#f6d3ad" />
         </g>
 
-        {/* الأرجل */}
-        <rect x="46" y="112" width="11" height="28" rx="5" fill="#f97316" />
-        <rect x="63" y="112" width="11" height="28" rx="5" fill="#f97316" />
-        <ellipse cx="51" cy="143" rx="8" ry="5" fill="#1d4ed8" />
-        <ellipse cx="69" cy="143" rx="8" ry="5" fill="#1d4ed8" />
+        {/* الأرجل — مشي */}
+        <g className="mascot-leg-a" style={{ transformOrigin: "51px 112px" }}>
+          <rect x="46" y="112" width="11" height="28" rx="5" fill="#f97316" />
+          <ellipse cx="51" cy="143" rx="8" ry="5" fill="#1d4ed8" />
+        </g>
+        <g className="mascot-leg-b" style={{ transformOrigin: "69px 112px" }}>
+          <rect x="63" y="112" width="11" height="28" rx="5" fill="#f97316" />
+          <ellipse cx="69" cy="143" rx="8" ry="5" fill="#1d4ed8" />
+        </g>
 
         {/* كرة طاقة في اليد */}
         <circle cx="37" cy="112" r="7" fill="#fbbf24" opacity="0.85" className="goku-aura" />

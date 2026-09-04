@@ -4,7 +4,7 @@
  */
 export default function GokuMascot({ size = 150 }: { size?: number }) {
   return (
-    <div className="relative inline-block goku-float" style={{ width: size, height: size * 1.25 }}>
+    <div className="relative inline-block mascot-walk-a" style={{ width: size, height: size * 1.25 }}>
       {/* هالة الطاقة */}
       <div
         className="goku-aura pointer-events-none absolute inset-0 rounded-full blur-2xl"

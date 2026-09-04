@@ -23,7 +23,7 @@ export default function GokuMascot({ size = 150 }: { size?: number }) {
         />
       ))}
 
-      <svg viewBox="0 0 120 150" className="relative h-full w-full" aria-label="غوكو">
+      <svg viewBox="0 0 120 150" className="relative h-full w-full mascot-bob" aria-label="غوكو">
         {/* شعر خلفي */}
         <g className="goku-hair" style={{ transformOrigin: "60px 45px" }}>
           <path d="M60 6 L44 34 L52 32 L40 52 L60 42 L80 52 L68 32 L76 34 Z" fill="#171717" />

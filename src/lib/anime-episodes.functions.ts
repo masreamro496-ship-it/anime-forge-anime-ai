@@ -29,7 +29,7 @@ export const listAnimeTitles = createServerFn({ method: "GET" }).handler(async (
 
 // كل حلقات أنمي معيّن
 export const getAnimeEpisodesBySlug = createServerFn({ method: "GET" })
-  .validator((d: { slug: string }) => d)
+  .inputValidator((d: { slug: string }) => d)
   .handler(async ({ data }) => {
     const { data: rows, error } = await supabase
       .from("anime_episodes")
@@ -48,7 +48,7 @@ export const getAnimeEpisodesBySlug = createServerFn({ method: "GET" })
 
 // رابط مشاهدة (iframe) حلقة معيّنة
 export const getEpisodeEmbed = createServerFn({ method: "GET" })
-  .validator((d: { slug: string; episodeNumber: number }) => d)
+  .inputValidator((d: { slug: string; episodeNumber: number }) => d)
   .handler(async ({ data }) => {
     const { data: row, error } = await supabase
       .from("anime_episodes")
@@ -64,7 +64,7 @@ export const getEpisodeEmbed = createServerFn({ method: "GET" })
 
 // إضافة حلقة جديدة (من صفحة الرفع) — تظهر فورًا على الموقع
 export const addAnimeEpisode = createServerFn({ method: "POST" })
-  .validator((d: { animeTitle: string; episodeNumber: number; embedUrl: string }) => d)
+  .inputValidator((d: { animeTitle: string; episodeNumber: number; embedUrl: string }) => d)
   .handler(async ({ data }) => {
     const title = data.animeTitle.trim();
     const url = data.embedUrl.trim();

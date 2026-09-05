@@ -2,9 +2,18 @@
  * شخصية غوكو مرسومة بالكامل بـ SVG (مش صورة) ومتحركة بالأنميشن:
  * شعر يتحرك، هالة طاقة، ذراع تلوّح، وشرارات صاعدة.
  */
-export default function GokuMascot({ size = 150 }: { size?: number }) {
+export default function GokuMascot({
+  size = 150,
+  mode = "walk",
+}: {
+  size?: number;
+  mode?: "walk" | "blast";
+}) {
   return (
-    <div className="relative inline-block mascot-walk-a" style={{ width: size, height: size * 1.25 }}>
+    <div
+      className={`relative inline-block ${mode === "blast" ? "goku-charge" : "mascot-walk-a"}`}
+      style={{ width: size, height: size * 1.25 }}
+    >
       {/* هالة الطاقة */}
       <div
         className="goku-aura pointer-events-none absolute inset-0 rounded-full blur-2xl"

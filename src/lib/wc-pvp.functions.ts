@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 
 // إعداد الاتصال المباشر بقاعدة البيانات المستقلة
@@ -7,7 +8,8 @@ const SUPABASE_KEY = "sb_publishable_gjpclJMqOF6g74NMKVEM9Q_ndgM4rqX";
 
 export const wcPayEntry = createServerFn({ method: "POST" })
   .inputValidator((d: { room_id: string }) => d)
-  .handler(async ({ data, request }) => {
+  .handler(async ({ data }) => {
+    const request = getRequest();
     const authHeader = request.headers.get("authorization");
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
       global: {
@@ -35,7 +37,8 @@ export const wcFinishMatch = createServerFn({ method: "POST" })
     winners: string[];
     players: unknown;
   }) => d)
-  .handler(async ({ data, request }) => {
+  .handler(async ({ data }) => {
+    const request = getRequest();
     const authHeader = request.headers.get("authorization");
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
       global: {

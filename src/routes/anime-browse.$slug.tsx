@@ -52,7 +52,7 @@ function AnimeEpisodesPage() {
               <Film className="h-5 w-5 text-gold" /> الحلقات
             </h2>
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 md:grid-cols-8">
-              {data.data.episodes.map((ep) => (
+              {data.data.episodes.map((ep: { id: string; number: number }) => (
                 <Link
                   key={ep.id}
                   to="/anime-browse/$slug/watch/$episode"

@@ -2,9 +2,18 @@
  * شخصية المحقق كونان مرسومة بالكامل بـ SVG ومتحركة:
  * تمشي يمين وشمال، تلوّح بيدها، ترمش، ونظارتها تلمع.
  */
-export default function ConanMascot({ size = 150 }: { size?: number }) {
+export default function ConanMascot({
+  size = 150,
+  mode = "walk",
+}: {
+  size?: number;
+  mode?: "walk" | "dodge";
+}) {
   return (
-    <div className="relative inline-block mascot-walk-b" style={{ width: size, height: size * 1.25 }}>
+    <div
+      className={`relative inline-block ${mode === "dodge" ? "conan-dodge" : "mascot-walk-b"}`}
+      style={{ width: size, height: size * 1.25 }}
+    >
       <div
         className="pointer-events-none absolute inset-0 rounded-full blur-2xl goku-aura"
         style={{ background: "radial-gradient(circle, rgba(59,130,246,0.45), transparent 65%)" }}

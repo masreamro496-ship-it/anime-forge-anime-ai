@@ -38,6 +38,33 @@ export type Database = {
         }
         Relationships: []
       }
+      anime_episodes: {
+        Row: {
+          anime_slug: string
+          anime_title: string
+          created_at: string
+          embed_url: string
+          episode_number: number
+          id: string
+        }
+        Insert: {
+          anime_slug: string
+          anime_title: string
+          created_at?: string
+          embed_url: string
+          episode_number: number
+          id?: string
+        }
+        Update: {
+          anime_slug?: string
+          anime_title?: string
+          created_at?: string
+          embed_url?: string
+          episode_number?: number
+          id?: string
+        }
+        Relationships: []
+      }
       anime_media: {
         Row: {
           author_is_moderator: boolean
@@ -402,6 +429,39 @@ export type Database = {
         }
         Relationships: []
       }
+      donations: {
+        Row: {
+          amount_egp: number
+          created_at: string
+          donor_name: string | null
+          id: string
+          note: string | null
+          op_number: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_egp?: number
+          created_at?: string
+          donor_name?: string | null
+          id?: string
+          note?: string | null
+          op_number?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_egp?: number
+          created_at?: string
+          donor_name?: string | null
+          id?: string
+          note?: string | null
+          op_number?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       feature_passes: {
         Row: {
           created_at: string
@@ -425,6 +485,250 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      gd_feed_posts: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          image_url: string
+          likes_count: number
+          owner_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+          likes_count?: number
+          owner_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          likes_count?: number
+          owner_id?: string
+        }
+        Relationships: []
+      }
+      gd_follows: {
+        Row: {
+          created_at: string
+          designer_id: string
+          follower_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          designer_id: string
+          follower_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          designer_id?: string
+          follower_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      gd_listings: {
+        Row: {
+          created_at: string
+          description: string | null
+          downloads_count: number
+          file_path: string | null
+          id: string
+          license: string
+          listing_type: string
+          owner_id: string
+          preview_image_url: string | null
+          price_usd: number
+          project_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          downloads_count?: number
+          file_path?: string | null
+          id?: string
+          license?: string
+          listing_type?: string
+          owner_id: string
+          preview_image_url?: string | null
+          price_usd?: number
+          project_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          downloads_count?: number
+          file_path?: string | null
+          id?: string
+          license?: string
+          listing_type?: string
+          owner_id?: string
+          preview_image_url?: string | null
+          price_usd?: number
+          project_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gd_listings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "gd_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gd_projects: {
+        Row: {
+          canvas_json: Json
+          created_at: string
+          height: number
+          id: string
+          owner_id: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          width: number
+        }
+        Insert: {
+          canvas_json?: Json
+          created_at?: string
+          height?: number
+          id?: string
+          owner_id: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          width?: number
+        }
+        Update: {
+          canvas_json?: Json
+          created_at?: string
+          height?: number
+          id?: string
+          owner_id?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          width?: number
+        }
+        Relationships: []
+      }
+      gd_purchases: {
+        Row: {
+          buyer_id: string
+          completed_at: string | null
+          copied_project_id: string | null
+          created_at: string
+          id: string
+          listing_id: string
+          payment_method: string
+          price_usd: number
+          seller_id: string
+          status: string
+        }
+        Insert: {
+          buyer_id: string
+          completed_at?: string | null
+          copied_project_id?: string | null
+          created_at?: string
+          id?: string
+          listing_id: string
+          payment_method?: string
+          price_usd?: number
+          seller_id: string
+          status?: string
+        }
+        Update: {
+          buyer_id?: string
+          completed_at?: string | null
+          copied_project_id?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string
+          payment_method?: string
+          price_usd?: number
+          seller_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gd_purchases_copied_project_id_fkey"
+            columns: ["copied_project_id"]
+            isOneToOne: false
+            referencedRelation: "gd_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gd_purchases_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "gd_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gd_vodafone_payments: {
+        Row: {
+          amount_egp: number
+          approved_by: string | null
+          approved_by_role: string | null
+          buyer_note: string | null
+          buyer_phone: string
+          created_at: string
+          id: string
+          purchase_id: string
+          resolved_at: string | null
+          status: string
+        }
+        Insert: {
+          amount_egp?: number
+          approved_by?: string | null
+          approved_by_role?: string | null
+          buyer_note?: string | null
+          buyer_phone: string
+          created_at?: string
+          id?: string
+          purchase_id: string
+          resolved_at?: string | null
+          status?: string
+        }
+        Update: {
+          amount_egp?: number
+          approved_by?: string | null
+          approved_by_role?: string | null
+          buyer_note?: string | null
+          buyer_phone?: string
+          created_at?: string
+          id?: string
+          purchase_id?: string
+          resolved_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gd_vodafone_payments_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "gd_purchases"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       generation_requests: {
         Row: {
@@ -624,6 +928,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          credits: number
           display_name: string | null
           earnings_usd: number
           id: string
@@ -634,6 +939,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          credits?: number
           display_name?: string | null
           earnings_usd?: number
           id: string
@@ -644,6 +950,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          credits?: number
           display_name?: string | null
           earnings_usd?: number
           id?: string
@@ -982,6 +1289,39 @@ export type Database = {
           task_title?: string
           updated_at?: string
           user_email?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_models: {
+        Row: {
+          created_at: string
+          id: string
+          images: string[]
+          model_url: string | null
+          name: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          images?: string[]
+          model_url?: string | null
+          name: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          images?: string[]
+          model_url?: string | null
+          name?: string
+          status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -1389,6 +1729,25 @@ export type Database = {
         Returns: string
       }
       demote_moderator: { Args: { _email: string }; Returns: string }
+      gd_copy_template_to_buyer: {
+        Args: { p_purchase_id: string }
+        Returns: string
+      }
+      gd_publish_listing: {
+        Args: {
+          p_description: string
+          p_file_path: string
+          p_license: string
+          p_listing_type: string
+          p_owner_id: string
+          p_preview_image_url: string
+          p_price_usd: number
+          p_project_id: string
+          p_publish_cost_credits: number
+          p_title: string
+        }
+        Returns: string
+      }
       generate_pro_code: { Args: never; Returns: string }
       get_anime_media_video_path: {
         Args: { _media_id: string }

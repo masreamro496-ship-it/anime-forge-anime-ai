@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/graphic-design/editor")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { project?: string; template?: string } => ({
     project: (search.project as string) || undefined,
     template: (search.template as string) || undefined,
   }),

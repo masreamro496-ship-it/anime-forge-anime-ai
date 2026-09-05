@@ -27,8 +27,7 @@ import { InstallAppButton } from "@/components/InstallAppButton";
 import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
 import gameComingSoon from "@/assets/world-cup-game.jpg";
 import { PaidFeatureGate } from "@/components/PaidFeatureGate";
-import GokuMascot from "@/components/GokuMascot";
-import ConanMascot from "@/components/ConanMascot";
+import MascotScene from "@/components/MascotScene";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -182,10 +181,8 @@ function Landing() {
           <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-gold/20 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
 
-          <div className="flex items-end justify-center gap-2 sm:gap-8">
-            <GokuMascot size={130} />
-            <ConanMascot size={130} />
-          </div>
+          <MascotScene size={140} />
+
           <Sparkles className="mx-auto h-10 w-10 text-gold animate-pulse" />
 
           <h2 className="mt-3 text-2xl font-black leading-snug sm:text-4xl">

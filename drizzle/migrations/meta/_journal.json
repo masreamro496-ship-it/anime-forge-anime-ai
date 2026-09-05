@@ -15,6 +15,13 @@
       "when": 1788528553258,
       "tag": "0001_grant_admin_by_code",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788613208035,
+      "tag": "0002_create_missing_app_tables",
+      "breakpoints": true
     }
   ]
 }

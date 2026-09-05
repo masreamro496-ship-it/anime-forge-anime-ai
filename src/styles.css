@@ -277,3 +277,27 @@ button:has(a[href*="lovable.dev"]),
 .conan-wave { animation: conan-wave-arm 1.2s ease-in-out infinite; }
 .conan-lens { animation: conan-lens-arm 3s ease-in-out infinite; }
 .conan-shine { animation: conan-shine 3.2s linear infinite; }
+
+/* ===== مشهد: غوكو يطلق كرة الطاقة وكونان يتفاداها (دورة 3.2 ثانية) ===== */
+@keyframes goku-charge {
+  0%, 100% { transform: translateX(0) scale(1); }
+  25% { transform: translateX(10px) scale(0.98); }
+  38% { transform: translateX(-14px) scale(1.04); }
+  55% { transform: translateX(0) scale(1); }
+}
+@keyframes conan-dodge {
+  0%, 40% { transform: translateX(0) rotate(0deg); }
+  52% { transform: translateX(-26px) translateY(-14px) rotate(-16deg); }
+  70% { transform: translateX(-18px) translateY(0) rotate(-8deg); }
+  85%, 100% { transform: translateX(0) rotate(0deg); }
+}
+@keyframes ki-blast {
+  0%, 34% { transform: translateX(0) scale(0.2); opacity: 0; }
+  40% { transform: translateX(0) scale(1); opacity: 1; }
+  62% { transform: translateX(-150px) scale(1.05); opacity: 1; }
+  74% { transform: translateX(-230px) scale(1.35); opacity: 0; }
+  100% { transform: translateX(-230px) scale(0.2); opacity: 0; }
+}
+.goku-charge { animation: goku-charge 3.2s ease-in-out infinite; will-change: transform; }
+.conan-dodge { animation: conan-dodge 3.2s ease-in-out infinite; will-change: transform; }
+.ki-blast { animation: ki-blast 3.2s linear infinite; will-change: transform; }

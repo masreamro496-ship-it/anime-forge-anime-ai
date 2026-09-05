@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 
@@ -24,7 +25,8 @@ const sendChatSchema = z.object({
 
 export const sendChatMessage = createServerFn({ method: "POST" })
   .inputValidator((input) => sendChatSchema.parse(input))
-  .handler(async ({ data, request }) => {
+  .handler(async ({ data }) => {
+    const request = getRequest();
     // استخراج توكن المصادقة من الطلب إن وجد لربط المستخدم بقاعدته
     const authHeader = request.headers.get("authorization");
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -150,7 +152,8 @@ export const sendChatMessage = createServerFn({ method: "POST" })
   });
 
 export const loadChatHistory = createServerFn({ method: "GET" })
-  .handler(async ({ request }) => {
+  .handler(async () => {
+    const request = getRequest();
     const authHeader = request.headers.get("authorization");
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
       global: { headers: authHeader ? { authorization: authHeader } : {} },
@@ -172,7 +175,8 @@ export const loadChatHistory = createServerFn({ method: "GET" })
   });
 
 export const clearChatHistory = createServerFn({ method: "POST" })
-  .handler(async ({ request }) => {
+  .handler(async () => {
+    const request = getRequest();
     const authHeader = request.headers.get("authorization");
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
       global: { headers: authHeader ? { authorization: authHeader } : {} },

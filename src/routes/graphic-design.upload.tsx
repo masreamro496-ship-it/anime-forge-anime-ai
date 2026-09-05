@@ -73,14 +73,14 @@ function UploadPage() {
       let previewUrl: string | null = null;
 
       if (listingType === "file" && file) {
-        const path = `${user.id}/${Date.now()}-${file.name}`;
+        const path = `${user!.id}/${Date.now()}-${file.name}`;
         const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file);
         if (upErr) throw upErr;
         filePath = path;
       }
 
       if (previewImage) {
-        const path = `previews/${user.id}/${Date.now()}-${previewImage.name}`;
+        const path = `previews/${user!.id}/${Date.now()}-${previewImage.name}`;
         const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(path, previewImage, { upsert: true });
         if (upErr) throw upErr;
         const { data: pub } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
@@ -91,13 +91,13 @@ function UploadPage() {
       }
 
       const { data, error } = await supabase.rpc("gd_publish_listing", {
-        p_owner_id: user.id,
+        p_owner_id: user!.id,
         p_title: title.trim(),
         p_description: description.trim(),
         p_listing_type: listingType,
-        p_project_id: listingType === "template" ? selectedProjectId : null,
-        p_file_path: filePath,
-        p_preview_image_url: previewUrl,
+        p_project_id: (listingType === "template" ? selectedProjectId : null) as unknown as string,
+        p_file_path: filePath as unknown as string,
+        p_preview_image_url: previewUrl as unknown as string,
         p_license: license,
         p_price_usd: price,
         p_publish_cost_credits: PUBLISH_COST_CREDITS,
@@ -164,7 +164,7 @@ function UploadPage() {
               {myProjects.length === 0 ? (
                 <p className="text-xs text-muted-foreground">
                   مفيش مشاريع محفوظة عندك.{" "}
-                  <Link to="/graphic-design/editor" className="text-red-500 underline">
+                  <Link to="/graphic-design/editor" search={{}} className="text-red-500 underline">
                     افتح المحرر وابدأ تصميم
                   </Link>
                 </p>

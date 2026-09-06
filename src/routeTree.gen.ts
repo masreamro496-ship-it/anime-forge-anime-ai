@@ -14,6 +14,7 @@ import { Route as WatermarkRouteImport } from './routes/watermark'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as SocialRouteImport } from './routes/social'
 import { Route as ShortsRouteImport } from './routes/shorts'
+import { Route as RobotControlRouteImport } from './routes/robot-control'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
 import { Route as ModelStudioRouteImport } from './routes/model-studio'
@@ -77,6 +78,11 @@ const SocialRoute = SocialRouteImport.update({
 const ShortsRoute = ShortsRouteImport.update({
   id: '/shorts',
   path: '/shorts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotControlRoute = RobotControlRouteImport.update({
+  id: '/robot-control',
+  path: '/robot-control',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -298,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/model-studio': typeof ModelStudioRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
+  '/robot-control': typeof RobotControlRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
@@ -343,6 +350,7 @@ export interface FileRoutesByTo {
   '/model-studio': typeof ModelStudioRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
+  '/robot-control': typeof RobotControlRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
@@ -390,6 +398,7 @@ export interface FileRoutesById {
   '/model-studio': typeof ModelStudioRoute
   '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
+  '/robot-control': typeof RobotControlRoute
   '/shorts': typeof ShortsRouteWithChildren
   '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
@@ -438,6 +447,7 @@ export interface FileRouteTypes {
     | '/model-studio'
     | '/pro-upgrade'
     | '/profile'
+    | '/robot-control'
     | '/shorts'
     | '/social'
     | '/tasks'
@@ -483,6 +493,7 @@ export interface FileRouteTypes {
     | '/model-studio'
     | '/pro-upgrade'
     | '/profile'
+    | '/robot-control'
     | '/shorts'
     | '/social'
     | '/tasks'
@@ -529,6 +540,7 @@ export interface FileRouteTypes {
     | '/model-studio'
     | '/pro-upgrade'
     | '/profile'
+    | '/robot-control'
     | '/shorts'
     | '/social'
     | '/tasks'
@@ -576,6 +588,7 @@ export interface RootRouteChildren {
   ModelStudioRoute: typeof ModelStudioRoute
   ProUpgradeRoute: typeof ProUpgradeRoute
   ProfileRoute: typeof ProfileRoute
+  RobotControlRoute: typeof RobotControlRoute
   ShortsRoute: typeof ShortsRouteWithChildren
   SocialRoute: typeof SocialRoute
   TasksRoute: typeof TasksRoute
@@ -625,6 +638,13 @@ declare module '@tanstack/react-router' {
       path: '/shorts'
       fullPath: '/shorts'
       preLoaderRoute: typeof ShortsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robot-control': {
+      id: '/robot-control'
+      path: '/robot-control'
+      fullPath: '/robot-control'
+      preLoaderRoute: typeof RobotControlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -1007,6 +1027,7 @@ const rootRouteChildren: RootRouteChildren = {
   ModelStudioRoute: ModelStudioRoute,
   ProUpgradeRoute: ProUpgradeRoute,
   ProfileRoute: ProfileRoute,
+  RobotControlRoute: RobotControlRoute,
   ShortsRoute: ShortsRouteWithChildren,
   SocialRoute: SocialRoute,
   TasksRoute: TasksRoute,

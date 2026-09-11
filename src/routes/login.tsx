@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -10,6 +10,9 @@ export const Route = createFileRoute("/login")({
     typeof s.redirect === "string" ? { redirect: s.redirect } : {},
   component: LoginPage,
 });
+
+// ثابت لمدة الانتظار بين محاولات إرسال OTP (بالثواني)
+const OTP_COOLDOWN_SECONDS = 60;
 
 function LoginPage() {
   const { user } = useAuth();
@@ -32,6 +35,19 @@ function LoginPage() {
 
   const [loading, setLoading] = useState(false);
 
+  // تتبع آخر وقت تم فيه إرسال OTP، لتفعيل cooldown حقيقي
+  const lastOtpSentAt = useRef<number | null>(null);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
+  // عدّاد تنازلي مرئي لل cooldown
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+    const t = setInterval(() => {
+      setCooldownRemaining((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+    return () => clearInterval(t);
+  }, [cooldownRemaining]);
+
   // دالة بناء رابط التوجيه بدقة استناداً إلى النطاق الحالي لموقعك
   const getRedirectUrl = () => {
     const targetPath = redirectTo && redirectTo.startsWith("/") ? redirectTo : "/dashboard";
@@ -40,11 +56,20 @@ function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      navigate({ to: (redirectTo ?? "/dashboard") as "/dashboard" });
+      // navigate بدون type-cast خطر؛ التحقق من المسار تم بالفعل في validateSearch
+      navigate({ to: redirectTo && redirectTo.startsWith("/") ? redirectTo : "/dashboard" });
     }
   }, [user, navigate, redirectTo]);
 
+  // تحقق فعلي من cooldown لتسجيل الدخول (بريد/Google/GitHub)
+  // ملاحظة: هنا فقط حماية بسيطة على مستوى الواجهة لمنع الضغط المتكرر، وليست بديلاً عن rate limiting من طرف السيرفر
+  const loginAttemptRef = useRef<number>(0);
   function checkLoginCooldown(): string | null {
+    const now = Date.now();
+    if (now - loginAttemptRef.current < 1500) {
+      return "برجاء الانتظار قليلاً قبل المحاولة مرة أخرى";
+    }
+    loginAttemptRef.current = now;
     return null;
   }
 
@@ -129,16 +154,41 @@ function LoginPage() {
   // 4. إرسال رمز التحقق (OTP) للهاتف
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!phone.trim()) {
       toast.error("يرجى إدخال رقم الهاتف مع كود الدولة (مثال: +201000000000)");
       return;
     }
+
+    // تحقق مبسط من صيغة الرقم (يبدأ بـ + ويحتوي أرقام فقط بعدها)
+    if (!/^\+[1-9]\d{7,14}$/.test(phone.trim())) {
+      toast.error("صيغة رقم الهاتف غير صحيحة، يجب أن يبدأ بـ + وكود الدولة");
+      return;
+    }
+
+    if (!name.trim()) {
+      toast.error("يرجى إدخال الاسم بالكامل");
+      return;
+    }
+
+    // منع الضغط المتكرر على إرسال OTP قبل انتهاء الـ cooldown
+    if (lastOtpSentAt.current && Date.now() - lastOtpSentAt.current < OTP_COOLDOWN_SECONDS * 1000) {
+      const remaining = Math.ceil(
+        (OTP_COOLDOWN_SECONDS * 1000 - (Date.now() - lastOtpSentAt.current)) / 1000
+      );
+      toast.error(`برجاء الانتظار ${remaining} ثانية قبل إعادة الإرسال`);
+      return;
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({
         phone: phone.trim(),
       });
       if (error) throw error;
+
+      lastOtpSentAt.current = Date.now();
+      setCooldownRemaining(OTP_COOLDOWN_SECONDS);
       toast.success("تم إرسال رمز التحقق إلى هاتفك!");
       setPhoneStep("verify");
     } catch (err: unknown) {
@@ -152,10 +202,12 @@ function LoginPage() {
   // 5. تأكيد رمز التحقق (OTP) وحفظ الاسم
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otp.trim()) {
-      toast.error("يرجى إدخال رمز التحقق المكون من الأرقام");
+
+    if (!otp.trim() || otp.trim().length < 4) {
+      toast.error("يرجى إدخال رمز التحقق الصحيح");
       return;
     }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.verifyOtp({
@@ -175,16 +227,26 @@ function LoginPage() {
       toast.success("تم تسجيل الدخول بنجاح!");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "رمز التحقق غير صحيح";
-      toast.error(msg);
+      toast.error(
+        msg.includes("expired") || msg.includes("Token has expired")
+          ? "انتهت صلاحية الرمز، برجاء طلب رمز جديد"
+          : msg
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  // إعادة إرسال الرمز من شاشة التحقق مباشرة
+  const handleResendOtp = async () => {
+    if (cooldownRemaining > 0) return;
+    await handleSendOtp({ preventDefault: () => {} } as React.FormEvent);
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10 bg-background" dir="rtl">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-card">
-        
+
         {/* العناوين والشعار */}
         <Link to="/" className="flex items-center justify-center gap-2">
           <Sparkles className="h-6 w-6 text-gold" />
@@ -255,6 +317,7 @@ function LoginPage() {
             onClick={() => {
               setAuthMethod("email");
               setPhoneStep("send");
+              setOtp("");
             }}
             className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition-all ${
               authMethod === "email"
@@ -267,7 +330,10 @@ function LoginPage() {
           </button>
           <button
             type="button"
-            onClick={() => setAuthMethod("phone")}
+            onClick={() => {
+              setAuthMethod("phone");
+              setPassword("");
+            }}
             className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition-all ${
               authMethod === "phone"
                 ? "bg-background text-foreground shadow-sm"
@@ -362,10 +428,14 @@ function LoginPage() {
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || cooldownRemaining > 0}
                   className="w-full rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold disabled:opacity-60"
                 >
-                  {loading ? "جاري إرسال الرمز..." : "إرسال رمز التحقق (SMS)"}
+                  {loading
+                    ? "جاري إرسال الرمز..."
+                    : cooldownRemaining > 0
+                    ? `أعد المحاولة بعد ${cooldownRemaining} ث`
+                    : "إرسال رمز التحقق (SMS)"}
                 </button>
               </form>
             ) : (
@@ -391,14 +461,30 @@ function LoginPage() {
                   {loading ? "جاري التحقق..." : "تأكيد وتأكيد الحساب"}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setPhoneStep("send")}
-                  className="flex items-center justify-center gap-1 w-full text-xs text-muted-foreground hover:text-foreground mt-2"
-                >
-                  <ArrowRight className="h-3 w-3" />
-                  تغيير رقم الهاتف
-                </button>
+                <div className="flex items-center justify-between mt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPhoneStep("send");
+                      setOtp("");
+                    }}
+                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    <ArrowRight className="h-3 w-3" />
+                    تغيير رقم الهاتف
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={cooldownRemaining > 0 || loading}
+                    className="text-xs font-bold text-gold hover:underline disabled:opacity-50 disabled:no-underline"
+                  >
+                    {cooldownRemaining > 0
+                      ? `إعادة الإرسال بعد ${cooldownRemaining} ث`
+                      : "إعادة إرسال الرمز"}
+                  </button>
+                </div>
               </form>
             )}
           </>
@@ -421,3 +507,4 @@ function LoginPage() {
     </div>
   );
 }
+

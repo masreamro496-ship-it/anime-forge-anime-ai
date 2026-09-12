@@ -448,7 +448,7 @@ function Landing() {
               to="/domains"
               className="flex items-center justify-center gap-3 w-full rounded-2xl border-2 border-sky-400/60 bg-gradient-to-r from-sky-600 to-indigo-600 p-4 text-lg font-black text-white shadow-lg hover:brightness-110 hover:scale-[1.01] transition-all"
             >
-               < مغلق</span>
+              <span>الدومينات — مغلق حالياً</span>
             </Link>
           </div>
 

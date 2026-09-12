@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Sparkles, Phone, Mail, Lock, User, ArrowRight } from "lucide-react";
+import { Sparkles, Phone, Mail, Lock, User, Globe } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (s: Record<string, unknown>): { redirect?: string } =>
@@ -11,8 +11,31 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
-// ثابت لمدة الانتظار بين محاولات إرسال OTP (بالثواني)
-const OTP_COOLDOWN_SECONDS = 60;
+// قائمة الدول الأكثر استخداماً مع أكواد الاتصال الدولية
+// أضف/احذف أي دولة حسب احتياجك
+const COUNTRIES: { name: string; code: string; flag: string }[] = [
+  { name: "مصر", code: "+20", flag: "🇪🇬" },
+  { name: "السعودية", code: "+966", flag: "🇸🇦" },
+  { name: "الإمارات", code: "+971", flag: "🇦🇪" },
+  { name: "الكويت", code: "+965", flag: "🇰🇼" },
+  { name: "قطر", code: "+974", flag: "🇶🇦" },
+  { name: "البحرين", code: "+973", flag: "🇧🇭" },
+  { name: "عُمان", code: "+968", flag: "🇴🇲" },
+  { name: "الأردن", code: "+962", flag: "🇯🇴" },
+  { name: "العراق", code: "+964", flag: "🇮🇶" },
+  { name: "لبنان", code: "+961", flag: "🇱🇧" },
+  { name: "سوريا", code: "+963", flag: "🇸🇾" },
+  { name: "فلسطين", code: "+970", flag: "🇵🇸" },
+  { name: "ليبيا", code: "+218", flag: "🇱🇾" },
+  { name: "تونس", code: "+216", flag: "🇹🇳" },
+  { name: "الجزائر", code: "+213", flag: "🇩🇿" },
+  { name: "المغرب", code: "+212", flag: "🇲🇦" },
+  { name: "السودان", code: "+249", flag: "🇸🇩" },
+  { name: "اليمن", code: "+967", flag: "🇾🇪" },
+  { name: "تركيا", code: "+90", flag: "🇹🇷" },
+  { name: "أمريكا وكندا", code: "+1", flag: "🇺🇸" },
+  { name: "المملكة المتحدة", code: "+44", flag: "🇬🇧" },
+];
 
 function LoginPage() {
   const { user } = useAuth();
@@ -28,25 +51,12 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
-  // بيانات رقم الهاتف
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
-  const [phoneStep, setPhoneStep] = useState<"send" | "verify">("send");
+  // بيانات رقم الهاتف (دخول مباشر بدون رمز تحقق SMS)
+  const [countryCode, setCountryCode] = useState(COUNTRIES[0].code);
+  const [phoneLocal, setPhoneLocal] = useState("");
+  const [phoneName, setPhoneName] = useState("");
 
   const [loading, setLoading] = useState(false);
-
-  // تتبع آخر وقت تم فيه إرسال OTP، لتفعيل cooldown حقيقي
-  const lastOtpSentAt = useRef<number | null>(null);
-  const [cooldownRemaining, setCooldownRemaining] = useState(0);
-
-  // عدّاد تنازلي مرئي لل cooldown
-  useEffect(() => {
-    if (cooldownRemaining <= 0) return;
-    const t = setInterval(() => {
-      setCooldownRemaining((prev) => (prev <= 1 ? 0 : prev - 1));
-    }, 1000);
-    return () => clearInterval(t);
-  }, [cooldownRemaining]);
 
   // دالة بناء رابط التوجيه بدقة استناداً إلى النطاق الحالي لموقعك
   const getRedirectUrl = () => {
@@ -61,7 +71,7 @@ function LoginPage() {
     }
   }, [user, navigate, redirectTo]);
 
-  // تحقق فعلي من cooldown لتسجيل الدخول (بريد/Google/GitHub)
+  // تحقق فعلي من cooldown لتسجيل الدخول (بريد/Google/GitHub/هاتف)
   // ملاحظة: هنا فقط حماية بسيطة على مستوى الواجهة لمنع الضغط المتكرر، وليست بديلاً عن rate limiting من طرف السيرفر
   const loginAttemptRef = useRef<number>(0);
   function checkLoginCooldown(): string | null {
@@ -151,96 +161,54 @@ function LoginPage() {
     }
   };
 
-  // 4. إرسال رمز التحقق (OTP) للهاتف
-  const handleSendOtp = async (e: React.FormEvent) => {
+  // 4. دخول مباشر برقم الهاتف — بدون إرسال أو انتظار رمز SMS
+  // المستخدم يختار الدولة + يكتب رقمه واسمه ويدخل فوراً
+  const handlePhoneLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!phone.trim()) {
-      toast.error("يرجى إدخال رقم الهاتف مع كود الدولة (مثال: +201000000000)");
+    const cd = checkLoginCooldown();
+    if (cd) {
+      toast.error(cd);
       return;
     }
 
-    // تحقق مبسط من صيغة الرقم (يبدأ بـ + ويحتوي أرقام فقط بعدها)
-    if (!/^\+[1-9]\d{7,14}$/.test(phone.trim())) {
-      toast.error("صيغة رقم الهاتف غير صحيحة، يجب أن يبدأ بـ + وكود الدولة");
+    const localDigits = phoneLocal.trim().replace(/^0+/, ""); // إزالة الصفر الأول لو موجود
+    if (!localDigits || !/^\d{6,12}$/.test(localDigits)) {
+      toast.error("يرجى إدخال رقم هاتف صحيح");
       return;
     }
 
-    if (!name.trim()) {
+    if (!phoneName.trim()) {
       toast.error("يرجى إدخال الاسم بالكامل");
       return;
     }
 
-    // منع الضغط المتكرر على إرسال OTP قبل انتهاء الـ cooldown
-    if (lastOtpSentAt.current && Date.now() - lastOtpSentAt.current < OTP_COOLDOWN_SECONDS * 1000) {
-      const remaining = Math.ceil(
-        (OTP_COOLDOWN_SECONDS * 1000 - (Date.now() - lastOtpSentAt.current)) / 1000
-      );
-      toast.error(`برجاء الانتظار ${remaining} ثانية قبل إعادة الإرسال`);
-      return;
-    }
+    const fullPhone = `${countryCode}${localDigits}`;
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: phone.trim(),
-      });
+      // دخول مباشر بدون رمز تحقق: ننشئ جلسة مجهولة (Anonymous) ونربطها برقم الهاتف والاسم
+      const { data, error } = await supabase.auth.signInAnonymously();
       if (error) throw error;
 
-      lastOtpSentAt.current = Date.now();
-      setCooldownRemaining(OTP_COOLDOWN_SECONDS);
-      toast.success("تم إرسال رمز التحقق إلى هاتفك!");
-      setPhoneStep("verify");
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "حدث خطأ أثناء إرسال الرمز";
-      toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 5. تأكيد رمز التحقق (OTP) وحفظ الاسم
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!otp.trim() || otp.trim().length < 4) {
-      toast.error("يرجى إدخال رمز التحقق الصحيح");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        phone: phone.trim(),
-        token: otp.trim(),
-        type: "sms",
-      });
-      if (error) throw error;
-
-      // تحديث اسم المستخدم إذا تم كتابته
-      if (name.trim() && data.user) {
+      if (data.user) {
         await supabase.auth.updateUser({
-          data: { full_name: name.trim() },
+          data: {
+            full_name: phoneName.trim(),
+            phone_number: fullPhone,
+            country_code: countryCode,
+          },
         });
       }
 
       toast.success("تم تسجيل الدخول بنجاح!");
+      navigate({ to: redirectTo && redirectTo.startsWith("/") ? redirectTo : "/dashboard" });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "رمز التحقق غير صحيح";
-      toast.error(
-        msg.includes("expired") || msg.includes("Token has expired")
-          ? "انتهت صلاحية الرمز، برجاء طلب رمز جديد"
-          : msg
-      );
+      const msg = err instanceof Error ? err.message : "حدث خطأ أثناء تسجيل الدخول";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
-  };
-
-  // إعادة إرسال الرمز من شاشة التحقق مباشرة
-  const handleResendOtp = async () => {
-    if (cooldownRemaining > 0) return;
-    await handleSendOtp({ preventDefault: () => {} } as React.FormEvent);
   };
 
   return (
@@ -314,11 +282,7 @@ function LoginPage() {
         <div className="mb-4 flex gap-2 rounded-xl border border-border p-1 bg-muted/40">
           <button
             type="button"
-            onClick={() => {
-              setAuthMethod("email");
-              setPhoneStep("send");
-              setOtp("");
-            }}
+            onClick={() => setAuthMethod("email")}
             className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition-all ${
               authMethod === "email"
                 ? "bg-background text-foreground shadow-sm"
@@ -397,97 +361,61 @@ function LoginPage() {
           </form>
         )}
 
-        {/* نموذج رقم الهاتف */}
+        {/* نموذج رقم الهاتف — دخول مباشر بدون رمز SMS */}
         {authMethod === "phone" && (
-          <>
-            {phoneStep === "send" ? (
-              <form onSubmit={handleSendOtp} className="space-y-3">
-                <div className="relative">
-                  <Phone className="absolute right-3 top-3.5 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="tel"
-                    placeholder="رقم الهاتف (مثال: +201000000000)"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                    className="w-full rounded-xl border border-input bg-background pr-10 pl-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gold/50 text-right"
-                  />
-                </div>
+          <form onSubmit={handlePhoneLogin} className="space-y-3">
+            {/* اختيار الدولة */}
+            <div className="relative">
+              <Globe className="absolute right-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <select
+                value={countryCode}
+                onChange={(e) => setCountryCode(e.target.value)}
+                required
+                className="w-full appearance-none rounded-xl border border-input bg-background pr-10 pl-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gold/50"
+              >
+                {COUNTRIES.map((c) => (
+                  <option key={c.code + c.name} value={c.code}>
+                    {c.flag} {c.name} ({c.code})
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                <div className="relative">
-                  <User className="absolute right-3 top-3.5 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="الاسم بالكامل"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    className="w-full rounded-xl border border-input bg-background pr-10 pl-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gold/50"
-                  />
-                </div>
+            {/* رقم الهاتف */}
+            <div className="relative">
+              <Phone className="absolute right-3 top-3.5 h-4 w-4 text-muted-foreground" />
+              <input
+                type="tel"
+                placeholder="رقم الهاتف بدون كود الدولة (مثال: 1000000000)"
+                value={phoneLocal}
+                onChange={(e) => setPhoneLocal(e.target.value.replace(/[^\d]/g, ""))}
+                required
+                inputMode="numeric"
+                className="w-full rounded-xl border border-input bg-background pr-10 pl-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gold/50 text-right"
+              />
+            </div>
 
-                <button
-                  type="submit"
-                  disabled={loading || cooldownRemaining > 0}
-                  className="w-full rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold disabled:opacity-60"
-                >
-                  {loading
-                    ? "جاري إرسال الرمز..."
-                    : cooldownRemaining > 0
-                    ? `أعد المحاولة بعد ${cooldownRemaining} ث`
-                    : "إرسال رمز التحقق (SMS)"}
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleVerifyOtp} className="space-y-3">
-                <div className="relative">
-                  <Lock className="absolute right-3 top-3.5 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="أدخل رمز التحقق (OTP)"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    required
-                    maxLength={6}
-                    className="w-full rounded-xl border border-input bg-background pr-10 pl-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gold/50 text-center text-lg tracking-widest"
-                  />
-                </div>
+            {/* الاسم بالكامل */}
+            <div className="relative">
+              <User className="absolute right-3 top-3.5 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="الاسم بالكامل"
+                value={phoneName}
+                onChange={(e) => setPhoneName(e.target.value)}
+                required
+                className="w-full rounded-xl border border-input bg-background pr-10 pl-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gold/50"
+              />
+            </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold disabled:opacity-60"
-                >
-                  {loading ? "جاري التحقق..." : "تأكيد وتأكيد الحساب"}
-                </button>
-
-                <div className="flex items-center justify-between mt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPhoneStep("send");
-                      setOtp("");
-                    }}
-                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    <ArrowRight className="h-3 w-3" />
-                    تغيير رقم الهاتف
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleResendOtp}
-                    disabled={cooldownRemaining > 0 || loading}
-                    className="text-xs font-bold text-gold hover:underline disabled:opacity-50 disabled:no-underline"
-                  >
-                    {cooldownRemaining > 0
-                      ? `إعادة الإرسال بعد ${cooldownRemaining} ث`
-                      : "إعادة إرسال الرمز"}
-                  </button>
-                </div>
-              </form>
-            )}
-          </>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl bg-gradient-gold py-3 text-base font-black text-gold-foreground shadow-gold disabled:opacity-60"
+            >
+              {loading ? "جاري تسجيل الدخول..." : "دخول مباشر"}
+            </button>
+          </form>
         )}
 
         {/* التبديل بين إنشاء الحساب وتسجيل الدخول */}

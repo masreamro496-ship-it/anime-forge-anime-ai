@@ -22,6 +22,8 @@ import {
   Shield,
   Download,
   Cpu,
+  Gamepad2,
+  RotateCcw,
 } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { GlobalLanguageSelector } from "@/components/LanguageSwitcher";
@@ -131,6 +133,146 @@ export const Route = createFileRoute("/")({
   }),
   component: Landing,
 });
+
+/* =========================================================
+   لعبة X و O (Tic-Tac-Toe) — لعبة كاملة تحدد الفائز أو التعادل
+   ========================================================= */
+
+const WIN_LINES = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+];
+
+function calculateWinner(squares: (string | null)[]) {
+  for (const [a, b, c] of WIN_LINES) {
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return { winner: squares[a], line: [a, b, c] };
+    }
+  }
+  return null;
+}
+
+function TicTacToe() {
+  const [board, setBoard] = useState<(string | null)[]>(Array(9).fill(null));
+  const [isXNext, setIsXNext] = useState(true);
+  const [scores, setScores] = useState({ X: 0, O: 0, draw: 0 });
+
+  const result = calculateWinner(board);
+  const winner = result?.winner ?? null;
+  const winLine = result?.line ?? [];
+  const isDraw = !winner && board.every((cell) => cell !== null);
+
+  function handleClick(index: number) {
+    if (board[index] || winner) return;
+    const nextBoard = board.slice();
+    nextBoard[index] = isXNext ? "X" : "O";
+    setBoard(nextBoard);
+
+    const res = calculateWinner(nextBoard);
+    if (res?.winner) {
+      setScores((s) => ({ ...s, [res.winner as "X" | "O"]: s[res.winner as "X" | "O"] + 1 }));
+    } else if (nextBoard.every((cell) => cell !== null)) {
+      setScores((s) => ({ ...s, draw: s.draw + 1 }));
+    }
+
+    setIsXNext(!isXNext);
+  }
+
+  function resetBoard() {
+    setBoard(Array(9).fill(null));
+    setIsXNext(true);
+  }
+
+  let statusText: string;
+  if (winner) {
+    statusText = `🎉 الفائز هو: ${winner}`;
+  } else if (isDraw) {
+    statusText = "🤝 تعادل! محدش كسب";
+  } else {
+    statusText = `دور اللاعب: ${isXNext ? "X" : "O"}`;
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-sm rounded-2xl border-2 border-gold bg-card p-5 text-center shadow-gold">
+      <div className="mb-3 flex items-center justify-between text-xs font-black">
+        <span className="text-gold">X: {scores.X}</span>
+        <span className="text-muted-foreground">تعادل: {scores.draw}</span>
+        <span className="text-gold">O: {scores.O}</span>
+      </div>
+
+      <p
+        className={`mb-4 text-lg font-black ${
+          winner ? "text-gold animate-pulse" : isDraw ? "text-muted-foreground" : "text-foreground"
+        }`}
+      >
+        {statusText}
+      </p>
+
+      <div className="mx-auto grid w-full max-w-[260px] grid-cols-3 gap-2">
+        {board.map((cell, i) => {
+          const isWinningCell = winLine.includes(i);
+          return (
+            <button
+              key={i}
+              onClick={() => handleClick(i)}
+              disabled={Boolean(cell) || Boolean(winner)}
+              className={`flex aspect-square items-center justify-center rounded-xl border-2 text-3xl font-black transition-transform hover:scale-[1.03] ${
+                isWinningCell
+                  ? "border-gold bg-gold/20 text-gold"
+                  : "border-border bg-background/40 text-foreground"
+              } ${cell ? "cursor-default" : "cursor-pointer"}`}
+            >
+              {cell}
+            </button>
+          );
+        })}
+      </div>
+
+      <button
+        onClick={resetBoard}
+        className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-gold px-5 py-2.5 text-sm font-black text-gold-foreground shadow-gold transition-transform hover:scale-[1.03]"
+      >
+        <RotateCcw className="h-4 w-4" />
+        جولة جديدة
+      </button>
+    </div>
+  );
+}
+
+function TicTacToeSection() {
+  const [gameStarted, setGameStarted] = useState(false);
+
+  return (
+    <section className="container mx-auto px-4 pb-10">
+      <div className="rounded-3xl border-2 border-gold bg-gradient-to-br from-gold/20 via-primary/10 to-transparent p-6 text-center shadow-gold sm:p-8">
+        <Gamepad2 className="mx-auto h-10 w-10 text-gold" />
+        <h2 className="mt-3 text-2xl font-black text-gradient-gold sm:text-3xl">لعبة X و O</h2>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+          العب مع صاحبك على نفس الجهاز — أول واحد يعمل 3 في خط يكسب الجولة
+        </p>
+
+        {!gameStarted ? (
+          <button
+            onClick={() => setGameStarted(true)}
+            className="mx-auto mt-6 flex items-center gap-2 rounded-2xl bg-gradient-gold px-8 py-4 text-base font-black text-gold-foreground shadow-gold transition-transform hover:scale-[1.03]"
+          >
+            <Play className="h-5 w-5" /> ابدأ اللعب
+          </button>
+        ) : (
+          <div className="mt-6">
+            <TicTacToe />
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
 
 function Landing() {
   const { user } = useAuth();
@@ -551,6 +693,9 @@ function Landing() {
           </a>
         </div>
       </section>
+
+      {/* لعبة X و O */}
+      <TicTacToeSection />
 
       {/* Quick info */}
       <section className="container mx-auto px-4 py-8">

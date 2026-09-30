@@ -3,8 +3,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
-import { Crown, Sparkles, LogOut, Coins, ShieldCheck, Video, Mic, Receipt, Clock, CheckCircle2, XCircle, Play, DollarSign, Check, Gift, KeyRound, Copy } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Sparkles, LogOut, Coins, ShieldCheck, Video, Mic, Receipt, Clock, CheckCircle2, XCircle, Play, DollarSign, Check, Gift, KeyRound, Copy } from "lucide-react";
+import { useState } from "react";
 import { AdminChatBox } from "@/components/AdminChatBox";
 import AdminCodeBox from "@/components/AdminCodeBox";
 import { toast } from "sonner";
@@ -20,35 +20,7 @@ export const Route = createFileRoute("/dashboard")({
 function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const qc = useQueryClient();
   const { data, isLoading } = useProfile();
-
-  // --- تفعيل تلقائي لباقة Pro بعد إتمام الدفع عبر NOWPayments ---
-  useEffect(() => {
-    const handlePaymentSuccess = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const isSuccess = urlParams.get("payment") === "success";
-
-      if (isSuccess && user) {
-        try {
-          const { error } = await supabase
-            .from("profiles")
-            .update({ is_pro: true })
-            .eq("id", user.id);
-
-          if (!error) {
-            toast.success("🎉 تم تفعيل عمليتك وباقة PRO بنجاح!");
-            qc.invalidateQueries({ queryKey: ["profile", user.id] });
-            window.history.replaceState({}, document.title, window.location.pathname);
-          }
-        } catch (err) {
-          console.error("خطأ أثناء تفعيل Pro:", err);
-        }
-      }
-    };
-
-    handlePaymentSuccess();
-  }, [user, qc]);
 
   const { data: requests } = useQuery({
     queryKey: ["my-requests", user?.id],
@@ -108,7 +80,7 @@ function Dashboard() {
 
 
         {/* Stats */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
             <div className="flex items-center gap-2 text-muted-foreground"><Coins className="h-5 w-5" /> الكريديت</div>
             <div className="mt-3 text-3xl font-black text-gradient-gold">{isLoading ? "..." : data?.credits.toFixed(0)}</div>
@@ -118,19 +90,6 @@ function Dashboard() {
             <div className="flex items-center gap-2 text-muted-foreground"><DollarSign className="h-5 w-5 text-green-400" /> الأرباح</div>
             <div className="mt-3 text-3xl font-black text-green-400">${(data?.earningsUsd ?? 0).toFixed(2)}</div>
             <p className="mt-1 text-[11px] text-muted-foreground">من المشاريع المباعة</p>
-          </div>
-
-          <div className={`rounded-2xl border p-6 ${isPro ? "border-gold bg-card shadow-gold" : "border-border bg-card shadow-card"}`}>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Crown className={`h-5 w-5 ${isPro ? "text-gold" : ""}`} /> الباقة
-            </div>
-            <div className={`mt-3 text-2xl font-black ${isPro ? "text-gradient-gold" : ""}`}>{isPro ? "PRO" : "مجاني"}</div>
-            <p className="mt-1 text-[11px] text-muted-foreground">{isPro ? "2 مشاريع · حتى 30 د · 360p" : "مشروع واحد · 1-10 د · 360p"}</p>
-            {!isPro && (
-              <Link to="/pro-upgrade" className="mt-3 inline-block rounded-lg bg-gradient-gold px-3 py-1 text-[11px] font-black text-gold-foreground shadow-gold">
-                ترقية والاشتراكات
-              </Link>
-            )}
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
@@ -371,4 +330,3 @@ function ProCodeCard() {
     </section>
   );
 }
-

@@ -15,7 +15,6 @@ import {
   Palette,
   Smartphone,
   Heart,
-  Crown,
   LogIn,
   ChevronDown,
   Code2,
@@ -575,25 +574,6 @@ function Landing() {
             </p>
           </Link>
 
-          {/* الترقية والاشتراكات + الدومينات */}
-          <div className="md:col-span-2 space-y-3">
-            <Link
-              to="/pro-upgrade"
-              className="flex items-center justify-center gap-3 w-full rounded-2xl bg-gradient-to-r from-red-600 via-amber-500 to-yellow-500 p-5 text-xl font-black text-white shadow-xl hover:brightness-110 hover:scale-[1.01] transition-all duration-300 border border-yellow-400/50"
-            >
-              <Crown className="h-7 w-7 text-yellow-200 fill-yellow-200 animate-bounce" />
-              <span>ترقية والاشتراكات 👑</span>
-              <Sparkles className="h-6 w-6 text-yellow-200" />
-            </Link>
-
-            <Link
-              to="/domains"
-              className="flex items-center justify-center gap-3 w-full rounded-2xl border-2 border-sky-400/60 bg-gradient-to-r from-sky-600 to-indigo-600 p-4 text-lg font-black text-white shadow-lg hover:brightness-110 hover:scale-[1.01] transition-all"
-            >
-              <span>الدومينات — مغلق حالياً</span>
-            </Link>
-          </div>
-
           {/* المزيد — قسم قابل للطي يجمع القرآن / تقديم إدارة / تقديم مطور */}
           <div className="md:col-span-2">
             <button
@@ -762,4 +742,3 @@ function Landing() {
     </div>
   );
 }
-

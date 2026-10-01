@@ -9,165 +9,56 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WheelRouteImport } from './routes/wheel'
-import { Route as WatermarkRouteImport } from './routes/watermark'
-import { Route as TasksRouteImport } from './routes/tasks'
-import { Route as SocialRouteImport } from './routes/social'
-import { Route as ShortsRouteImport } from './routes/shorts'
-import { Route as RobotControlRouteImport } from './routes/robot-control'
-import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
-import { Route as ModelStudioRouteImport } from './routes/model-studio'
-import { Route as MangaRouteImport } from './routes/manga'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as LegalRouteImport } from './routes/legal'
-import { Route as GraphicDesignRouteImport } from './routes/graphic-design'
-import { Route as FreeShortsRouteImport } from './routes/free-shorts'
-import { Route as DomainsRouteImport } from './routes/domains'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as ChatRouteImport } from './routes/chat'
-import { Route as AudioRouteImport } from './routes/audio'
-import { Route as ApplyDeveloperRouteImport } from './routes/apply-developer'
-import { Route as ApplyAdminRouteImport } from './routes/apply-admin'
-import { Route as AnimeUploadRouteImport } from './routes/anime-upload'
-import { Route as AnimeMarketRouteImport } from './routes/anime-market'
-import { Route as AnimeBrowseRouteImport } from './routes/anime-browse'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as WorldCupIndexRouteImport } from './routes/world-cup.index'
-import { Route as GraphicDesignIndexRouteImport } from './routes/graphic-design.index'
-import { Route as WorldCupPlayRouteImport } from './routes/world-cup.play'
-import { Route as WatchIdRouteImport } from './routes/watch.$id'
-import { Route as ShortsUploadRouteImport } from './routes/shorts.upload'
-import { Route as ShortsIdRouteImport } from './routes/shorts.$id'
-import { Route as GraphicDesignUploadRouteImport } from './routes/graphic-design.upload'
-import { Route as GraphicDesignMarketRouteImport } from './routes/graphic-design.market'
-import { Route as GraphicDesignGalleryRouteImport } from './routes/graphic-design.gallery'
-import { Route as GraphicDesignEditorRouteImport } from './routes/graphic-design.editor'
-import { Route as GraphicDesignDashboardRouteImport } from './routes/graphic-design.dashboard'
-import { Route as GenerateVideoRouteImport } from './routes/generate.video'
-import { Route as GenerateGokuRouteImport } from './routes/generate.goku'
-import { Route as AnimeMarketIdRouteImport } from './routes/anime-market.$id'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AnimeBrowseRouteImport } from './routes/anime-browse'
+import { Route as AnimeMarketRouteImport } from './routes/anime-market'
+import { Route as AnimeUploadRouteImport } from './routes/anime-upload'
+import { Route as ApplyAdminRouteImport } from './routes/apply-admin'
+import { Route as ApplyDeveloperRouteImport } from './routes/apply-developer'
+import { Route as AudioRouteImport } from './routes/audio'
+import { Route as ChatRouteImport } from './routes/chat'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DomainsRouteImport } from './routes/domains'
+import { Route as FreeShortsRouteImport } from './routes/free-shorts'
+import { Route as GraphicDesignRouteImport } from './routes/graphic-design'
+import { Route as GuessCharacterRouteImport } from './routes/guess-character'
+import { Route as LegalRouteImport } from './routes/legal'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MangaRouteImport } from './routes/manga'
+import { Route as ModelStudioRouteImport } from './routes/model-studio'
+import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as RobotControlRouteImport } from './routes/robot-control'
+import { Route as ShortsRouteImport } from './routes/shorts'
+import { Route as SocialRouteImport } from './routes/social'
+import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as WatermarkRouteImport } from './routes/watermark'
+import { Route as WheelRouteImport } from './routes/wheel'
 import { Route as AnimeBrowseSlugRouteImport } from './routes/anime-browse.$slug'
-import { Route as GraphicDesignProfileUserIdRouteImport } from './routes/graphic-design.profile.$userId'
+import { Route as AnimeMarketIdRouteImport } from './routes/anime-market.$id'
+import { Route as GenerateGokuRouteImport } from './routes/generate.goku'
+import { Route as GenerateVideoRouteImport } from './routes/generate.video'
+import { Route as GraphicDesignIndexRouteImport } from './routes/graphic-design.index'
+import { Route as GraphicDesignDashboardRouteImport } from './routes/graphic-design.dashboard'
+import { Route as GraphicDesignEditorRouteImport } from './routes/graphic-design.editor'
+import { Route as GraphicDesignGalleryRouteImport } from './routes/graphic-design.gallery'
+import { Route as GraphicDesignMarketRouteImport } from './routes/graphic-design.market'
+import { Route as GraphicDesignUploadRouteImport } from './routes/graphic-design.upload'
+import { Route as ShortsIdRouteImport } from './routes/shorts.$id'
+import { Route as ShortsUploadRouteImport } from './routes/shorts.upload'
+import { Route as WatchIdRouteImport } from './routes/watch.$id'
+import { Route as WorldCupIndexRouteImport } from './routes/world-cup.index'
+import { Route as WorldCupPlayRouteImport } from './routes/world-cup.play'
 import { Route as GraphicDesignMarketListingIdRouteImport } from './routes/graphic-design.market.$listingId'
-import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/fatora/success'
-import { Route as ApiPublicCreditsDeductRouteImport } from './routes/api/public/credits/deduct'
+import { Route as GraphicDesignProfileUserIdRouteImport } from './routes/graphic-design.profile.$userId'
 import { Route as AnimeBrowseSlugWatchEpisodeRouteImport } from './routes/anime-browse.$slug.watch.$episode'
+import { Route as ApiPublicCreditsDeductRouteImport } from './routes/api/public/credits/deduct'
+import { Route as ApiPublicFatoraSuccessRouteImport } from './routes/api/public/fatora/success'
 
-const WheelRoute = WheelRouteImport.update({
-  id: '/wheel',
-  path: '/wheel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WatermarkRoute = WatermarkRouteImport.update({
-  id: '/watermark',
-  path: '/watermark',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TasksRoute = TasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SocialRoute = SocialRouteImport.update({
-  id: '/social',
-  path: '/social',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShortsRoute = ShortsRouteImport.update({
-  id: '/shorts',
-  path: '/shorts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RobotControlRoute = RobotControlRouteImport.update({
-  id: '/robot-control',
-  path: '/robot-control',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProUpgradeRoute = ProUpgradeRouteImport.update({
-  id: '/pro-upgrade',
-  path: '/pro-upgrade',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ModelStudioRoute = ModelStudioRouteImport.update({
-  id: '/model-studio',
-  path: '/model-studio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MangaRoute = MangaRouteImport.update({
-  id: '/manga',
-  path: '/manga',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalRoute = LegalRouteImport.update({
-  id: '/legal',
-  path: '/legal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GraphicDesignRoute = GraphicDesignRouteImport.update({
-  id: '/graphic-design',
-  path: '/graphic-design',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FreeShortsRoute = FreeShortsRouteImport.update({
-  id: '/free-shorts',
-  path: '/free-shorts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DomainsRoute = DomainsRouteImport.update({
-  id: '/domains',
-  path: '/domains',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChatRoute = ChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AudioRoute = AudioRouteImport.update({
-  id: '/audio',
-  path: '/audio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApplyDeveloperRoute = ApplyDeveloperRouteImport.update({
-  id: '/apply-developer',
-  path: '/apply-developer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApplyAdminRoute = ApplyAdminRouteImport.update({
-  id: '/apply-admin',
-  path: '/apply-admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnimeUploadRoute = AnimeUploadRouteImport.update({
-  id: '/anime-upload',
-  path: '/anime-upload',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnimeMarketRoute = AnimeMarketRouteImport.update({
-  id: '/anime-market',
-  path: '/anime-market',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnimeBrowseRoute = AnimeBrowseRouteImport.update({
-  id: '/anime-browse',
-  path: '/anime-browse',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -175,14 +66,144 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AnimeBrowseRoute = AnimeBrowseRouteImport.update({
+  id: '/anime-browse',
+  path: '/anime-browse',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorldCupIndexRoute = WorldCupIndexRouteImport.update({
-  id: '/world-cup/',
-  path: '/world-cup/',
+const AnimeMarketRoute = AnimeMarketRouteImport.update({
+  id: '/anime-market',
+  path: '/anime-market',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnimeUploadRoute = AnimeUploadRouteImport.update({
+  id: '/anime-upload',
+  path: '/anime-upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApplyAdminRoute = ApplyAdminRouteImport.update({
+  id: '/apply-admin',
+  path: '/apply-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApplyDeveloperRoute = ApplyDeveloperRouteImport.update({
+  id: '/apply-developer',
+  path: '/apply-developer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AudioRoute = AudioRouteImport.update({
+  id: '/audio',
+  path: '/audio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DomainsRoute = DomainsRouteImport.update({
+  id: '/domains',
+  path: '/domains',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeShortsRoute = FreeShortsRouteImport.update({
+  id: '/free-shorts',
+  path: '/free-shorts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GraphicDesignRoute = GraphicDesignRouteImport.update({
+  id: '/graphic-design',
+  path: '/graphic-design',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuessCharacterRoute = GuessCharacterRouteImport.update({
+  id: '/guess-character',
+  path: '/guess-character',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MangaRoute = MangaRouteImport.update({
+  id: '/manga',
+  path: '/manga',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelStudioRoute = ModelStudioRouteImport.update({
+  id: '/model-studio',
+  path: '/model-studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProUpgradeRoute = ProUpgradeRouteImport.update({
+  id: '/pro-upgrade',
+  path: '/pro-upgrade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotControlRoute = RobotControlRouteImport.update({
+  id: '/robot-control',
+  path: '/robot-control',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShortsRoute = ShortsRouteImport.update({
+  id: '/shorts',
+  path: '/shorts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocialRoute = SocialRouteImport.update({
+  id: '/social',
+  path: '/social',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WatermarkRoute = WatermarkRouteImport.update({
+  id: '/watermark',
+  path: '/watermark',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WheelRoute = WheelRouteImport.update({
+  id: '/wheel',
+  path: '/wheel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnimeBrowseSlugRoute = AnimeBrowseSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => AnimeBrowseRoute,
+} as any)
+const AnimeMarketIdRoute = AnimeMarketIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AnimeMarketRoute,
+} as any)
+const GenerateGokuRoute = GenerateGokuRouteImport.update({
+  id: '/generate/goku',
+  path: '/generate/goku',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GenerateVideoRoute = GenerateVideoRouteImport.update({
+  id: '/generate/video',
+  path: '/generate/video',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GraphicDesignIndexRoute = GraphicDesignIndexRouteImport.update({
@@ -190,39 +211,9 @@ const GraphicDesignIndexRoute = GraphicDesignIndexRouteImport.update({
   path: '/',
   getParentRoute: () => GraphicDesignRoute,
 } as any)
-const WorldCupPlayRoute = WorldCupPlayRouteImport.update({
-  id: '/world-cup/play',
-  path: '/world-cup/play',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WatchIdRoute = WatchIdRouteImport.update({
-  id: '/watch/$id',
-  path: '/watch/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShortsUploadRoute = ShortsUploadRouteImport.update({
-  id: '/upload',
-  path: '/upload',
-  getParentRoute: () => ShortsRoute,
-} as any)
-const ShortsIdRoute = ShortsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ShortsRoute,
-} as any)
-const GraphicDesignUploadRoute = GraphicDesignUploadRouteImport.update({
-  id: '/upload',
-  path: '/upload',
-  getParentRoute: () => GraphicDesignRoute,
-} as any)
-const GraphicDesignMarketRoute = GraphicDesignMarketRouteImport.update({
-  id: '/market',
-  path: '/market',
-  getParentRoute: () => GraphicDesignRoute,
-} as any)
-const GraphicDesignGalleryRoute = GraphicDesignGalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
+const GraphicDesignDashboardRoute = GraphicDesignDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => GraphicDesignRoute,
 } as any)
 const GraphicDesignEditorRoute = GraphicDesignEditorRouteImport.update({
@@ -230,59 +221,74 @@ const GraphicDesignEditorRoute = GraphicDesignEditorRouteImport.update({
   path: '/editor',
   getParentRoute: () => GraphicDesignRoute,
 } as any)
-const GraphicDesignDashboardRoute = GraphicDesignDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const GraphicDesignGalleryRoute = GraphicDesignGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
   getParentRoute: () => GraphicDesignRoute,
 } as any)
-const GenerateVideoRoute = GenerateVideoRouteImport.update({
-  id: '/generate/video',
-  path: '/generate/video',
-  getParentRoute: () => rootRouteImport,
+const GraphicDesignMarketRoute = GraphicDesignMarketRouteImport.update({
+  id: '/market',
+  path: '/market',
+  getParentRoute: () => GraphicDesignRoute,
 } as any)
-const GenerateGokuRoute = GenerateGokuRouteImport.update({
-  id: '/generate/goku',
-  path: '/generate/goku',
-  getParentRoute: () => rootRouteImport,
+const GraphicDesignUploadRoute = GraphicDesignUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => GraphicDesignRoute,
 } as any)
-const AnimeMarketIdRoute = AnimeMarketIdRouteImport.update({
+const ShortsIdRoute = ShortsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => AnimeMarketRoute,
+  getParentRoute: () => ShortsRoute,
 } as any)
-const AnimeBrowseSlugRoute = AnimeBrowseSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => AnimeBrowseRoute,
+const ShortsUploadRoute = ShortsUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => ShortsRoute,
 } as any)
-const GraphicDesignProfileUserIdRoute =
-  GraphicDesignProfileUserIdRouteImport.update({
-    id: '/profile/$userId',
-    path: '/profile/$userId',
-    getParentRoute: () => GraphicDesignRoute,
-  } as any)
+const WatchIdRoute = WatchIdRouteImport.update({
+  id: '/watch/$id',
+  path: '/watch/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorldCupIndexRoute = WorldCupIndexRouteImport.update({
+  id: '/world-cup/',
+  path: '/world-cup/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorldCupPlayRoute = WorldCupPlayRouteImport.update({
+  id: '/world-cup/play',
+  path: '/world-cup/play',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GraphicDesignMarketListingIdRoute =
   GraphicDesignMarketListingIdRouteImport.update({
     id: '/$listingId',
     path: '/$listingId',
     getParentRoute: () => GraphicDesignMarketRoute,
   } as any)
-const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({
-  id: '/api/public/fatora/success',
-  path: '/api/public/fatora/success',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicCreditsDeductRoute = ApiPublicCreditsDeductRouteImport.update({
-  id: '/api/public/credits/deduct',
-  path: '/api/public/credits/deduct',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const GraphicDesignProfileUserIdRoute =
+  GraphicDesignProfileUserIdRouteImport.update({
+    id: '/profile/$userId',
+    path: '/profile/$userId',
+    getParentRoute: () => GraphicDesignRoute,
+  } as any)
 const AnimeBrowseSlugWatchEpisodeRoute =
   AnimeBrowseSlugWatchEpisodeRouteImport.update({
     id: '/watch/$episode',
     path: '/watch/$episode',
     getParentRoute: () => AnimeBrowseSlugRoute,
   } as any)
+const ApiPublicCreditsDeductRoute = ApiPublicCreditsDeductRouteImport.update({
+  id: '/api/public/credits/deduct',
+  path: '/api/public/credits/deduct',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicFatoraSuccessRoute = ApiPublicFatoraSuccessRouteImport.update({
+  id: '/api/public/fatora/success',
+  path: '/api/public/fatora/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -298,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
   '/graphic-design': typeof GraphicDesignRouteWithChildren
+  '/guess-character': typeof GuessCharacterRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/manga': typeof MangaRoute
@@ -344,6 +351,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
+  '/guess-character': typeof GuessCharacterRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/manga': typeof MangaRoute
@@ -392,6 +400,7 @@ export interface FileRoutesById {
   '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
   '/graphic-design': typeof GraphicDesignRouteWithChildren
+  '/guess-character': typeof GuessCharacterRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/manga': typeof MangaRoute
@@ -441,6 +450,7 @@ export interface FileRouteTypes {
     | '/domains'
     | '/free-shorts'
     | '/graphic-design'
+    | '/guess-character'
     | '/legal'
     | '/login'
     | '/manga'
@@ -487,6 +497,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/domains'
     | '/free-shorts'
+    | '/guess-character'
     | '/legal'
     | '/login'
     | '/manga'
@@ -534,6 +545,7 @@ export interface FileRouteTypes {
     | '/domains'
     | '/free-shorts'
     | '/graphic-design'
+    | '/guess-character'
     | '/legal'
     | '/login'
     | '/manga'
@@ -582,6 +594,7 @@ export interface RootRouteChildren {
   DomainsRoute: typeof DomainsRoute
   FreeShortsRoute: typeof FreeShortsRoute
   GraphicDesignRoute: typeof GraphicDesignRouteWithChildren
+  GuessCharacterRoute: typeof GuessCharacterRoute
   LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
   MangaRoute: typeof MangaRoute
@@ -605,165 +618,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/wheel': {
-      id: '/wheel'
-      path: '/wheel'
-      fullPath: '/wheel'
-      preLoaderRoute: typeof WheelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/watermark': {
-      id: '/watermark'
-      path: '/watermark'
-      fullPath: '/watermark'
-      preLoaderRoute: typeof WatermarkRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tasks': {
-      id: '/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof TasksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/social': {
-      id: '/social'
-      path: '/social'
-      fullPath: '/social'
-      preLoaderRoute: typeof SocialRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shorts': {
-      id: '/shorts'
-      path: '/shorts'
-      fullPath: '/shorts'
-      preLoaderRoute: typeof ShortsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/robot-control': {
-      id: '/robot-control'
-      path: '/robot-control'
-      fullPath: '/robot-control'
-      preLoaderRoute: typeof RobotControlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pro-upgrade': {
-      id: '/pro-upgrade'
-      path: '/pro-upgrade'
-      fullPath: '/pro-upgrade'
-      preLoaderRoute: typeof ProUpgradeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/model-studio': {
-      id: '/model-studio'
-      path: '/model-studio'
-      fullPath: '/model-studio'
-      preLoaderRoute: typeof ModelStudioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/manga': {
-      id: '/manga'
-      path: '/manga'
-      fullPath: '/manga'
-      preLoaderRoute: typeof MangaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal': {
-      id: '/legal'
-      path: '/legal'
-      fullPath: '/legal'
-      preLoaderRoute: typeof LegalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/graphic-design': {
-      id: '/graphic-design'
-      path: '/graphic-design'
-      fullPath: '/graphic-design'
-      preLoaderRoute: typeof GraphicDesignRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/free-shorts': {
-      id: '/free-shorts'
-      path: '/free-shorts'
-      fullPath: '/free-shorts'
-      preLoaderRoute: typeof FreeShortsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/domains': {
-      id: '/domains'
-      path: '/domains'
-      fullPath: '/domains'
-      preLoaderRoute: typeof DomainsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chat': {
-      id: '/chat'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof ChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/audio': {
-      id: '/audio'
-      path: '/audio'
-      fullPath: '/audio'
-      preLoaderRoute: typeof AudioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/apply-developer': {
-      id: '/apply-developer'
-      path: '/apply-developer'
-      fullPath: '/apply-developer'
-      preLoaderRoute: typeof ApplyDeveloperRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/apply-admin': {
-      id: '/apply-admin'
-      path: '/apply-admin'
-      fullPath: '/apply-admin'
-      preLoaderRoute: typeof ApplyAdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/anime-upload': {
-      id: '/anime-upload'
-      path: '/anime-upload'
-      fullPath: '/anime-upload'
-      preLoaderRoute: typeof AnimeUploadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/anime-market': {
-      id: '/anime-market'
-      path: '/anime-market'
-      fullPath: '/anime-market'
-      preLoaderRoute: typeof AnimeMarketRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/anime-browse': {
-      id: '/anime-browse'
-      path: '/anime-browse'
-      fullPath: '/anime-browse'
-      preLoaderRoute: typeof AnimeBrowseRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -773,18 +632,200 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/anime-browse': {
+      id: '/anime-browse'
+      path: '/anime-browse'
+      fullPath: '/anime-browse'
+      preLoaderRoute: typeof AnimeBrowseRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/world-cup/': {
-      id: '/world-cup/'
-      path: '/world-cup'
-      fullPath: '/world-cup/'
-      preLoaderRoute: typeof WorldCupIndexRouteImport
+    '/anime-market': {
+      id: '/anime-market'
+      path: '/anime-market'
+      fullPath: '/anime-market'
+      preLoaderRoute: typeof AnimeMarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/anime-upload': {
+      id: '/anime-upload'
+      path: '/anime-upload'
+      fullPath: '/anime-upload'
+      preLoaderRoute: typeof AnimeUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apply-admin': {
+      id: '/apply-admin'
+      path: '/apply-admin'
+      fullPath: '/apply-admin'
+      preLoaderRoute: typeof ApplyAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apply-developer': {
+      id: '/apply-developer'
+      path: '/apply-developer'
+      fullPath: '/apply-developer'
+      preLoaderRoute: typeof ApplyDeveloperRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/audio': {
+      id: '/audio'
+      path: '/audio'
+      fullPath: '/audio'
+      preLoaderRoute: typeof AudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/domains': {
+      id: '/domains'
+      path: '/domains'
+      fullPath: '/domains'
+      preLoaderRoute: typeof DomainsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free-shorts': {
+      id: '/free-shorts'
+      path: '/free-shorts'
+      fullPath: '/free-shorts'
+      preLoaderRoute: typeof FreeShortsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/graphic-design': {
+      id: '/graphic-design'
+      path: '/graphic-design'
+      fullPath: '/graphic-design'
+      preLoaderRoute: typeof GraphicDesignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guess-character': {
+      id: '/guess-character'
+      path: '/guess-character'
+      fullPath: '/guess-character'
+      preLoaderRoute: typeof GuessCharacterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manga': {
+      id: '/manga'
+      path: '/manga'
+      fullPath: '/manga'
+      preLoaderRoute: typeof MangaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/model-studio': {
+      id: '/model-studio'
+      path: '/model-studio'
+      fullPath: '/model-studio'
+      preLoaderRoute: typeof ModelStudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pro-upgrade': {
+      id: '/pro-upgrade'
+      path: '/pro-upgrade'
+      fullPath: '/pro-upgrade'
+      preLoaderRoute: typeof ProUpgradeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robot-control': {
+      id: '/robot-control'
+      path: '/robot-control'
+      fullPath: '/robot-control'
+      preLoaderRoute: typeof RobotControlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shorts': {
+      id: '/shorts'
+      path: '/shorts'
+      fullPath: '/shorts'
+      preLoaderRoute: typeof ShortsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social': {
+      id: '/social'
+      path: '/social'
+      fullPath: '/social'
+      preLoaderRoute: typeof SocialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/watermark': {
+      id: '/watermark'
+      path: '/watermark'
+      fullPath: '/watermark'
+      preLoaderRoute: typeof WatermarkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wheel': {
+      id: '/wheel'
+      path: '/wheel'
+      fullPath: '/wheel'
+      preLoaderRoute: typeof WheelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/anime-browse/$slug': {
+      id: '/anime-browse/$slug'
+      path: '/$slug'
+      fullPath: '/anime-browse/$slug'
+      preLoaderRoute: typeof AnimeBrowseSlugRouteImport
+      parentRoute: typeof AnimeBrowseRoute
+    }
+    '/anime-market/$id': {
+      id: '/anime-market/$id'
+      path: '/$id'
+      fullPath: '/anime-market/$id'
+      preLoaderRoute: typeof AnimeMarketIdRouteImport
+      parentRoute: typeof AnimeMarketRoute
+    }
+    '/generate/goku': {
+      id: '/generate/goku'
+      path: '/generate/goku'
+      fullPath: '/generate/goku'
+      preLoaderRoute: typeof GenerateGokuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/generate/video': {
+      id: '/generate/video'
+      path: '/generate/video'
+      fullPath: '/generate/video'
+      preLoaderRoute: typeof GenerateVideoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/graphic-design/': {
@@ -794,53 +835,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GraphicDesignIndexRouteImport
       parentRoute: typeof GraphicDesignRoute
     }
-    '/world-cup/play': {
-      id: '/world-cup/play'
-      path: '/world-cup/play'
-      fullPath: '/world-cup/play'
-      preLoaderRoute: typeof WorldCupPlayRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/watch/$id': {
-      id: '/watch/$id'
-      path: '/watch/$id'
-      fullPath: '/watch/$id'
-      preLoaderRoute: typeof WatchIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shorts/upload': {
-      id: '/shorts/upload'
-      path: '/upload'
-      fullPath: '/shorts/upload'
-      preLoaderRoute: typeof ShortsUploadRouteImport
-      parentRoute: typeof ShortsRoute
-    }
-    '/shorts/$id': {
-      id: '/shorts/$id'
-      path: '/$id'
-      fullPath: '/shorts/$id'
-      preLoaderRoute: typeof ShortsIdRouteImport
-      parentRoute: typeof ShortsRoute
-    }
-    '/graphic-design/upload': {
-      id: '/graphic-design/upload'
-      path: '/upload'
-      fullPath: '/graphic-design/upload'
-      preLoaderRoute: typeof GraphicDesignUploadRouteImport
-      parentRoute: typeof GraphicDesignRoute
-    }
-    '/graphic-design/market': {
-      id: '/graphic-design/market'
-      path: '/market'
-      fullPath: '/graphic-design/market'
-      preLoaderRoute: typeof GraphicDesignMarketRouteImport
-      parentRoute: typeof GraphicDesignRoute
-    }
-    '/graphic-design/gallery': {
-      id: '/graphic-design/gallery'
-      path: '/gallery'
-      fullPath: '/graphic-design/gallery'
-      preLoaderRoute: typeof GraphicDesignGalleryRouteImport
+    '/graphic-design/dashboard': {
+      id: '/graphic-design/dashboard'
+      path: '/dashboard'
+      fullPath: '/graphic-design/dashboard'
+      preLoaderRoute: typeof GraphicDesignDashboardRouteImport
       parentRoute: typeof GraphicDesignRoute
     }
     '/graphic-design/editor': {
@@ -850,47 +849,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GraphicDesignEditorRouteImport
       parentRoute: typeof GraphicDesignRoute
     }
-    '/graphic-design/dashboard': {
-      id: '/graphic-design/dashboard'
-      path: '/dashboard'
-      fullPath: '/graphic-design/dashboard'
-      preLoaderRoute: typeof GraphicDesignDashboardRouteImport
+    '/graphic-design/gallery': {
+      id: '/graphic-design/gallery'
+      path: '/gallery'
+      fullPath: '/graphic-design/gallery'
+      preLoaderRoute: typeof GraphicDesignGalleryRouteImport
       parentRoute: typeof GraphicDesignRoute
     }
-    '/generate/video': {
-      id: '/generate/video'
-      path: '/generate/video'
-      fullPath: '/generate/video'
-      preLoaderRoute: typeof GenerateVideoRouteImport
-      parentRoute: typeof rootRouteImport
+    '/graphic-design/market': {
+      id: '/graphic-design/market'
+      path: '/market'
+      fullPath: '/graphic-design/market'
+      preLoaderRoute: typeof GraphicDesignMarketRouteImport
+      parentRoute: typeof GraphicDesignRoute
     }
-    '/generate/goku': {
-      id: '/generate/goku'
-      path: '/generate/goku'
-      fullPath: '/generate/goku'
-      preLoaderRoute: typeof GenerateGokuRouteImport
-      parentRoute: typeof rootRouteImport
+    '/graphic-design/upload': {
+      id: '/graphic-design/upload'
+      path: '/upload'
+      fullPath: '/graphic-design/upload'
+      preLoaderRoute: typeof GraphicDesignUploadRouteImport
+      parentRoute: typeof GraphicDesignRoute
     }
-    '/anime-market/$id': {
-      id: '/anime-market/$id'
+    '/shorts/$id': {
+      id: '/shorts/$id'
       path: '/$id'
-      fullPath: '/anime-market/$id'
-      preLoaderRoute: typeof AnimeMarketIdRouteImport
-      parentRoute: typeof AnimeMarketRoute
+      fullPath: '/shorts/$id'
+      preLoaderRoute: typeof ShortsIdRouteImport
+      parentRoute: typeof ShortsRoute
     }
-    '/anime-browse/$slug': {
-      id: '/anime-browse/$slug'
-      path: '/$slug'
-      fullPath: '/anime-browse/$slug'
-      preLoaderRoute: typeof AnimeBrowseSlugRouteImport
-      parentRoute: typeof AnimeBrowseRoute
+    '/shorts/upload': {
+      id: '/shorts/upload'
+      path: '/upload'
+      fullPath: '/shorts/upload'
+      preLoaderRoute: typeof ShortsUploadRouteImport
+      parentRoute: typeof ShortsRoute
     }
-    '/graphic-design/profile/$userId': {
-      id: '/graphic-design/profile/$userId'
-      path: '/profile/$userId'
-      fullPath: '/graphic-design/profile/$userId'
-      preLoaderRoute: typeof GraphicDesignProfileUserIdRouteImport
-      parentRoute: typeof GraphicDesignRoute
+    '/watch/$id': {
+      id: '/watch/$id'
+      path: '/watch/$id'
+      fullPath: '/watch/$id'
+      preLoaderRoute: typeof WatchIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/world-cup/': {
+      id: '/world-cup/'
+      path: '/world-cup'
+      fullPath: '/world-cup/'
+      preLoaderRoute: typeof WorldCupIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/world-cup/play': {
+      id: '/world-cup/play'
+      path: '/world-cup/play'
+      fullPath: '/world-cup/play'
+      preLoaderRoute: typeof WorldCupPlayRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/graphic-design/market/$listingId': {
       id: '/graphic-design/market/$listingId'
@@ -899,12 +912,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GraphicDesignMarketListingIdRouteImport
       parentRoute: typeof GraphicDesignMarketRoute
     }
-    '/api/public/fatora/success': {
-      id: '/api/public/fatora/success'
-      path: '/api/public/fatora/success'
-      fullPath: '/api/public/fatora/success'
-      preLoaderRoute: typeof ApiPublicFatoraSuccessRouteImport
-      parentRoute: typeof rootRouteImport
+    '/graphic-design/profile/$userId': {
+      id: '/graphic-design/profile/$userId'
+      path: '/profile/$userId'
+      fullPath: '/graphic-design/profile/$userId'
+      preLoaderRoute: typeof GraphicDesignProfileUserIdRouteImport
+      parentRoute: typeof GraphicDesignRoute
+    }
+    '/anime-browse/$slug/watch/$episode': {
+      id: '/anime-browse/$slug/watch/$episode'
+      path: '/watch/$episode'
+      fullPath: '/anime-browse/$slug/watch/$episode'
+      preLoaderRoute: typeof AnimeBrowseSlugWatchEpisodeRouteImport
+      parentRoute: typeof AnimeBrowseSlugRoute
     }
     '/api/public/credits/deduct': {
       id: '/api/public/credits/deduct'
@@ -913,12 +933,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCreditsDeductRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/anime-browse/$slug/watch/$episode': {
-      id: '/anime-browse/$slug/watch/$episode'
-      path: '/watch/$episode'
-      fullPath: '/anime-browse/$slug/watch/$episode'
-      preLoaderRoute: typeof AnimeBrowseSlugWatchEpisodeRouteImport
-      parentRoute: typeof AnimeBrowseSlugRoute
+    '/api/public/fatora/success': {
+      id: '/api/public/fatora/success'
+      path: '/api/public/fatora/success'
+      fullPath: '/api/public/fatora/success'
+      preLoaderRoute: typeof ApiPublicFatoraSuccessRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -1021,6 +1041,7 @@ const rootRouteChildren: RootRouteChildren = {
   DomainsRoute: DomainsRoute,
   FreeShortsRoute: FreeShortsRoute,
   GraphicDesignRoute: GraphicDesignRouteWithChildren,
+  GuessCharacterRoute: GuessCharacterRoute,
   LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
   MangaRoute: MangaRoute,

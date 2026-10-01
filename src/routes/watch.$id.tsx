@@ -23,7 +23,7 @@ export const Route = createFileRoute("/watch/$id")({
   component: WatchPage,
   errorComponent: ({ error, reset }) => (
     <div className="p-8 text-center">
-      <p className="mb-3 text-sm text-destructive">{error.message}</p>
+      <p className="mb-3 text-sm text-destructive">{(error as Error)?.message ?? "خطأ غير متوقع"}</p>
       <button onClick={reset} className="rounded-xl bg-gradient-gold px-4 py-2 text-sm font-bold text-gold-foreground">إعادة</button>
     </div>
   ),

@@ -21,6 +21,7 @@ import { Route as ModelStudioRouteImport } from './routes/model-studio'
 import { Route as MangaRouteImport } from './routes/manga'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LegalRouteImport } from './routes/legal'
+import { Route as GuessCharacterRouteImport } from './routes/guess-character'
 import { Route as GraphicDesignRouteImport } from './routes/graphic-design'
 import { Route as FreeShortsRouteImport } from './routes/free-shorts'
 import { Route as DomainsRouteImport } from './routes/domains'
@@ -113,6 +114,11 @@ const LoginRoute = LoginRouteImport.update({
 const LegalRoute = LegalRouteImport.update({
   id: '/legal',
   path: '/legal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuessCharacterRoute = GuessCharacterRouteImport.update({
+  id: '/guess-character',
+  path: '/guess-character',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GraphicDesignRoute = GraphicDesignRouteImport.update({
@@ -298,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
   '/graphic-design': typeof GraphicDesignRouteWithChildren
+  '/guess-character': typeof GuessCharacterRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/manga': typeof MangaRoute
@@ -344,6 +351,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
+  '/guess-character': typeof GuessCharacterRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/manga': typeof MangaRoute
@@ -392,6 +400,7 @@ export interface FileRoutesById {
   '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
   '/graphic-design': typeof GraphicDesignRouteWithChildren
+  '/guess-character': typeof GuessCharacterRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/manga': typeof MangaRoute
@@ -441,6 +450,7 @@ export interface FileRouteTypes {
     | '/domains'
     | '/free-shorts'
     | '/graphic-design'
+    | '/guess-character'
     | '/legal'
     | '/login'
     | '/manga'
@@ -487,6 +497,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/domains'
     | '/free-shorts'
+    | '/guess-character'
     | '/legal'
     | '/login'
     | '/manga'
@@ -534,6 +545,7 @@ export interface FileRouteTypes {
     | '/domains'
     | '/free-shorts'
     | '/graphic-design'
+    | '/guess-character'
     | '/legal'
     | '/login'
     | '/manga'
@@ -582,6 +594,7 @@ export interface RootRouteChildren {
   DomainsRoute: typeof DomainsRoute
   FreeShortsRoute: typeof FreeShortsRoute
   GraphicDesignRoute: typeof GraphicDesignRouteWithChildren
+  GuessCharacterRoute: typeof GuessCharacterRoute
   LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
   MangaRoute: typeof MangaRoute
@@ -687,6 +700,13 @@ declare module '@tanstack/react-router' {
       path: '/legal'
       fullPath: '/legal'
       preLoaderRoute: typeof LegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guess-character': {
+      id: '/guess-character'
+      path: '/guess-character'
+      fullPath: '/guess-character'
+      preLoaderRoute: typeof GuessCharacterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/graphic-design': {
@@ -1021,6 +1041,7 @@ const rootRouteChildren: RootRouteChildren = {
   DomainsRoute: DomainsRoute,
   FreeShortsRoute: FreeShortsRoute,
   GraphicDesignRoute: GraphicDesignRouteWithChildren,
+  GuessCharacterRoute: GuessCharacterRoute,
   LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
   MangaRoute: MangaRoute,

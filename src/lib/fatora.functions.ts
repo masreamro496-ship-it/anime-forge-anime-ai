@@ -39,7 +39,7 @@ export const createFatoraCheckout = createServerFn({ method: "POST" })
         },
         language: "ar",
         success_url: `${data.origin}/api/public/fatora/success?order=${orderId}`,
-        failure_url: `${data.origin}/pro-upgrade?payment=failed`,
+        failure_url: `${data.origin}/dashboard?payment=failed`,
         note: plan.name,
       }),
     });

@@ -14,20 +14,22 @@ export default function ConanMascot({
       className={`relative inline-block ${mode === "dodge" ? "conan-dodge" : "mascot-walk-b"}`}
       style={{ width: size, height: size * 1.25 }}
     >
-      <div
-        className="pointer-events-none absolute inset-0 rounded-full blur-2xl goku-aura"
-        style={{ background: "radial-gradient(circle, rgba(59,130,246,0.45), transparent 65%)" }}
-      />
 
-      <svg viewBox="0 0 120 150" className="relative h-full w-full mascot-bob" aria-label="المحقق كونان">
+      <svg viewBox="0 0 120 150" className="relative h-full w-full mascot-bob" style={{ background: "transparent", overflow: "visible" }} aria-label="المحقق كونان">
         {/* شعر */}
         <g className="conan-hair" style={{ transformOrigin: "60px 40px" }}>
           <path d="M38 48 q0 -30 22 -30 q22 0 22 30 q-6 -14 -22 -14 q-16 0 -22 14 Z" fill="#1f2937" />
           <path d="M78 22 q14 6 10 22 q-6 -12 -14 -16 Z" fill="#1f2937" />
         </g>
 
-        {/* الوجه */}
+        {/* أذنين ورقبة ووجه */}
+        <ellipse cx="40" cy="55" rx="4" ry="6" fill="#f2c9a0" />
+        <ellipse cx="80" cy="55" rx="4" ry="6" fill="#f2c9a0" />
+        <rect x="55" y="68" width="10" height="8" fill="#f2c9a0" />
         <ellipse cx="60" cy="52" rx="19" ry="20" fill="#f7d7b4" />
+        <path d="M41 44 q6 -10 19 -10 q13 0 19 10 l-4 -2 l-3 5 l-4 -6 l-4 6 l-4 -6 l-4 6 l-4 -6 l-3 5 z" fill="#1f2937" />
+        <ellipse cx="48" cy="62" rx="3.5" ry="2" fill="#fca5a5" opacity="0.6" />
+        <ellipse cx="72" cy="62" rx="3.5" ry="2" fill="#fca5a5" opacity="0.6" />
 
         {/* النظارة */}
         <g className="conan-glass">

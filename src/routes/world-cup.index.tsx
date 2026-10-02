@@ -141,7 +141,7 @@ function WorldCupPage() {
         </div>
 
         <Link
-          to="/pro-upgrade"
+          to="/tasks"
           className="mt-3 block rounded-2xl border-2 border-yellow-500/50 bg-gradient-to-r from-yellow-500/15 to-amber-500/15 p-4 text-center hover:scale-[1.01] transition-transform"
         >
           <span className="text-xl">⭐</span>

@@ -15,7 +15,7 @@ export const Route = createFileRoute("/api/public/fatora/success")({
         const origin = url.origin;
 
         const fail = (msg: string) =>
-          Response.redirect(`${origin}/pro-upgrade?payment=failed&reason=${encodeURIComponent(msg)}`, 302);
+          Response.redirect(`${origin}/dashboard?payment=failed&reason=${encodeURIComponent(msg)}`, 302);
 
         if (!orderId) return fail("missing_order");
 

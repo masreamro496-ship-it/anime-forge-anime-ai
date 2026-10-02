@@ -41,7 +41,7 @@ function GokuPage() {
           <Crown className="mx-auto h-14 w-14 text-gold" />
           <h1 className="mt-4 text-3xl font-black text-gradient-gold">ميزة حصرية لأعضاء PRO</h1>
           <p className="mt-3 text-muted-foreground">استنساخ صوت غوكو متاح فقط لأعضاء الباقة الذهبية.</p>
-          <Link to="/pro-upgrade" className="mt-6 inline-block rounded-xl bg-gradient-gold px-7 py-3 font-black text-gold-foreground shadow-gold">
+          <Link to="/tasks" className="mt-6 inline-block rounded-xl bg-gradient-gold px-7 py-3 font-black text-gold-foreground shadow-gold">
             ترقية الآن — 50 جنيه
           </Link>
         </main>

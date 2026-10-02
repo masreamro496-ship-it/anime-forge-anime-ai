@@ -420,40 +420,40 @@ function Landing() {
             <p className="mt-1 text-sm text-muted-foreground">استمع مجاناً · التحميل 5 كريديت لكل ملف</p>
           </Link>
 
-          <Link to="/watermark" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#a855f7", background: "linear-gradient(135deg, rgba(168,85,247,0.18), transparent)" }}>
-            <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#a855f7" }}>جديد</span>
-            <Wand2 className="h-10 w-10" style={{ color: "#a855f7" }} />
-            <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>حذف العلامة المائية</h3>
-            <p className="mt-1 text-sm text-muted-foreground">معالجة متقدمة عبر Cloudinary · 15 كريديت · النتيجة خاصة بك فقط</p>
-          </Link>
+          <div aria-disabled="true" className="relative cursor-not-allowed overflow-hidden rounded-2xl border-2 border-border p-6 opacity-60">
+            <span className="absolute right-3 top-3 rounded-full bg-muted px-2 py-0.5 text-[10px] font-black text-muted-foreground">مغلق الآن</span>
+            <Wand2 className="h-10 w-10 text-muted-foreground" />
+            <h3 className="mt-3 text-lg font-black text-muted-foreground">حذف العلامة المائية</h3>
+            <p className="mt-1 text-sm text-muted-foreground">الخدمة مغلقة مؤقتاً</p>
+          </div>
 
           {/* شات برمجي — مدفوع بالكريدت */}
           <PaidFeatureGate featureKey="ai_chat" href="https://anime-forge-ai-coder.lovable.app/login" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#3b82f6", background: "linear-gradient(135deg, rgba(59,130,246,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-black text-white">New</span>
             <Rocket className="h-10 w-10" style={{ color: "#3b82f6" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#3b82f6" }}>شات برمجي</h3>
-            <p className="mt-1 text-sm text-muted-foreground">ادفع 25 كريدت للدخول والتجربة لمدة ساعتين فقط</p>
+            <p className="mt-1 text-sm text-muted-foreground">30 كريدت لكل ساعة · زوّد الساعات براحتك</p>
           </PaidFeatureGate>
 
           <PaidFeatureGate featureKey="keys" href="https://anime-key-forge.lovable.app/" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#a855f7", background: "linear-gradient(135deg, rgba(168,85,247,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#a855f7" }}>جديد</span>
             <Sparkles className="h-10 w-10" style={{ color: "#a855f7" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#a855f7" }}>إنشاء مفاتيح</h3>
-            <p className="mt-1 text-sm text-muted-foreground">ادفع 5 كريدت كل يوم لتجربته · وبعد انتهاء اليوم ادفع مرة أخرى</p>
+            <p className="mt-1 text-sm text-muted-foreground">30 كريدت لكل ساعة · ساعتين 60 · 3 ساعات 90 وهكذا</p>
           </PaidFeatureGate>
 
           <PaidFeatureGate featureKey="art4k" href="https://anime-forge-4k-art.lovable.app/" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#f97316", background: "linear-gradient(135deg, rgba(249,115,22,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#f97316" }}>جديد</span>
             <Wand2 className="h-10 w-10" style={{ color: "#f97316" }} />
-            <h3 className="mt-3 text-lg font-black" style={{ color: "#f97316" }}>توليد جودة أنمي صورية خيالية 4K</h3>
-            <p className="mt-1 text-sm text-muted-foreground">ادفع 50 كريدت كل 5 ساعات لتجربته</p>
+            <h3 className="mt-3 text-lg font-black" style={{ color: "#f97316" }}>توليد جودة أنمي صورية خيالية</h3>
+            <p className="mt-1 text-sm text-muted-foreground">30 كريدت لكل ساعة · زوّد الساعات براحتك</p>
           </PaidFeatureGate>
 
           <PaidFeatureGate featureKey="dubbing" href="https://anime-forge-dummling.lovable.app/" className="group relative block w-full overflow-hidden rounded-2xl border-2 p-6 text-right transition-transform hover:scale-[1.01]" style={{ borderColor: "#22c55e", background: "linear-gradient(135deg, rgba(34,197,94,0.25), transparent)" }}>
             <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[10px] font-black" style={{ color: "#22c55e" }}>جديد</span>
             <Film className="h-10 w-10" style={{ color: "#22c55e" }} />
             <h3 className="mt-3 text-lg font-black" style={{ color: "#22c55e" }}>دبلجة فيديوهات</h3>
-            <p className="mt-1 text-sm text-muted-foreground">دبلجة من الإنجليزية أو الصينية أو اليابانية للعربية · ادفع 25 كريدت للدخول لمدة 3 ساعات فقط</p>
+            <p className="mt-1 text-sm text-muted-foreground">دبلجة من الإنجليزية أو الصينية أو اليابانية للعربية · 30 كريدت لكل ساعة</p>
           </PaidFeatureGate>
 
           <Link to="/anime-market" className="group relative overflow-hidden rounded-2xl border-2 p-6 transition-transform hover:scale-[1.01]" style={{ borderColor: "#ec4899", background: "linear-gradient(135deg, rgba(236,72,153,0.25), transparent)" }}>
@@ -506,7 +506,7 @@ function Landing() {
             <span className="text-3xl">🎨</span>
             <h3 className="mt-3 text-lg font-black text-pink-400">ارسم بسهولة وأنميشن 2D</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              ادفع 250 كريدت للتجربة لمدة شهر كامل · وخلفيات أنمي رهيبة
+              30 كريدت لكل ساعة · وخلفيات أنمي رهيبة
             </p>
           </PaidFeatureGate>
 
@@ -672,6 +672,16 @@ function Landing() {
             <p className="mt-2 text-xs text-muted-foreground">تعب لمدة شهرين</p>
           </a>
         </div>
+      </section>
+
+      {/* تخمين الشخصية */}
+      <section className="container mx-auto px-4 pb-6">
+        <Link to="/guess-character" className="block rounded-3xl border-2 border-red-500/70 bg-gradient-to-br from-red-500/15 to-amber-500/10 p-6 text-center shadow-card transition-transform hover:scale-[1.01]">
+          <span className="text-4xl">🕵️</span>
+          <h2 className="mt-2 text-2xl font-black text-red-500">تخمين الشخصية</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">شوف جزء من وجه شخصية أنمي وخمّنها — كل إجابة صح = 1 كريدت · الشخصيات بترجع كل 5 دقايق</p>
+          <span className="mt-4 inline-block rounded-2xl bg-red-500 px-8 py-3 text-base font-black text-white">العب دلوقتي</span>
+        </Link>
       </section>
 
       {/* لعبة X و O */}

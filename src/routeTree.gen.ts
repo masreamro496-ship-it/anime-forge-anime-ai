@@ -19,7 +19,6 @@ import { Route as ApplyDeveloperRouteImport } from './routes/apply-developer'
 import { Route as AudioRouteImport } from './routes/audio'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as DomainsRouteImport } from './routes/domains'
 import { Route as FreeShortsRouteImport } from './routes/free-shorts'
 import { Route as GraphicDesignRouteImport } from './routes/graphic-design'
 import { Route as GuessCharacterRouteImport } from './routes/guess-character'
@@ -27,7 +26,6 @@ import { Route as LegalRouteImport } from './routes/legal'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MangaRouteImport } from './routes/manga'
 import { Route as ModelStudioRouteImport } from './routes/model-studio'
-import { Route as ProUpgradeRouteImport } from './routes/pro-upgrade'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RobotControlRouteImport } from './routes/robot-control'
 import { Route as ShortsRouteImport } from './routes/shorts'
@@ -106,11 +104,6 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DomainsRoute = DomainsRouteImport.update({
-  id: '/domains',
-  path: '/domains',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const FreeShortsRoute = FreeShortsRouteImport.update({
   id: '/free-shorts',
   path: '/free-shorts',
@@ -144,11 +137,6 @@ const MangaRoute = MangaRouteImport.update({
 const ModelStudioRoute = ModelStudioRouteImport.update({
   id: '/model-studio',
   path: '/model-studio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProUpgradeRoute = ProUpgradeRouteImport.update({
-  id: '/pro-upgrade',
-  path: '/pro-upgrade',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -301,7 +289,6 @@ export interface FileRoutesByFullPath {
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
-  '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
   '/graphic-design': typeof GraphicDesignRouteWithChildren
   '/guess-character': typeof GuessCharacterRoute
@@ -309,7 +296,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/manga': typeof MangaRoute
   '/model-studio': typeof ModelStudioRoute
-  '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
   '/robot-control': typeof RobotControlRoute
   '/shorts': typeof ShortsRouteWithChildren
@@ -349,14 +335,12 @@ export interface FileRoutesByTo {
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
-  '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
   '/guess-character': typeof GuessCharacterRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/manga': typeof MangaRoute
   '/model-studio': typeof ModelStudioRoute
-  '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
   '/robot-control': typeof RobotControlRoute
   '/shorts': typeof ShortsRouteWithChildren
@@ -397,7 +381,6 @@ export interface FileRoutesById {
   '/audio': typeof AudioRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
-  '/domains': typeof DomainsRoute
   '/free-shorts': typeof FreeShortsRoute
   '/graphic-design': typeof GraphicDesignRouteWithChildren
   '/guess-character': typeof GuessCharacterRoute
@@ -405,7 +388,6 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/manga': typeof MangaRoute
   '/model-studio': typeof ModelStudioRoute
-  '/pro-upgrade': typeof ProUpgradeRoute
   '/profile': typeof ProfileRoute
   '/robot-control': typeof RobotControlRoute
   '/shorts': typeof ShortsRouteWithChildren
@@ -447,7 +429,6 @@ export interface FileRouteTypes {
     | '/audio'
     | '/chat'
     | '/dashboard'
-    | '/domains'
     | '/free-shorts'
     | '/graphic-design'
     | '/guess-character'
@@ -455,7 +436,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/manga'
     | '/model-studio'
-    | '/pro-upgrade'
     | '/profile'
     | '/robot-control'
     | '/shorts'
@@ -495,14 +475,12 @@ export interface FileRouteTypes {
     | '/audio'
     | '/chat'
     | '/dashboard'
-    | '/domains'
     | '/free-shorts'
     | '/guess-character'
     | '/legal'
     | '/login'
     | '/manga'
     | '/model-studio'
-    | '/pro-upgrade'
     | '/profile'
     | '/robot-control'
     | '/shorts'
@@ -542,7 +520,6 @@ export interface FileRouteTypes {
     | '/audio'
     | '/chat'
     | '/dashboard'
-    | '/domains'
     | '/free-shorts'
     | '/graphic-design'
     | '/guess-character'
@@ -550,7 +527,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/manga'
     | '/model-studio'
-    | '/pro-upgrade'
     | '/profile'
     | '/robot-control'
     | '/shorts'
@@ -591,7 +567,6 @@ export interface RootRouteChildren {
   AudioRoute: typeof AudioRoute
   ChatRoute: typeof ChatRoute
   DashboardRoute: typeof DashboardRoute
-  DomainsRoute: typeof DomainsRoute
   FreeShortsRoute: typeof FreeShortsRoute
   GraphicDesignRoute: typeof GraphicDesignRouteWithChildren
   GuessCharacterRoute: typeof GuessCharacterRoute
@@ -599,7 +574,6 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MangaRoute: typeof MangaRoute
   ModelStudioRoute: typeof ModelStudioRoute
-  ProUpgradeRoute: typeof ProUpgradeRoute
   ProfileRoute: typeof ProfileRoute
   RobotControlRoute: typeof RobotControlRoute
   ShortsRoute: typeof ShortsRouteWithChildren
@@ -688,13 +662,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/domains': {
-      id: '/domains'
-      path: '/domains'
-      fullPath: '/domains'
-      preLoaderRoute: typeof DomainsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/free-shorts': {
       id: '/free-shorts'
       path: '/free-shorts'
@@ -742,13 +709,6 @@ declare module '@tanstack/react-router' {
       path: '/model-studio'
       fullPath: '/model-studio'
       preLoaderRoute: typeof ModelStudioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pro-upgrade': {
-      id: '/pro-upgrade'
-      path: '/pro-upgrade'
-      fullPath: '/pro-upgrade'
-      preLoaderRoute: typeof ProUpgradeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -1038,7 +998,6 @@ const rootRouteChildren: RootRouteChildren = {
   AudioRoute: AudioRoute,
   ChatRoute: ChatRoute,
   DashboardRoute: DashboardRoute,
-  DomainsRoute: DomainsRoute,
   FreeShortsRoute: FreeShortsRoute,
   GraphicDesignRoute: GraphicDesignRouteWithChildren,
   GuessCharacterRoute: GuessCharacterRoute,
@@ -1046,7 +1005,6 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MangaRoute: MangaRoute,
   ModelStudioRoute: ModelStudioRoute,
-  ProUpgradeRoute: ProUpgradeRoute,
   ProfileRoute: ProfileRoute,
   RobotControlRoute: RobotControlRoute,
   ShortsRoute: ShortsRouteWithChildren,

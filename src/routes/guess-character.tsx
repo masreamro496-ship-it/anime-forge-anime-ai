@@ -46,7 +46,7 @@ type GuessResult = {
 const ERRORS: Record<string, string> = {
   not_authenticated: "لازم تسجّل الدخول الأول",
   character_not_found: "الشخصية مش متاحة",
-  already_answered: "خمّنت الشخصية دي قبل كده",
+  already_answered: "استنى 5 دقايق وجرّب الشخصية دي تاني",
 };
 
 function shuffle<T>(arr: T[]): T[] {
@@ -82,7 +82,7 @@ function GuessCharacterPage() {
     const [charsRes, attemptsRes] = await Promise.all([
       sb.from("guess_characters").select("*"),
       user
-        ? sb.from("guess_attempts").select("character_id")
+        ? sb.from("guess_attempts").select("character_id,created_at")
         : Promise.resolve({ data: [], error: null }),
     ]);
 
@@ -94,7 +94,9 @@ function GuessCharacterPage() {
 
     const chars = (charsRes.data ?? []) as Character[];
     const done = new Set(
-      ((attemptsRes.data ?? []) as { character_id: string }[]).map((a) => a.character_id),
+      ((attemptsRes.data ?? []) as { character_id: string; created_at?: string }[])
+        .filter((a) => !a.created_at || Date.now() - new Date(a.created_at).getTime() < 5 * 60 * 1000)
+        .map((a) => a.character_id),
     );
     const remaining = shuffle(chars.filter((c) => !done.has(c.id)));
     setAll(chars);
@@ -105,6 +107,8 @@ function GuessCharacterPage() {
 
   useEffect(() => {
     void load();
+    const t = setInterval(() => void load(), 5 * 60 * 1000);
+    return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
@@ -176,7 +180,7 @@ function GuessCharacterPage() {
             شوف جزء من وجه الشخصية وخمّن مين هي — كل إجابة صحيحة = <span className="text-gold">كريدت واحد</span>
           </p>
           <p className="mt-1 text-[11px] text-muted-foreground">
-            محاولة واحدة لكل شخصية. الإجابة الغلط مش بتاخد كريدت.
+            الشخصيات بترجع تاني كل 5 دقايق. الإجابة الغلط مش بتاخد كريدت.
           </p>
           <p className="mt-2 text-xs font-black">نتيجتك في الجلسة: {score}</p>
         </div>
@@ -189,7 +193,7 @@ function GuessCharacterPage() {
           <div className="rounded-2xl border border-border bg-card p-8 text-center">
             <Sparkles className="mx-auto h-8 w-8 text-gold" />
             <p className="mt-3 text-sm font-black">خلّصت كل الشخصيات المتاحة!</p>
-            <p className="mt-1 text-xs text-muted-foreground">استنى شخصيات جديدة قريب.</p>
+            <p className="mt-1 text-xs text-muted-foreground">الشخصيات هترجع تاني بعد 5 دقايق.</p>
             <button
               onClick={() => void load()}
               className="mt-4 inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-bold"

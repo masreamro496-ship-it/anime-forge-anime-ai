@@ -13,20 +13,21 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 export type FeatureKey = "ai_chat" | "keys" | "art4k" | "dubbing" | "draw2d" | "world_cup";
 
 export const FEATURES: Record<FeatureKey, { cost: number; label: string; period: string }> = {
-  ai_chat: { cost: 25, label: "شات برمجي", period: "ساعتين فقط" },
-  keys: { cost: 5, label: "إنشاء مفاتيح", period: "يوم واحد" },
-  art4k: { cost: 50, label: "توليد جودة صورية 4K", period: "5 ساعات" },
-  dubbing: { cost: 25, label: "دبلجة الفيديوهات", period: "3 ساعات" },
-  draw2d: { cost: 250, label: "ارسم بسهولة وأنميشن 2D", period: "شهر كامل" },
+  ai_chat: { cost: 30, label: "شات برمجي", period: "ساعة" },
+  keys: { cost: 30, label: "إنشاء مفاتيح", period: "ساعة" },
+  art4k: { cost: 30, label: "توليد جودة أنمي صورية خيالية", period: "ساعة" },
+  dubbing: { cost: 30, label: "دبلجة الفيديوهات", period: "ساعة" },
+  draw2d: { cost: 30, label: "ارسم بسهولة وأنميشن 2D", period: "ساعة" },
   world_cup: { cost: 10, label: "لعبة كأس العالم", period: "شهر كامل" },
 };
 
 // كود الخصم الترويجي — مرة واحدة فقط لكل مستخدم لكل ميزة
 const PROMO_CODE = "animeforge600vist";
-const PROMO_PRICES: Partial<Record<FeatureKey, number>> = {
-  art4k: 10,
-  draw2d: 25,
-};
+const PROMO_PRICES: Partial<Record<FeatureKey, number>> = {};
+
+// الأدوات اللي بتتحسب بالساعة: 30 كريدت لكل ساعة بلا حد أقصى
+const HOURLY: FeatureKey[] = ["ai_chat", "keys", "art4k", "dubbing", "draw2d"];
+const PER_HOUR = 30;
 
 function fmt(ts: string) {
   try {
@@ -61,6 +62,9 @@ export function PaidFeatureGate({
   const [showPromoBox, setShowPromoBox] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoUsed, setPromoUsed] = useState(false);
+  const [hours, setHours] = useState(1);
+  const hourly = HOURLY.includes(featureKey);
+  const total = hourly ? PER_HOUR * hours : FEATURES[featureKey].cost;
   const meta = FEATURES[featureKey];
   const promoPrice = PROMO_PRICES[featureKey];
 
@@ -100,6 +104,7 @@ export function PaidFeatureGate({
     }
 
     setPromoCode("");
+    setHours(1);
     setShowPromoBox(false);
     setOpen(true);
   };
@@ -107,7 +112,9 @@ export function PaidFeatureGate({
   const pay = async () => {
     setBusy(true);
     try {
-      const { data, error } = await supabase.rpc("unlock_feature", { _key: featureKey });
+      const { data, error } = hourly
+        ? await supabase.rpc("unlock_feature_hours", { _key: featureKey, _hours: hours })
+        : await supabase.rpc("unlock_feature", { _key: featureKey });
       if (error) throw error;
       const res = data as { expires_at?: string };
       toast.success(
@@ -175,17 +182,44 @@ export function PaidFeatureGate({
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-black text-gradient-gold">{meta.label}</h3>
-            <p className="mt-3 text-sm leading-7 text-foreground/85">
-              لازم تدفع <b className="text-gold">{meta.cost} كريدت</b> عشان تدخل وتجرّبه لمدة{" "}
-              <b>{meta.period}</b> فقط. وبعد انتهاء المدة لازم تدفع مرة أخرى.
-            </p>
+            {hourly ? (
+              <>
+                <p className="mt-3 text-sm leading-7 text-foreground/85">
+                  كل ساعة بـ <b className="text-gold">{PER_HOUR} كريدت</b> — اختار عدد الساعات اللي تحبها (بلا حد).
+                </p>
+                <div className="mt-4 flex items-center justify-center gap-3">
+                  <button type="button" onClick={() => setHours((h) => Math.max(1, h - 1))} className="h-10 w-10 rounded-full border-2 border-gold text-xl font-black text-gold">−</button>
+                  <input
+                    type="number"
+                    min={1}
+                    value={hours}
+                    onChange={(e) => setHours(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+                    className="w-20 rounded-lg border border-border bg-background py-2 text-center text-lg font-black"
+                  />
+                  <button type="button" onClick={() => setHours((h) => h + 1)} className="h-10 w-10 rounded-full border-2 border-gold text-xl font-black text-gold">+</button>
+                </div>
+                <div className="mt-2 flex flex-wrap justify-center gap-1.5">
+                  {[1, 2, 3, 5, 10, 24].map((h) => (
+                    <button key={h} type="button" onClick={() => setHours(h)} className={`rounded-full border px-2.5 py-1 text-[11px] font-bold ${hours === h ? "border-gold bg-gold/15 text-gold" : "border-border"}`}>
+                      {h} س = {h * PER_HOUR}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-3 text-sm font-bold">{hours} ساعة = <b className="text-gold">{total} كريدت</b></p>
+              </>
+            ) : (
+              <p className="mt-3 text-sm leading-7 text-foreground/85">
+                لازم تدفع <b className="text-gold">{meta.cost} كريدت</b> عشان تدخل وتجرّبه لمدة{" "}
+                <b>{meta.period}</b> فقط. وبعد انتهاء المدة لازم تدفع مرة أخرى.
+              </p>
+            )}
 
             <button
               onClick={pay}
               disabled={busy}
               className="mt-5 w-full rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 py-3 text-base font-black text-white disabled:opacity-60"
             >
-              {busy ? "جاري الخصم..." : `ادفع ${meta.cost} كريدت وادخل`}
+              {busy ? "جاري الخصم..." : `ادفع ${total} كريدت وادخل`}
             </button>
 
             {promoPrice && !promoUsed && (

@@ -12,8 +12,6 @@ import {
   MessageSquare,
   Bot,
   Palette,
-  Globe,
-  Crown,
   Ticket,
   Users,
   Music,
@@ -43,8 +41,6 @@ const moreItems = [
   { label: "عجلة الحظ", desc: "لفة أسبوعية وجوائز", icon: Ticket, to: "/wheel" as const, tone: "#eab308" },
   { label: "الدردشة العامة", desc: "تواصل مع المجتمع", icon: Users, to: "/social" as const, tone: "#14b8a6" },
   { label: "الصوتيات", desc: "مؤثرات وموسيقى أنمي", icon: Music, to: "/audio" as const, tone: "#a855f7" },
-  { label: "ترقية PRO", desc: "مزايا كاملة واشتراكات", icon: Crown, to: "/pro-upgrade" as const, tone: "#f59e0b" },
-  { label: "دومينات مستقلة", desc: "احصل على دومين .com", icon: Globe, to: "/domains" as const, tone: "#0ea5e9" },
   { label: "الشروط والسياسات", desc: "القوانين وسياسة الخصوصية", icon: Scale, to: "/legal" as const, tone: "#64748b" },
 ];
 

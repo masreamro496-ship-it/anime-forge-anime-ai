@@ -790,6 +790,138 @@ export type Database = {
         }
         Relationships: []
       }
+      lv_feature_passes: {
+        Row: {
+          expires_at: string
+          feature_key: string
+          user_id: string
+        }
+        Insert: {
+          expires_at: string
+          feature_key: string
+          user_id: string
+        }
+        Update: {
+          expires_at?: string
+          feature_key?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lv_free_trials: {
+        Row: {
+          feature_key: string
+          used_at: string
+          user_id: string
+        }
+        Insert: {
+          feature_key: string
+          used_at?: string
+          user_id: string
+        }
+        Update: {
+          feature_key?: string
+          used_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lv_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          reason: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lv_wallets: {
+        Row: {
+          balance: number
+          created_at: string
+          updated_at: string
+          user_id: string
+          welcome_claimed: boolean
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          updated_at?: string
+          user_id: string
+          welcome_claimed?: boolean
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+          welcome_claimed?: boolean
+        }
+        Relationships: []
+      }
+      lv_wheel_extra: {
+        Row: {
+          spins: number
+          user_id: string
+        }
+        Insert: {
+          spins?: number
+          user_id: string
+        }
+        Update: {
+          spins?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lv_wheel_spins: {
+        Row: {
+          amount: number
+          card_status: string | null
+          created_at: string
+          id: string
+          phone: string | null
+          prize_kind: string
+          used_extra: boolean
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          card_status?: string | null
+          created_at?: string
+          id?: string
+          phone?: string | null
+          prize_kind: string
+          used_extra?: boolean
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          card_status?: string | null
+          created_at?: string
+          id?: string
+          phone?: string | null
+          prize_kind?: string
+          used_extra?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       media_servers: {
         Row: {
           created_at: string
@@ -1761,6 +1893,21 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      lv_card_action: {
+        Args: { _action: string; _phone: string; _spin: string; _uid: string }
+        Returns: Json
+      }
+      lv_claim_welcome: { Args: { _uid: string }; Returns: Json }
+      lv_ensure_wallet: {
+        Args: { _initial: number; _uid: string }
+        Returns: number
+      }
+      lv_free_trial: { Args: { _key: string; _uid: string }; Returns: Json }
+      lv_spin: { Args: { _uid: string }; Returns: Json }
+      lv_unlock: {
+        Args: { _hours: number; _key: string; _uid: string }
+        Returns: Json
       }
       post_bot_greeting: { Args: never; Returns: boolean }
       promote_scheduled_shorts: { Args: never; Returns: undefined }

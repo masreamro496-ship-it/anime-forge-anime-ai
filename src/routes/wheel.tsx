@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
+import { getWheelState, spinWheel, wheelCardAction } from "@/lib/wallet.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { uploadUserFile } from "@/lib/storage";
 import { toast } from "sonner";
@@ -51,30 +54,21 @@ function WheelPage() {
   const [receipt, setReceipt] = useState<File | null>(null);
   const [buying, setBuying] = useState(false);
 
+  const wheelStateFn = useServerFn(getWheelState);
+  const spinFn = useServerFn(spinWheel);
+  const cardFn = useServerFn(wheelCardAction);
+  const qc = useQueryClient();
+
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from("wheel_spins")
-      .select("created_at")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .then(({ data }) => {
-        const last = data?.[0]?.created_at as string | undefined;
-        if (!last) return;
-        const next = new Date(new Date(last).getTime() + 7 * 24 * 3600 * 1000);
-        if (next > new Date()) setNextAt(next.toLocaleString("ar-EG"));
-      });
-    (supabase as unknown as {
-      from: (t: string) => {
-        select: (c: string) => { eq: (k: string, v: string) => { maybeSingle: () => Promise<{ data: { spins: number } | null }> } };
-      };
-    })
-      .from("wheel_extra_spins")
-      .select("spins")
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data }) => setExtraSpins(Number(data?.spins ?? 0)));
-  }, [user]);
+    wheelStateFn().then((s) => {
+      if (!s.ok) return;
+      setExtraSpins(s.extraSpins);
+      if (!s.lastAt) return;
+      const next = new Date(new Date(s.lastAt).getTime() + 7 * 24 * 3600 * 1000);
+      if (next > new Date()) setNextAt(next.toLocaleString("ar-EG"));
+    }).catch(() => {});
+  }, [user, wheelStateFn]);
 
   const spin = async () => {
     if (!user) {
@@ -84,31 +78,30 @@ function WheelPage() {
     setSpinning(true);
     setPrize(null);
     setClaimed(false);
-    const { data, error } = await supabase.rpc("spin_wheel" as never);
-    if (error) {
+    const res = await spinFn().catch(() => null);
+    if (!res || !res.ok) {
       setSpinning(false);
-      if (error.message.includes("weekly_limit")) {
+      if (res?.error === "weekly_limit") {
         toast.error("لفّة واحدة فقط كل أسبوع — أو اشترِ لفّتين بـ 20 جنيه");
       } else {
-        toast.error(error.message);
+        toast.error("حصلت مشكلة، جرّب تاني");
       }
       return;
     }
-    const p = data as unknown as Prize & { used_extra?: boolean };
+    const p: Prize & { used_extra?: boolean } = res;
     if (p.used_extra) setExtraSpins((n) => Math.max(0, n - 1));
 
-    // نختار مقطعاً مطابقاً للجائزة فعلياً حتى يقف السهم على القيمة الصحيحة
     const matches = SEGMENTS.map((s, i) => ({ s, i })).filter(({ s }) =>
       p.kind === "cash_card_5" ? s.label.includes("فكة") : s.label.startsWith(String(p.amount)),
     );
     const idx = matches.length ? matches[Math.floor(Math.random() * matches.length)]!.i : 0;
-    // مركز المقطع i عند (i*SEG + SEG/2) درجة من الأعلى، والمؤشر في الأعلى (0°)
     const target = 360 * 6 + (360 - (idx * SEG + SEG / 2));
     setAngle(target);
 
     window.setTimeout(() => {
       setSpinning(false);
       setPrize(p);
+      qc.invalidateQueries({ queryKey: ["profile"] });
       if (!p.used_extra) setNextAt(new Date(Date.now() + 7 * 24 * 3600 * 1000).toLocaleString("ar-EG"));
       toast.success(p.kind === "cash_card_5" ? "🎉 ربحت كرت فكة بـ 5 جنيه!" : `🎉 ربحت ${p.amount} كريدت!`);
     }, 4200);
@@ -121,13 +114,9 @@ function WheelPage() {
       return;
     }
     setClaiming(true);
-    const { error } = await supabase.from("wheel_claims").insert({
-      spin_id: prize.spin_id,
-      user_id: user!.id,
-      phone,
-    } as never);
+    const res = await cardFn({ data: { spinId: prize.spin_id, action: "claimed", phone } }).catch(() => null);
     setClaiming(false);
-    if (error) return toast.error(error.message);
+    if (!res?.ok) return toast.error("حصلت مشكلة، جرّب تاني");
     setClaimed(true);
     toast.success("تم إرسال طلب الكرت للإدارة ✅");
   };
@@ -135,10 +124,11 @@ function WheelPage() {
   const convertCard = async () => {
     if (!prize) return;
     setClaiming(true);
-    const { error } = await supabase.rpc("convert_cash_card" as never, { _spin_id: prize.spin_id } as never);
+    const res = await cardFn({ data: { spinId: prize.spin_id, action: "converted" } }).catch(() => null);
     setClaiming(false);
-    if (error) return toast.error(error.message);
+    if (!res?.ok) return toast.error("حصلت مشكلة، جرّب تاني");
     setClaimed(true);
+    qc.invalidateQueries({ queryKey: ["profile"] });
     toast.success("تم تحويل الكرت إلى 50 كريدت ✅");
   };
 

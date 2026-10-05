@@ -22,7 +22,7 @@ export async function requireOldUser() {
   const old = createClient(OLD_URL, OLD_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data, error } = await old.auth.getUser(token);
   if (error || !data.user) throw new Error("not_authenticated");
-  return { userId: data.user.id, token };
+  return { userId: data.user.id, token, email: data.user.email ?? null };
 }
 
 /** Reads the user's credits from the old database once, to seed the new wallet. */

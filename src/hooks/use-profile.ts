@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import { useAuth } from "./use-auth";
 import { getWallet } from "@/lib/wallet.functions";
+import { getMyRank } from "@/lib/ranks.functions";
 
 // إعداد الاتصال المباشر بقاعدة البيانات المستقلة
 const SUPABASE_URL = "https://ximllvsgpfeqmhharjin.supabase.co";
@@ -28,10 +29,11 @@ export function useProfile() {
     queryFn: async () => {
       if (!user) throw new Error("no user");
 
-      const [profileRes, rolesRes, wallet] = await Promise.all([
+      const [profileRes, rolesRes, wallet, rank] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", user.id),
         getWallet().catch(() => null),
+        getMyRank().catch(() => null),
       ]);
 
       const profile = profileRes.data as ProfileData["profile"];
@@ -45,8 +47,8 @@ export function useProfile() {
         welcomeClaimed: wallet?.ok ? wallet.welcomeClaimed : true,
         earningsUsd: Number(profile?.earnings_usd ?? 0),
         roles: roleList,
-        isAdmin: roleList.includes("admin"),
-        isPro: !!profile?.is_pro || roleList.includes("pro"),
+        isAdmin: roleList.includes("admin") || !!rank?.isAdmin,
+        isPro: !!profile?.is_pro || roleList.includes("pro") || !!rank?.isPro,
       };
     },
   });

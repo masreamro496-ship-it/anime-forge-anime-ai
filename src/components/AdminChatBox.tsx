@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
+import { listMyAdminMessages, sendAdminMessage } from "@/lib/ranks.functions";
 import { MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 
@@ -9,30 +10,25 @@ export function AdminChatBox() {
   const { user } = useAuth();
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
+  const listFn = useServerFn(listMyAdminMessages);
+  const sendFn = useServerFn(sendAdminMessage);
 
   const { data: messages, refetch } = useQuery({
     queryKey: ["admin-messages", "mine", user?.id],
     enabled: !!user,
-    queryFn: async () => {
-      const { data } = await supabase.from("admin_messages")
-        .select("id,body,is_read,created_at")
-        .eq("user_id", user!.id)
-        .order("created_at", { ascending: false })
-        .limit(10);
-      return data ?? [];
-    },
+    queryFn: () => listFn(),
   });
 
   const send = async () => {
-    if (!user) return;
+    if (!user) return toast.error("سجّل دخولك أولاً");
     const text = body.trim();
     if (!text) return;
     setSending(true);
-    const { error } = await supabase.from("admin_messages").insert({ user_id: user.id, body: text });
+    const res = await sendFn({ data: { body: text } }).catch(() => null);
     setSending(false);
-    if (error) return toast.error(error.message);
+    if (!res?.ok) return toast.error("تعذّر إرسال الرسالة، جرّب تاني");
     setBody("");
-    toast.success("تم إرسال رسالتك للإدارة");
+    toast.success("تم إرسال رسالتك للإدارة ✅");
     refetch();
   };
 

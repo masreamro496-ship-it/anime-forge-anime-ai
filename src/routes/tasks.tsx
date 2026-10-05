@@ -3,10 +3,65 @@ import { useState } from "react";
 import { Trophy, Video, Share2, MessageSquare, Bug, Star, Calendar, HelpCircle, FileText, Send, ArrowRight, CheckCircle2, Image as ImageIcon, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadUserFile } from "@/lib/storage";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
+import { useProfile } from "@/hooks/use-profile";
+import { claimWelcomeCredits } from "@/lib/wallet.functions";
 
 export const Route = createFileRoute("/tasks")({
+  head: () => ({
+    meta: [
+      { title: "اربح كريدت — انمي فورج" },
+      { name: "description", content: "خد 25 كريدت مجاناً وأكمل المهمات لتربح كريدت أكثر في انمي فورج." },
+      { property: "og:title", content: "اربح كريدت — انمي فورج" },
+      { property: "og:description", content: "25 كريدت مجاناً ومهمات يومية بمكافآت." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: TasksPage,
 });
+
+function WelcomeCredits() {
+  const { user } = useAuth();
+  const { data } = useProfile();
+  const qc = useQueryClient();
+  const claimFn = useServerFn(claimWelcomeCredits);
+  const [busy, setBusy] = useState(false);
+  const claimed = data?.welcomeClaimed ?? false;
+
+  const claim = async () => {
+    if (!user) return toast.error("سجّل دخولك أولاً");
+    setBusy(true);
+    const res = await claimFn().catch(() => null);
+    setBusy(false);
+    if (!res?.ok) {
+      toast.error(res?.error === "already_claimed" ? "أخدت الـ 25 كريدت قبل كده" : "حصلت مشكلة، جرّب تاني");
+      return;
+    }
+    toast.success(`🎉 اتضاف 25 كريدت! رصيدك ${res.balance}`);
+    qc.invalidateQueries({ queryKey: ["profile"] });
+  };
+
+  return (
+    <div className="mb-4 rounded-2xl border-2 border-primary bg-primary/10 p-4 text-center">
+      <p className="text-lg font-black">🎁 25 كريدت مجاناً</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        مرة واحدة لكل حساب{data ? ` — رصيدك الحالي ${data.credits} كريدت` : ""}
+      </p>
+      <button
+        type="button"
+        onClick={claim}
+        disabled={busy || (!!user && claimed)}
+        className="mt-3 w-full rounded-xl bg-primary py-3 text-sm font-black text-primary-foreground disabled:opacity-50"
+      >
+        {!!user && claimed ? "✅ أخدتهم بالفعل" : busy ? "جاري الإضافة..." : "خد 25 كريدت دلوقتي"}
+      </button>
+    </div>
+  );
+}
 
 function TasksPage() {
   const [proofs, setProofs] = useState<{ [key: string]: string }>({});
@@ -107,6 +162,8 @@ function TasksPage() {
           <p className="text-xs text-muted-foreground">أكمل المهمات وارفق صورة/سكرين شوت أو رابط الإثبات للحصول على الكريدت!</p>
         </div>
       </div>
+
+      <WelcomeCredits />
 
       <div className="grid gap-4">
         {tasks.map((task) => {

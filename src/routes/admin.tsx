@@ -2,6 +2,8 @@ import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { adminListMessages, adminMarkMessageRead, adminSetPro } from "@/lib/ranks.functions";
 import { signedUrl, uploadUserFile, publicUrl } from "@/lib/storage";
 import { ShieldCheck, ArrowRight, Check, X, ExternalLink, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -550,6 +552,7 @@ function RequestRow({ row, expanded, onToggle, onChange }: { row: any; expanded:
 
 function PaymentsTable() {
   const qc = useQueryClient();
+  const setProFn = useServerFn(adminSetPro);
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "payments"],
     queryFn: async () => {

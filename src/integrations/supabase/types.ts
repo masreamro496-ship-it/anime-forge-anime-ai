@@ -790,6 +790,36 @@ export type Database = {
         }
         Relationships: []
       }
+      lv_admin_messages: {
+        Row: {
+          body: string
+          created_at: string
+          email: string | null
+          id: string
+          is_read: boolean
+          kind: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_read?: boolean
+          kind?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_read?: boolean
+          kind?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lv_feature_passes: {
         Row: {
           expires_at: string
@@ -822,6 +852,36 @@ export type Database = {
         Update: {
           feature_key?: string
           used_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lv_ranks: {
+        Row: {
+          email: string | null
+          is_admin: boolean
+          is_moderator: boolean
+          is_pro: boolean
+          pro_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          email?: string | null
+          is_admin?: boolean
+          is_moderator?: boolean
+          is_pro?: boolean
+          pro_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          email?: string | null
+          is_admin?: boolean
+          is_moderator?: boolean
+          is_pro?: boolean
+          pro_expires_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

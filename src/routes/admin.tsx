@@ -567,6 +567,7 @@ function PaymentsTable() {
 
   const approve = async (p: any) => {
     try {
+      await setProFn({ data: { userId: p.user_id } });
       await supabase.from("profiles").update({ is_pro: true, pro_expires_at: null }).eq("id", p.user_id);
       await supabase.from("user_roles").insert({ user_id: p.user_id, role: "pro" });
       const { data: bal } = await supabase.from("credits").select("balance").eq("user_id", p.user_id).maybeSingle();
@@ -636,26 +637,30 @@ function PaymentsTable() {
 
 function MessagesTable() {
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({
+  const listFn = useServerFn(adminListMessages);
+  const readFn = useServerFn(adminMarkMessageRead);
+  const { data, isLoading, error } = useQuery({
     queryKey: ["admin", "messages"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("admin_messages").select("*").order("created_at", { ascending: false }).limit(200);
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => listFn(),
   });
   if (isLoading) return <p className="text-muted-foreground">جاري التحميل...</p>;
+  if (error) return <p className="text-destructive">مش مسموح لك تشوف الرسائل</p>;
   if (!data?.length) return <p className="text-muted-foreground">لا توجد رسائل</p>;
   const markRead = async (id: string) => {
-    await supabase.from("admin_messages").update({ is_read: true }).eq("id", id);
+    await readFn({ data: { id } });
     qc.invalidateQueries({ queryKey: ["admin", "messages"] });
   };
   return (
     <div className="space-y-2">
       {data.map((m) => (
         <div key={m.id} className={`rounded-xl border p-4 ${m.is_read ? "border-border bg-card" : "border-gold/50 bg-gold/5"}`}>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <code dir="ltr">{m.user_id}</code>
+          <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+            <span dir="ltr" className="truncate">{m.email ?? m.user_id}</span>
+            {m.kind !== "message" && (
+              <span className="rounded bg-gold/15 px-2 py-0.5 font-bold text-gold">
+                {m.kind === "apply_admin" ? "تقديم إدارة" : "تقديم مطوّر"}
+              </span>
+            )}
             <span>{new Date(m.created_at).toLocaleString("ar-EG")}</span>
           </div>
           <p className="mt-2 whitespace-pre-wrap text-sm">{m.body}</p>

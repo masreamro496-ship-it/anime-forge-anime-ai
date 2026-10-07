@@ -43,6 +43,13 @@
       "when": 1791398331615,
       "tag": "0005_tighten_permissive_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791398837237,
+      "tag": "0006_lovable_tasks_admin_credits",
+      "breakpoints": true
     }
   ]
 }

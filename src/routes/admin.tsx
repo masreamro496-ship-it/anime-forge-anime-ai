@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { adminListMessages, adminMarkMessageRead, adminSetPro, getMyRank } from "@/lib/ranks.functions";
+import { adminAdjustCredits, adminListTasks, adminReviewTask } from "@/lib/admin-credits.functions";
 import { signedUrl, uploadUserFile, publicUrl } from "@/lib/storage";
 import { ShieldCheck, ArrowRight, Check, X, ExternalLink, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -429,6 +430,7 @@ function RequestRow({ row, expanded, onToggle, onChange }: { row: any; expanded:
     rejected: "bg-red-500/20 text-red-300",
   };
 
+  const adjustFn = useServerFn(adminAdjustCredits);
   const handleApproveAndUpload = async () => {
     if (!resultFile) return toast.error("ارفع ملف النتيجة أولاً");
     setBusy(true);
@@ -558,6 +560,7 @@ function RequestRow({ row, expanded, onToggle, onChange }: { row: any; expanded:
 function PaymentsTable() {
   const qc = useQueryClient();
   const setProFn = useServerFn(adminSetPro);
+  const adjustFn = useServerFn(adminAdjustCredits);
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "payments"],
     queryFn: async () => {

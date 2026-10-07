@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { adminListMessages, adminMarkMessageRead, adminSetPro, getMyRank } from "@/lib/ranks.functions";
+import { adminAdjustCredits, adminListTasks, adminReviewTask } from "@/lib/admin-credits.functions";
 import { signedUrl, uploadUserFile, publicUrl } from "@/lib/storage";
 import { ShieldCheck, ArrowRight, Check, X, ExternalLink, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -294,23 +295,31 @@ function ModeratorsPanel() {
 function TaskSubmissionsAdminView() {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const listFn = useServerFn(adminListTasks);
+  const reviewFn = useServerFn(adminReviewTask);
 
   const fetchSubmissions = async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from("task_submissions")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (data) setSubmissions(data);
+    try {
+      setSubmissions(await listFn());
+    } catch {
+      toast.error("تعذّر تحميل المهمات");
+    }
     setLoading(false);
   };
 
   useEffect(() => {
     fetchSubmissions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateStatus = async (id: string, status: "approved" | "rejected") => {
-    await supabase.from("task_submissions").update({ status }).eq("id", id);
+    try {
+      const res = await reviewFn({ data: { id, approve: status === "approved" } });
+      toast.success(status === "approved" ? `تم القبول وإضافة ${res.reward} كريدت ✅` : "تم الرفض");
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
     fetchSubmissions();
   };
 
@@ -339,7 +348,8 @@ function TaskSubmissionsAdminView() {
                   {sub.status === 'approved' ? 'مقبول' : sub.status === 'rejected' ? 'مرفوض' : 'معلق'}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">البريد: {sub.user_email}</p>
+              <p className="text-xs text-muted-foreground">البريد: {sub.email ?? sub.user_id}</p>
+              <p className="text-xs font-bold text-yellow-400">المكافأة عند القبول: {sub.reward} كريدت</p>
 
               {isImage(sub.proof_link) ? (
                 <div className="mt-2">
@@ -420,6 +430,7 @@ function RequestRow({ row, expanded, onToggle, onChange }: { row: any; expanded:
     rejected: "bg-red-500/20 text-red-300",
   };
 
+  const adjustFn = useServerFn(adminAdjustCredits);
   const handleApproveAndUpload = async () => {
     if (!resultFile) return toast.error("ارفع ملف النتيجة أولاً");
     setBusy(true);
@@ -427,15 +438,10 @@ function RequestRow({ row, expanded, onToggle, onChange }: { row: any; expanded:
       const path = await uploadUserFile("gen-outputs", row.user_id, resultFile, "result-");
       const url = publicUrl("gen-outputs", path);
 
-      const { data: bal } = await supabase.from("credits").select("balance").eq("user_id", row.user_id).maybeSingle();
-      const newBalance = Math.max(0, Number(bal?.balance ?? 0) - Number(row.credits_charged ?? 0));
-      await supabase.from("credits").update({ balance: newBalance }).eq("user_id", row.user_id);
-      await supabase.from("credit_transactions").insert({
-        user_id: row.user_id,
-        amount: -Number(row.credits_charged ?? 0),
-        kind: "spend",
-        description: `${row.type} request ${row.id}`,
-      });
+      const charge = Math.trunc(Number(row.credits_charged ?? 0));
+      if (charge > 0) {
+        await adjustFn({ data: { userId: row.user_id, amount: -charge, note: `${row.type}_request:${row.id}` } });
+      }
 
       const { error } = await supabase
         .from("generation_requests")
@@ -554,6 +560,7 @@ function RequestRow({ row, expanded, onToggle, onChange }: { row: any; expanded:
 function PaymentsTable() {
   const qc = useQueryClient();
   const setProFn = useServerFn(adminSetPro);
+  const adjustFn = useServerFn(adminAdjustCredits);
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "payments"],
     queryFn: async () => {
@@ -574,15 +581,7 @@ function PaymentsTable() {
       await setProFn({ data: { userId: p.user_id } });
       await supabase.from("profiles").update({ is_pro: true, pro_expires_at: null }).eq("id", p.user_id);
       await supabase.from("user_roles").insert({ user_id: p.user_id, role: "pro" });
-      const { data: bal } = await supabase.from("credits").select("balance").eq("user_id", p.user_id).maybeSingle();
-      const newBalance = Number(bal?.balance ?? 0) + 50;
-      await supabase.from("credits").update({ balance: newBalance }).eq("user_id", p.user_id);
-      await supabase.from("credit_transactions").insert({
-        user_id: p.user_id,
-        amount: 50,
-        kind: "pro_bonus",
-        description: `PRO upgrade — payment ${p.id}`,
-      });
+      await adjustFn({ data: { userId: p.user_id, amount: 50, note: `pro_bonus:${p.id}` } });
       await supabase.from("pending_payments").update({ status: "approved", reviewed_at: new Date().toISOString() }).eq("id", p.id);
       toast.success("تم اعتماد الترقية وإضافة 50 كريديت");
       qc.invalidateQueries({ queryKey: ["admin", "payments"] });
@@ -761,6 +760,7 @@ function GrantCreditsPanel() {
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const adjustFn = useServerFn(adminAdjustCredits);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -768,10 +768,13 @@ function GrantCreditsPanel() {
     if (!email.trim() || !amt) return toast.error("ادخل الإيميل وقيمة الكريديت");
     setBusy(true);
     
-    const res = await supabase.rpc("admin_grant_credits" as any, { _email: email.trim(), _amount: amt, _note: note || null } as any);
-    
+    try {
+      await adjustFn({ data: { email: email.trim(), amount: Math.trunc(amt), note: note || undefined } });
+    } catch (err) {
+      setBusy(false);
+      return toast.error((err as Error).message);
+    }
     setBusy(false);
-    if (res.error) return toast.error(res.error.message);
     toast.success(`تم منح ${amt} كريديت`);
     setAmount(""); setNote("");
   };

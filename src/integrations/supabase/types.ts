@@ -886,6 +886,48 @@ export type Database = {
         }
         Relationships: []
       }
+      lv_task_submissions: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          proof_link: string | null
+          proof_path: string | null
+          reviewed_at: string | null
+          reward: number
+          status: string
+          task_id: string
+          task_title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          proof_link?: string | null
+          proof_path?: string | null
+          reviewed_at?: string | null
+          reward: number
+          status?: string
+          task_id: string
+          task_title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          proof_link?: string | null
+          proof_path?: string | null
+          reviewed_at?: string | null
+          reward?: number
+          status?: string
+          task_id?: string
+          task_title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lv_transactions: {
         Row: {
           amount: number
@@ -1954,6 +1996,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      lv_adjust: {
+        Args: { _amount: number; _reason: string; _uid: string }
+        Returns: number
+      }
       lv_card_action: {
         Args: { _action: string; _phone: string; _spin: string; _uid: string }
         Returns: Json
@@ -1964,6 +2010,10 @@ export type Database = {
         Returns: number
       }
       lv_free_trial: { Args: { _key: string; _uid: string }; Returns: Json }
+      lv_review_task: {
+        Args: { _approve: boolean; _id: string }
+        Returns: Json
+      }
       lv_spin: { Args: { _uid: string }; Returns: Json }
       lv_unlock: {
         Args: { _hours: number; _key: string; _uid: string }

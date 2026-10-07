@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { claimWelcomeCredits } from "@/lib/wallet.functions";
+import { submitTask } from "@/lib/admin-credits.functions";
+import { TASK_REWARDS } from "@/lib/task-rewards";
 
 export const Route = createFileRoute("/tasks")({
   head: () => ({
@@ -68,8 +70,9 @@ function TasksPage() {
   const [files, setFiles] = useState<{ [key: string]: File | null }>({});
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
   const [submitted, setSubmitted] = useState<{ [key: string]: boolean }>({});
+  const submitTaskFn = useServerFn(submitTask);
 
-  const tasks = [
+  const tasks = ([
     { id: "video", title: "صناعة فيديو (TikTok / Shorts)", reward: "25 - 30 كريدت", icon: Video, color: "from-red-500/20 to-purple-500/10", desc: "عمل فيديو قصير (15-30 ثانية) يستعرض ميزة بالذكاء الاصطناعي مع رابط الموقع." },
     { id: "affiliate", title: "دعوة صديق للشراء", reward: "50 كريدت + 10%", icon: Share2, color: "from-green-500/20 to-emerald-500/10", desc: "شارك رابط إحالتك وخذ المكافأة عند شراء صديقك لأول باقة." },
     { id: "social", title: "النشر في مجتمعات الأنمي", reward: "10 - 15 كريدت", icon: MessageSquare, color: "from-blue-500/20 to-cyan-500/10", desc: "انشر بوست توصية بموقعك في جروب أنمي أو ذكاء اصطناعي (أكثر من 5000 عضو)." },
@@ -79,7 +82,7 @@ function TasksPage() {
     { id: "feedback", title: "استبيان التحديث القادم", reward: "3 - 5 كريدت", icon: FileText, color: "from-teal-500/20 to-green-500/10", desc: "أجب على 3 أسئلة قصيرة حول رأيك وتطويرات الموقع القادمة." },
     { id: "helper", title: "البطل المساعد (Community Helper)", reward: "10 كريدت", icon: HelpCircle, color: "from-indigo-500/20 to-purple-500/10", desc: "ساعد زائر جديد في جروب الدعم أو الديسكورد وأرسل سكرين شوت." },
     { id: "seo", title: "كتابة مقال أو تقييم SEO", reward: "20 - 25 كريدت", icon: FileText, color: "from-violet-500/20 to-fuchsia-500/10", desc: "اكتب منشوراً من فقرتين تشرح تجربتك مع الموقع في مجتمع تقني مع رابط الموقع." },
-  ];
+  ]).map((t) => ({ ...t, reward: `${TASK_REWARDS[t.id]?.reward ?? 0} كريدت` }));
 
   const handleFileChange = (taskId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -124,21 +127,12 @@ function TasksPage() {
         }
       }
 
-      const { error: dbError } = await (supabase as any).from("task_submissions").insert({
-        user_id: user.id,
-        user_email: user.email ?? null,
-        task_id: taskId,
-        task_title: taskTitle,
-        proof_link: finalProofUrl,
-        proof_path: proofPath,
-        status: "pending",
-      });
-
-      if (dbError) {
-        console.error("Database insert error:", dbError);
-        alert(`تعذّر حفظ الإثبات: ${dbError.message}`);
-      } else {
+      try {
+        await submitTaskFn({ data: { taskId, proofLink: finalProofUrl, proofPath } });
         setSubmitted({ ...submitted, [taskId]: true });
+        toast.success(`تم إرسال الإثبات ✅ هتاخد ${TASK_REWARDS[taskId]?.reward ?? 0} كريدت بعد موافقة الإدارة`);
+      } catch (e) {
+        alert((e as Error).message);
       }
     } catch (err) {
       console.error("Unexpected error:", err);
@@ -159,7 +153,7 @@ function TasksPage() {
           <h1 className="text-2xl font-black text-purple-400 flex items-center gap-2">
             <Trophy className="h-6 w-6 text-yellow-400" /> مركز المهمات والمكافآت
           </h1>
-          <p className="text-xs text-muted-foreground">أكمل المهمات وارفق صورة/سكرين شوت أو رابط الإثبات للحصول على الكريدت!</p>
+          <p className="text-xs text-muted-foreground">كل مهمة ليها مكافأة ثابتة مكتوبة جنبها، وبتتضاف لرصيدك بعد ما الإدارة توافق على الإثبات.</p>
         </div>
       </div>
 

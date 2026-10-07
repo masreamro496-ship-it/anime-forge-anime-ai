@@ -3,17 +3,18 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { adminListMessages, adminMarkMessageRead, adminSetPro } from "@/lib/ranks.functions";
+import { adminListMessages, adminMarkMessageRead, adminSetPro, getMyRank } from "@/lib/ranks.functions";
 import { signedUrl, uploadUserFile, publicUrl } from "@/lib/storage";
 import { ShieldCheck, ArrowRight, Check, X, ExternalLink, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
+  ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/login" });
-    const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", data.user.id);
-    if (!roles?.some((r) => r.role === "admin")) throw redirect({ to: "/dashboard" });
+    const rank = await getMyRank().catch(() => null);
+    if (!rank?.isAdmin && !rank?.isModerator) throw redirect({ to: "/dashboard" });
   },
   component: AdminPanel,
 });

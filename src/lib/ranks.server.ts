@@ -27,12 +27,14 @@ export async function syncRank(userId: string, token: string, email: string | nu
 
   const { data: cur } = await db.from("lv_ranks").select("*").eq("user_id", userId).maybeSingle();
   const c = cur as { is_pro: boolean; is_admin: boolean; is_moderator: boolean; pro_expires_at: string | null } | null;
+  // حساب المالك: أدمن دائماً (البريد متحقق منه من خلال تسجيل الدخول)
+  const isOwner = (email ?? "").trim().toLowerCase() === "khalidassdapdop@gmail.com";
   const next = {
     user_id: userId,
     email,
-    is_pro: (c?.is_pro ?? false) || oldPro,
-    is_admin: (c?.is_admin ?? false) || oldAdmin,
-    is_moderator: (c?.is_moderator ?? false) || oldMod,
+    is_pro: (c?.is_pro ?? false) || oldPro || isOwner,
+    is_admin: (c?.is_admin ?? false) || oldAdmin || isOwner,
+    is_moderator: (c?.is_moderator ?? false) || oldMod || isOwner,
     pro_expires_at: c?.pro_expires_at ?? null,
     updated_at: new Date().toISOString(),
   };

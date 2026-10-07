@@ -36,6 +36,13 @@
       "when": 1791222832344,
       "tag": "0004_lovable_ranks_admin_messages",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791398331615,
+      "tag": "0005_tighten_permissive_policies",
+      "breakpoints": true
     }
   ]
 }

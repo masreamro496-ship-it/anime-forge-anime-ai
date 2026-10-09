@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
+import { loadGuessGame, submitGuess } from "@/lib/guess.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { ArrowRight, Coins, Eye, Loader2, RefreshCw, Sparkles } from "lucide-react";
@@ -70,38 +72,24 @@ function GuessCharacterPage() {
   const [score, setScore] = useState(0);
   const [balance, setBalance] = useState<number | null>(null);
 
+  const loadFn = useServerFn(loadGuessGame);
+  const guessFn = useServerFn(submitGuess);
+  const qc = useQueryClient();
+
   const load = async () => {
     setLoading(true);
     setResult(null);
     setRevealed(false);
-    const sb = supabase as unknown as {
-      from: (t: string) => {
-        select: (c: string) => Promise<{ data: unknown[] | null; error: { message: string } | null }>;
-      };
-    };
-    const [charsRes, attemptsRes] = await Promise.all([
-      sb.from("guess_characters").select("*"),
-      user
-        ? sb.from("guess_attempts").select("character_id,created_at")
-        : Promise.resolve({ data: [], error: null }),
-    ]);
-
-    if (charsRes.error) {
-      toast.error("مش قادر أجيب الشخصيات: " + charsRes.error.message);
-      setLoading(false);
-      return;
+    try {
+      const { characters, recent } = await loadFn();
+      const done = new Set(recent);
+      const remaining = shuffle(characters.filter((c) => !done.has(c.id)));
+      setAll(characters);
+      setPool(remaining);
+      setCurrent(remaining[0] ?? null);
+    } catch {
+      toast.error("مش قادر أجيب الشخصيات، جرّب تاني");
     }
-
-    const chars = (charsRes.data ?? []) as Character[];
-    const done = new Set(
-      ((attemptsRes.data ?? []) as { character_id: string; created_at?: string }[])
-        .filter((a) => !a.created_at || Date.now() - new Date(a.created_at).getTime() < 5 * 60 * 1000)
-        .map((a) => a.character_id),
-    );
-    const remaining = shuffle(chars.filter((c) => !done.has(c.id)));
-    setAll(chars);
-    setPool(remaining);
-    setCurrent(remaining[0] ?? null);
     setLoading(false);
   };
 
@@ -125,18 +113,9 @@ function GuessCharacterPage() {
       return;
     }
     setSending(true);
-    const { data, error } = await (
-      supabase as unknown as {
-        rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: GuessResult | null; error: { message: string } | null }>;
-      }
-    ).rpc("submit_character_guess", { _character_id: current.id, _answer: answer });
+    const res = (await guessFn({ data: { characterId: current.id, answer } }).catch(() => null)) as GuessResult | null;
     setSending(false);
 
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    const res = data as GuessResult;
     if (!res?.ok) {
       toast.error(ERRORS[res?.error ?? ""] ?? "حصلت مشكلة، جرّب تاني");
       return;
@@ -144,6 +123,7 @@ function GuessCharacterPage() {
     setResult(res);
     setRevealed(true);
     if (typeof res.balance === "number") setBalance(res.balance);
+    qc.invalidateQueries({ queryKey: ["profile"] });
     if (res.correct) {
       setScore((s) => s + 1);
       toast.success(`إجابة صحيحة! +${res.awarded} كريدت 🎉`);

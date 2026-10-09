@@ -98,7 +98,10 @@ function NewProjectPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priceUsd, setPriceUsd] = useState<string>("");
-  const vodafonePhone = ADMIN_VODAFONE;
+  const [walletType, setWalletType] = useState<(typeof WALLETS)[number] | "">("");
+  const [walletPhone, setWalletPhone] = useState("");
+  const [walletConfirmed, setWalletConfirmed] = useState(false);
+  const createFn = useServerFn(createProject);
   const [progress, setProgress] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 

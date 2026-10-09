@@ -59,12 +59,13 @@ export const getProject = createServerFn({ method: "POST" })
     const { wallet_phone, video_url, ...pub } = full;
     const me = await requireOldUser().catch(() => null);
     const isOwner = !!me && me.userId === full.user_id;
-    let purchase: { id: string; status: string } | null = null;
+    type Purchase = { id: string; status: string };
+    let purchase = null as Purchase | null;
     let requests: { id: string; buyer_email: string | null; status: string; created_at: string }[] = [];
     if (me && !isOwner) {
       const { data: pr } = await db.from("lv_project_purchases").select("id, status")
         .eq("project_id", data.id).eq("buyer_id", me.userId).maybeSingle();
-      purchase = pr as typeof purchase;
+      purchase = (pr as Purchase | null) ?? null;
     }
     if (isOwner) {
       const { data: rq } = await db.from("lv_project_purchases").select("id, buyer_email, status, created_at")

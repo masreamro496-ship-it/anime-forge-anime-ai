@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { signCloudinaryUpload } from "@/lib/cloudinary.functions";
+import { createProject, WALLETS } from "@/lib/projects.functions";
 import { ArrowRight, Upload, Video as VideoIcon, DollarSign, Phone, Send, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,7 +22,6 @@ const FREE_MAX_SEC = 10 * 60; // up to 10 minutes
 const PRO_MAX_SEC = 30 * 60;  // up to 30 minutes
 const MIN_SEC = 60;           // minimum 1 minute
 const MAX_BYTES = 500 * 1024 * 1024; // 500MB hard cap for upload
-const ADMIN_VODAFONE = "01080390782";
 
 // Quality 360p eager transform on Cloudinary (applies to all users)
 const EAGER_360 = "w_640,h_360,c_limit,q_auto:eco,vc_h264";
@@ -98,7 +98,10 @@ function NewProjectPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priceUsd, setPriceUsd] = useState<string>("");
-  const vodafonePhone = ADMIN_VODAFONE;
+  const [walletType, setWalletType] = useState<(typeof WALLETS)[number] | "">("");
+  const [walletPhone, setWalletPhone] = useState("");
+  const [walletConfirmed, setWalletConfirmed] = useState(false);
+  const createFn = useServerFn(createProject);
   const [progress, setProgress] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
@@ -119,7 +122,9 @@ function NewProjectPage() {
     if (description.trim().length < 5) return toast.error("اكتب وصفاً مختصراً للمشروع");
     const priceNum = Number(priceUsd);
     if (!priceNum || priceNum <= 0) return toast.error("ادخل سعراً صحيحاً بالدولار");
-    if (vodafonePhone.trim().length < 8) return toast.error("رقم فودافون كاش غير صحيح");
+    if (!walletType) return toast.error("اختار نوع المحفظة (فودافون كاش، وي، ...)");
+    if (!/^01[0125]\d{8}$/.test(walletPhone.trim())) return toast.error("اكتب رقم موبايل مصري صحيح من 11 رقم يبدأ بـ 010 أو 011 أو 012 أو 015");
+    if (!walletConfirmed) return toast.error("أكّد إن الرقم ده عليه محفظة مفعّلة");
     if (!file) return toast.error("اختر ملف الفيديو أولاً");
 
     setSubmitting(true);
@@ -144,17 +149,17 @@ function NewProjectPage() {
       // Cloudinary thumbnail: derived JPG from the video
       const thumbnailUrl = result.secure_url.replace("/video/upload/", "/video/upload/so_auto,w_540,h_960,c_fill,q_auto,f_jpg/").replace(/\.(mp4|mov|webm|mkv)$/i, ".jpg");
 
-      // 3) Persist project metadata via existing RPC
-      const { error: rpcErr } = await (supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }> }).rpc("create_project", {
-        _title: title.trim().slice(0, 100),
-        _description: description.trim().slice(0, 1000),
-        _video_path: playableUrl,
-        _thumbnail_path: thumbnailUrl,
-        _duration_seconds: Math.round(meta?.duration ?? result.duration ?? 0),
-        _price_usd: priceNum,
-        _vodafone_phone: vodafonePhone.trim(),
-      });
-      if (rpcErr) throw rpcErr;
+      // 3) Save the project in the Lovable database — visible to everyone right away
+      await createFn({ data: {
+        title: title.trim(),
+        description: description.trim(),
+        priceUsd: priceNum,
+        walletType: walletType as (typeof WALLETS)[number],
+        walletPhone: walletPhone.trim(),
+        videoUrl: playableUrl,
+        coverUrl: thumbnailUrl,
+        durationSeconds: Math.round(meta?.duration ?? result.duration ?? 0),
+      } });
 
       setProgress(100);
       toast.success("تم نشر مشروعك! سيظهر فوراً للجميع 🎉");
@@ -184,7 +189,7 @@ function NewProjectPage() {
 
       <main className="container mx-auto max-w-2xl px-4 py-8 space-y-5">
         <div className="rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm leading-relaxed">
-          💰 <strong>منصة مشاريع فودافون كاش</strong> — أنشئ مشروعك، ضع سعراً بالدولار ورقم فودافون كاش. المشتري يحوّل لك ثم يطلب التفعيل وأنت توافق.
+          💰 <strong>منصة بيع المشاريع</strong> — أنشئ مشروعك، ضع سعراً بالدولار واختار محفظتك (فودافون كاش، وي، اتصالات، أورانج، إنستا باي). المشروع بيتنشر فوراً للكل، والمشتري يحوّل لك ثم يطلب التفعيل وأنت توافق.
           <br />
           <span className="text-xs opacity-80">
             حدّك الحالي: فيديو حتى <strong>{maxLabel}</strong> · جودة {isPro ? "عالية" : "240p"} (تحويل تلقائي عبر Cloudinary) · حتى <strong>{maxProjects}</strong> مشروع.
@@ -209,14 +214,27 @@ function NewProjectPage() {
               <input type="number" min={1} step={0.01} value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} placeholder="5" className="w-full rounded-lg border border-input bg-background px-4 py-2.5 pr-9 text-right" />
             </div>
           </label>
-          <div className="block">
-            <span className="mb-2 block text-sm font-bold">رقم فودافون كاش (الدفع)</span>
-            <div className="relative">
-              <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold" />
-              <div className="w-full rounded-lg border border-input bg-background/50 px-4 py-2.5 pr-9 font-mono text-sm">{ADMIN_VODAFONE}</div>
-            </div>
-            <p className="mt-1 text-[10px] text-muted-foreground">يدفع المشتري عبر فودافون كاش لهذا الرقم</p>
+        </div>
+
+        <div className="space-y-3 rounded-xl border border-border bg-card p-4">
+          <span className="block text-sm font-bold">محفظة استلام الفلوس</span>
+          <div className="flex flex-wrap gap-2">
+            {WALLETS.map((w) => (
+              <button key={w} type="button" onClick={() => setWalletType(w)}
+                className={`rounded-full border px-3 py-1.5 text-xs font-bold ${walletType === w ? "border-gold bg-gold/15 text-gold" : "border-border"}`}>
+                {w}
+              </button>
+            ))}
           </div>
+          <div className="relative">
+            <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold" />
+            <input inputMode="numeric" value={walletPhone} onChange={(e) => setWalletPhone(e.target.value.replace(/[^0-9]/g, "").slice(0, 11))}
+              placeholder="01xxxxxxxxx" dir="ltr" className="w-full rounded-lg border border-input bg-background px-4 py-2.5 pr-9 font-mono text-sm" />
+          </div>
+          <label className="flex items-start gap-2 text-xs">
+            <input type="checkbox" checked={walletConfirmed} onChange={(e) => setWalletConfirmed(e.target.checked)} className="mt-0.5" />
+            <span>أؤكد إن الرقم ده مسجّل عليه محفظة {walletType || "إلكترونية"} مفعّلة وهستلم عليه فلوس المشترين.</span>
+          </label>
         </div>
 
         <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-border bg-background/40 p-8 hover:border-gold">

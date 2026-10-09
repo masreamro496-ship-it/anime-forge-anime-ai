@@ -1,98 +1,65 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
-import { publicUrl } from "@/lib/storage";
-import { ArrowRight, DollarSign, Phone, ShoppingCart, CheckCircle2, Clock, Lock, Play, ExternalLink } from "lucide-react";
+import { getProject, requestProjectPurchase, reviewProjectPurchase } from "@/lib/projects.functions";
+import { ArrowRight, DollarSign, Phone, ShoppingCart, CheckCircle2, Clock, Lock, Play, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/shorts/$id")({ component: ProjectDetail });
-
-type ProjectPub = {
-  id: string; user_id: string; title: string; description: string;
-  thumbnail_path: string | null; duration_seconds: number | null;
-  price_usd: number; views_count: number;
-};
-
-type Purchase = { id: string; status: "pending" | "approved" | "rejected"; created_at: string };
+export const Route = createFileRoute("/shorts/$id")({
+  head: () => ({
+    meta: [
+      { title: "تفاصيل المشروع — انمي فورج" },
+      { name: "description", content: "تفاصيل مشروع أنمي معروض للبيع وطريقة الدفع على محفظة البائع." },
+      { property: "og:title", content: "تفاصيل المشروع — انمي فورج" },
+      { property: "og:description", content: "شوف المشروع واشتريه بالتحويل على محفظة البائع." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: ProjectDetail,
+});
 
 function ProjectDetail() {
   const { id } = useParams({ from: "/shorts/$id" });
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [sellerPhone, setSellerPhone] = useState<string | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const getFn = useServerFn(getProject);
+  const buyFn = useServerFn(requestProjectPurchase);
+  const reviewFn = useServerFn(reviewProjectPurchase);
 
-  const sb = supabase as unknown as {
-    from: (t: string) => {
-      select: (c: string) => {
-        eq: (k: string, v: unknown) => {
-          maybeSingle: () => Promise<{ data: unknown; error: { message: string } | null }>;
-          eq: (k: string, v: unknown) => { maybeSingle: () => Promise<{ data: unknown; error: { message: string } | null }> };
-        };
-      };
-    };
-    rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
-    storage: { from: (b: string) => { createSignedUrl: (p: string, e: number) => Promise<{ data: { signedUrl: string } | null; error: { message: string } | null }> } };
-  };
-
-  const { data: project, isLoading } = useQuery({
-    queryKey: ["project", id],
-    queryFn: async () => {
-      const res = await sb.from("shorts_public").select("id,user_id,title,description,thumbnail_path,duration_seconds,price_usd,views_count").eq("id", id).maybeSingle();
-      if (res.error) throw new Error(res.error.message);
-      return res.data as ProjectPub | null;
-    },
+  const { data, isLoading } = useQuery({
+    queryKey: ["project", id, user?.id],
+    queryFn: () => getFn({ data: { id } }),
   });
 
-  const { data: myPurchase } = useQuery({
-    queryKey: ["purchase", id, user?.id],
-    enabled: !!user && !!project && user!.id !== project!.user_id,
-    queryFn: async () => {
-      const res = await sb.from("project_purchases").select("id,status,created_at").eq("project_id", id).eq("buyer_id", user!.id).maybeSingle();
-      if (res.error) throw new Error(res.error.message);
-      return res.data as Purchase | null;
-    },
-  });
-
-  const isOwner = !!user && !!project && user.id === project.user_id;
-  const isApproved = myPurchase?.status === "approved";
-
-  // Load video URL when allowed (Cloudinary URLs are direct; legacy storage paths get a signed URL)
-  useEffect(() => {
-    if (!user || !project) return;
-    if (!isOwner && !isApproved) return;
-    (async () => {
-      const { data, error } = await sb.rpc("get_project_video_path", { _project_id: project.id });
-      if (error || !data) return;
-      const path = String(data);
-      if (/^https?:\/\//i.test(path)) {
-        setVideoUrl(path);
-      } else {
-        const pathRes = await sb.storage.from("shorts").createSignedUrl(path, 3600);
-        if (pathRes.data) setVideoUrl(pathRes.data.signedUrl);
-      }
-    })();
-  }, [user, project, isOwner, isApproved]);
-
+  if (isLoading) return <div className="p-10 text-center text-muted-foreground">جاري التحميل...</div>;
+  if (!data) return <div className="p-10 text-center text-muted-foreground">المشروع غير موجود.</div>;
+  const { project, isOwner, purchase, requests, walletPhone, videoUrl } = data;
+  const mins = Math.floor((project.duration_seconds ?? 0) / 60);
+  const secs = (project.duration_seconds ?? 0) % 60;
+  const refresh = () => qc.invalidateQueries({ queryKey: ["project", id] });
 
   const handleBuy = async () => {
     if (!user) return toast.error("سجّل دخولك للشراء");
-    if (!project) return;
-    const res = await sb.rpc("request_purchase", { _project_id: project.id });
-    if (res.error) return toast.error(res.error.message);
-    setSellerPhone(String(res.data ?? ""));
-    qc.invalidateQueries({ queryKey: ["purchase", id, user.id] });
-    toast.success("ظهر لك رقم البائع. حوّل المبلغ ثم اضغط «طلب تفعيل»");
+    try {
+      await buyFn({ data: { id } });
+      toast.success("ظهر لك رقم البائع. حوّل المبلغ وانتظر موافقته");
+      refresh();
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
   };
 
-  if (isLoading) return <div className="p-10 text-center text-muted-foreground">جاري التحميل...</div>;
-  if (!project) return <div className="p-10 text-center text-muted-foreground">المشروع غير موجود.</div>;
-
-  const thumb = project.thumbnail_path ? (/^https?:\/\//i.test(project.thumbnail_path) ? project.thumbnail_path : publicUrl("shorts", project.thumbnail_path)) : undefined;
-  const mins = Math.floor((project.duration_seconds ?? 0) / 60);
-  const secs = (project.duration_seconds ?? 0) % 60;
+  const review = async (purchaseId: string, approve: boolean) => {
+    try {
+      await reviewFn({ data: { purchaseId, approve } });
+      toast.success(approve ? "تمت الموافقة ✅" : "تم الرفض");
+      refresh();
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -104,92 +71,80 @@ function ProjectDetail() {
         </div>
       </header>
 
-      <main className="container mx-auto max-w-3xl px-4 py-6 grid gap-6 md:grid-cols-2">
-        <div className="overflow-hidden rounded-2xl border border-border bg-black aspect-[9/16]">
+      <main className="container mx-auto grid max-w-3xl gap-6 px-4 py-6 md:grid-cols-2">
+        <div className="aspect-[9/16] overflow-hidden rounded-2xl border border-border bg-muted">
           {videoUrl ? (
             <video src={videoUrl} controls playsInline className="h-full w-full object-cover" />
-          ) : thumb ? (
+          ) : (
             <div className="relative h-full w-full">
-              <img src={thumb} alt={project.title} className="h-full w-full object-cover" />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-center">
-                <div className="text-white">
+              {project.cover_url && <img src={project.cover_url} alt={project.title} className="h-full w-full object-cover" />}
+              <div className="absolute inset-0 flex items-center justify-center bg-background/70 text-center">
+                <div>
                   <Lock className="mx-auto h-10 w-10 text-gold" />
                   <p className="mt-2 text-sm font-bold">اشترِ المشروع لمشاهدة الفيديو</p>
                 </div>
               </div>
             </div>
-          ) : null}
+          )}
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-2xl font-black">{project.title || "مشروع بدون عنوان"}</h2>
-          <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{project.description}</p>
-
-          <div className="flex flex-wrap gap-3 text-xs">
+          <h2 className="text-2xl font-black">{project.title}</h2>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{project.description}</p>
+          <div className="flex flex-wrap gap-2 text-xs">
             <span className="flex items-center gap-1 rounded-full bg-gold/15 px-3 py-1 font-black text-gold"><DollarSign className="h-3 w-3" />{Number(project.price_usd).toFixed(2)} USD</span>
+            <span className="flex items-center gap-1 rounded-full bg-card px-3 py-1"><Wallet className="h-3 w-3" /> {project.wallet_type}</span>
             <span className="flex items-center gap-1 rounded-full bg-card px-3 py-1"><Play className="h-3 w-3" /> {mins}:{String(secs).padStart(2, "0")}</span>
             <span className="rounded-full bg-card px-3 py-1">{project.views_count} مشاهدة</span>
           </div>
 
           {isOwner && (
-            <div className="rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm">
-              👑 هذا مشروعك. اذهب للوحة التحكم لإدارة طلبات الشراء.
-              <Link to="/dashboard" className="mt-2 block text-center rounded-lg bg-gradient-gold py-2 font-black text-gold-foreground">لوحة التحكم</Link>
+            <div className="space-y-2 rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm">
+              <p className="font-black">👑 ده مشروعك — طلبات الشراء:</p>
+              {!requests.length && <p className="text-xs text-muted-foreground">مفيش طلبات لسه.</p>}
+              {requests.map((r) => (
+                <div key={r.id} className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card p-2 text-xs">
+                  <span dir="ltr" className="truncate">{r.buyer_email ?? "مشتري"}</span>
+                  {r.status === "pending" ? (
+                    <div className="flex gap-1">
+                      <button onClick={() => review(r.id, true)} className="rounded bg-primary px-2 py-1 font-bold text-primary-foreground">وصلت الفلوس</button>
+                      <button onClick={() => review(r.id, false)} className="rounded border border-border px-2 py-1 font-bold">رفض</button>
+                    </div>
+                  ) : (
+                    <span className="font-bold">{r.status === "approved" ? "✅ مفعّل" : "❌ مرفوض"}</span>
+                  )}
+                </div>
+              ))}
             </div>
           )}
 
-          {!isOwner && !myPurchase && (
-            <button onClick={handleBuy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-black text-white shadow-lg hover:bg-green-700">
+          {!isOwner && !purchase && (
+            <button onClick={handleBuy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 font-black text-primary-foreground">
               <ShoppingCart className="h-5 w-5" /> شراء بـ {Number(project.price_usd).toFixed(2)}$
             </button>
           )}
 
-          {sellerPhone && myPurchase?.status === "pending" && (
-            <div className="rounded-xl border border-gold bg-gold/10 p-4 space-y-2 text-sm">
-              <p className="font-black">حوّل المبلغ لرقم فودافون كاش:</p>
-              <a href={`tel:${sellerPhone}`} className="flex items-center justify-center gap-2 rounded-lg bg-background py-3 text-lg font-black text-gold">
-                <Phone className="h-5 w-5" /> {sellerPhone}
+          {!isOwner && purchase?.status === "pending" && walletPhone && (
+            <div className="space-y-2 rounded-xl border border-gold bg-gold/10 p-4 text-sm">
+              <p className="font-black">حوّل المبلغ على {project.wallet_type}:</p>
+              <a href={`tel:${walletPhone}`} className="flex items-center justify-center gap-2 rounded-lg bg-background py-3 text-lg font-black text-gold" dir="ltr">
+                <Phone className="h-5 w-5" /> {walletPhone}
               </a>
-              <p className="text-xs text-muted-foreground">بعد التحويل اضغط على «طلب تفعيل» وانتظر موافقة البائع/المشرف.</p>
+              <p className="flex items-center gap-1 text-xs text-muted-foreground"><Clock className="h-3 w-3" /> بعد التحويل البائع هيوافق والفيديو هيفتح لك.</p>
             </div>
           )}
 
-          {myPurchase?.status === "pending" && !sellerPhone && (
-            <button onClick={handleBuy} className="flex w-full items-center justify-center gap-2 rounded-xl border border-gold py-3 font-black text-gold">
-              <Clock className="h-5 w-5" /> طلبك معلق — عرض رقم البائع
-            </button>
-          )}
-
-          {myPurchase?.status === "pending" && sellerPhone && (
-            <div className="rounded-xl border border-yellow-500/40 bg-yellow-500/10 p-3 text-center text-sm">
-              <Clock className="mx-auto h-5 w-5 text-yellow-500" />
-              <p className="mt-1 font-bold">طلب التفعيل قيد المراجعة</p>
-              <p className="text-xs text-muted-foreground">سيتم فتح الفيديو فور موافقة البائع أو المشرف.</p>
-            </div>
-          )}
-
-          {myPurchase?.status === "approved" && (
-            <div className="rounded-xl border border-green-500/40 bg-green-500/10 p-3 text-center text-sm">
-              <CheckCircle2 className="mx-auto h-5 w-5 text-green-500" />
+          {purchase?.status === "approved" && (
+            <div className="rounded-xl border border-border bg-card p-3 text-center text-sm">
+              <CheckCircle2 className="mx-auto h-5 w-5 text-primary" />
               <p className="mt-1 font-bold">تم التفعيل! استمتع بالمشروع 🎉</p>
             </div>
           )}
+          {purchase?.status === "rejected" && (
+            <p className="rounded-xl border border-destructive/40 p-3 text-center text-sm text-destructive">البائع رفض الطلب.</p>
+          )}
         </div>
       </main>
-
-      <footer className="border-t border-border/50 bg-background/60">
-        <div className="container mx-auto px-4 py-4 text-center">
-          <a
-            href="https://019e9e18-a975-72fa-b6d2-a39e9f8eb8e0.arena.site/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white shadow-lg hover:bg-blue-700"
-          >
-            <ExternalLink className="h-4 w-4" />
-            تصفّح المزيد من المشاريع
-          </a>
-        </div>
-      </footer>
     </div>
   );
 }

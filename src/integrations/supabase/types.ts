@@ -856,6 +856,166 @@ export type Database = {
         }
         Relationships: []
       }
+      lv_guess_attempts: {
+        Row: {
+          answer: string | null
+          character_id: string
+          created_at: string
+          credits_awarded: number
+          id: string
+          is_correct: boolean
+          user_id: string
+        }
+        Insert: {
+          answer?: string | null
+          character_id: string
+          created_at?: string
+          credits_awarded?: number
+          id?: string
+          is_correct?: boolean
+          user_id: string
+        }
+        Update: {
+          answer?: string | null
+          character_id?: string
+          created_at?: string
+          credits_awarded?: number
+          id?: string
+          is_correct?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lv_guess_attempts_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "lv_guess_characters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lv_guess_characters: {
+        Row: {
+          anime: string | null
+          created_at: string
+          focus_x: number
+          focus_y: number
+          id: string
+          image_url: string
+          is_active: boolean
+          name: string
+          reward: number
+          zoom: number
+        }
+        Insert: {
+          anime?: string | null
+          created_at?: string
+          focus_x?: number
+          focus_y?: number
+          id?: string
+          image_url: string
+          is_active?: boolean
+          name: string
+          reward?: number
+          zoom?: number
+        }
+        Update: {
+          anime?: string | null
+          created_at?: string
+          focus_x?: number
+          focus_y?: number
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          name?: string
+          reward?: number
+          zoom?: number
+        }
+        Relationships: []
+      }
+      lv_project_purchases: {
+        Row: {
+          buyer_email: string | null
+          buyer_id: string
+          created_at: string
+          id: string
+          project_id: string
+          status: string
+        }
+        Insert: {
+          buyer_email?: string | null
+          buyer_id: string
+          created_at?: string
+          id?: string
+          project_id: string
+          status?: string
+        }
+        Update: {
+          buyer_email?: string | null
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          project_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lv_project_purchases_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "lv_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lv_projects: {
+        Row: {
+          author_email: string | null
+          cover_url: string | null
+          created_at: string
+          description: string
+          duration_seconds: number
+          id: string
+          price_usd: number
+          title: string
+          user_id: string
+          video_url: string
+          views_count: number
+          wallet_phone: string
+          wallet_type: string
+        }
+        Insert: {
+          author_email?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description: string
+          duration_seconds?: number
+          id?: string
+          price_usd: number
+          title: string
+          user_id: string
+          video_url: string
+          views_count?: number
+          wallet_phone: string
+          wallet_type: string
+        }
+        Update: {
+          author_email?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string
+          duration_seconds?: number
+          id?: string
+          price_usd?: number
+          title?: string
+          user_id?: string
+          video_url?: string
+          views_count?: number
+          wallet_phone?: string
+          wallet_type?: string
+        }
+        Relationships: []
+      }
       lv_ranks: {
         Row: {
           email: string | null
@@ -2015,6 +2175,10 @@ export type Database = {
         Returns: Json
       }
       lv_spin: { Args: { _uid: string }; Returns: Json }
+      lv_submit_guess: {
+        Args: { _answer: string; _character_id: string; _uid: string }
+        Returns: Json
+      }
       lv_unlock: {
         Args: { _hours: number; _key: string; _uid: string }
         Returns: Json

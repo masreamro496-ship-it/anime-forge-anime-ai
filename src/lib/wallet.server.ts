@@ -52,10 +52,14 @@ export function lovableDb() {
 
 export async function ensureWallet(userId: string, token: string) {
   const db = lovableDb();
-  const { data: existing } = await db.from("lv_wallets").select("balance, welcome_claimed").eq("user_id", userId).maybeSingle();
+  const { data: existing, error: readError } = await db.from("lv_wallets").select("balance, welcome_claimed").eq("user_id", userId).maybeSingle();
+  if (readError) throw readError;
   if (existing) return existing as { balance: number; welcome_claimed: boolean };
   const initial = await readOldCredits(token, userId);
-  await db.rpc("lv_ensure_wallet", { _uid: userId, _initial: initial });
-  const { data } = await db.from("lv_wallets").select("balance, welcome_claimed").eq("user_id", userId).single();
+  const { error: createError } = await db.rpc("lv_ensure_wallet", { _uid: userId, _initial: initial });
+  if (createError) throw createError;
+  const { data, error } = await db.from("lv_wallets").select("balance, welcome_claimed").eq("user_id", userId).single();
+  if (error) throw error;
+  if (!data) throw new Error("wallet_unavailable");
   return data as { balance: number; welcome_claimed: boolean };
 }

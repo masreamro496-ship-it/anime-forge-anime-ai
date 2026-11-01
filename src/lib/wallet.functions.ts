@@ -35,6 +35,8 @@ export const getFeatureStatus = createServerFn({ method: "POST" })
         db.from("lv_feature_passes").select("expires_at").eq("user_id", userId).eq("feature_key", data.key).maybeSingle(),
         db.from("lv_free_trials").select("used_at").eq("user_id", userId).eq("feature_key", data.key).maybeSingle(),
       ]);
+      if (pass.error) throw pass.error;
+      if (trial.error) throw trial.error;
       const exp = (pass.data as { expires_at?: string } | null)?.expires_at ?? null;
       return {
         ok: true as const,

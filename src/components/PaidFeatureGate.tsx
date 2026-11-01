@@ -5,6 +5,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { getFeatureStatus, startFreeTrial, unlockFeature } from "@/lib/wallet.functions";
+import { Button } from "@/components/ui/button";
+import { featureAccessError } from "@/lib/feature-access";
 
 export type FeatureKey = "ai_chat" | "keys" | "art4k" | "dubbing" | "draw2d" | "world_cup";
 
@@ -55,7 +57,9 @@ export function PaidFeatureGate({
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [hours, setHours] = useState(1);
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState<number | null>(null);
+  const [statusError, setStatusError] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
   const [trialUsed, setTrialUsed] = useState(true);
   const hourly = HOURLY.includes(featureKey);
   const meta = FEATURES[featureKey];
@@ -66,17 +70,14 @@ export function PaidFeatureGate({
     else if (to) navigate({ to: to as "/world-cup" });
   };
 
-  const onClick = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (!user) {
-      navigate({ to: "/login" });
-      return;
-    }
+  const loadStatus = async () => {
+    setStatusError(null);
+    setReady(false);
     setBusy(true);
     const s = await statusFn({ data: { key: featureKey } }).catch(() => null);
     setBusy(false);
     if (!s || !s.ok) {
-      toast.error("حصلت مشكلة، جرّب تاني");
+      setStatusError(featureAccessError(s?.error));
       return;
     }
     if (s.active) {
@@ -85,16 +86,27 @@ export function PaidFeatureGate({
     }
     setBalance(s.balance);
     setTrialUsed(s.trialUsed);
+    setReady(true);
+  };
+
+  const onClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
     setHours(1);
+    setBalance(null);
+    setStatusError(null);
+    setReady(false);
+    setTrialUsed(true);
     setOpen(true);
+    if (user) await loadStatus();
   };
 
   const pay = async () => {
+    if (!ready || busy) return;
     setBusy(true);
     const res = await unlockFn({ data: { key: featureKey, hours: hourly ? hours : 1 } }).catch(() => null);
     setBusy(false);
     if (!res || !res.ok) {
-      toast.error(res?.error === "insufficient_credits" ? NO_CREDIT_MSG : "حصلت مشكلة في الدفع، جرّب تاني");
+      toast.error(res?.error === "insufficient_credits" ? NO_CREDIT_MSG : featureAccessError(res?.error));
       return;
     }
     qc.invalidateQueries({ queryKey: ["profile"] });
@@ -104,6 +116,7 @@ export function PaidFeatureGate({
   };
 
   const freeTrial = async () => {
+    if (!ready || busy) return;
     setBusy(true);
     const res = await trialFn({ data: { key: featureKey } }).catch(() => null);
     setBusy(false);
@@ -111,7 +124,7 @@ export function PaidFeatureGate({
       if (res?.error === "trial_used") {
         setTrialUsed(true);
         toast.error("استخدمت التجربة المجانية للأداة دي قبل كده");
-      } else toast.error("حصلت مشكلة، جرّب تاني");
+      } else toast.error(featureAccessError(res?.error));
       return;
     }
     toast.success(`🎁 التجربة المجانية شغالة لحد ${fmt(res.expires_at)}`);
@@ -121,23 +134,27 @@ export function PaidFeatureGate({
 
   return (
     <>
-      <button type="button" onClick={onClick} className={className} style={style} disabled={busy && !open}>
+      <Button variant="ghost" type="button" onClick={onClick} className={`h-auto whitespace-normal ${className ?? ""}`} style={style} disabled={busy && !open}>
         {children}
-      </button>
+      </Button>
 
       {open && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4"
-          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-background/90 p-4"
+          onClick={() => { if (!busy) setOpen(false); }}
         >
           <div
-            className="w-full max-w-sm rounded-2xl border-2 border-gold bg-card p-6 text-center shadow-gold"
+            role="dialog"
+            aria-modal="true"
+            aria-label={meta.label}
+            className="max-h-[90dvh] w-full max-w-sm overflow-y-auto rounded-lg border-2 border-gold bg-card p-6 text-center shadow-gold"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-black text-gradient-gold">{meta.label}</h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              رصيدك: <b className="text-gold">{balance} كريدت</b>
+              {busy && !ready ? "جاري تحميل الرصيد..." : balance === null ? "سجّل الدخول لعرض رصيدك" : <>رصيدك: <b className="text-gold">{balance} كريدت</b></>}
             </p>
+            {statusError && <div role="alert" className="mt-3 text-sm text-destructive"><p>{statusError}</p><Button variant="outline" className="mt-2" disabled={busy} onClick={loadStatus}>إعادة تحميل الرصيد</Button><Button variant="link" onClick={() => navigate({ to: "/login" })}>تسجيل الدخول</Button></div>}
 
             {!trialUsed && (
               <button
@@ -181,16 +198,18 @@ export function PaidFeatureGate({
               </p>
             )}
 
-            <button
+            <Button
               onClick={pay}
-              disabled={busy}
+              disabled={busy || !ready}
               className="mt-5 w-full rounded-xl bg-primary py-3 text-base font-black text-primary-foreground disabled:opacity-60"
             >
               {busy ? "جاري الخصم..." : `ادفع ${total} كريدت وادخل`}
-            </button>
+            </Button>
+            {!user && <Button className="mt-3 w-full" onClick={() => navigate({ to: "/login" })}>تسجيل الدخول</Button>}
 
             <button
               onClick={() => setOpen(false)}
+              disabled={busy}
               className="mt-2 w-full rounded-xl border border-border py-2 text-sm font-bold"
             >
               إلغاء

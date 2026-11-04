@@ -94,8 +94,9 @@ function EditorPage() {
     let canvasInstance: any;
 
     // استيراد المكتبة فقط داخل المتصفح
-    import("fabric").then((module) => {
-      const fabric = module.fabric || module;
+    // استخدم حزمة المتصفح الخاصة بـ fabric حتى لا يتم سحب ملف canvas الأصلي (Node) في بناء الخادم
+    import("fabric/dist/fabric.min.js").then((module: any) => {
+      const fabric = module.fabric || module.default || module;
       fabricModuleRef.current = fabric;
 
       canvasInstance = new fabric.Canvas(canvasElRef.current, {
